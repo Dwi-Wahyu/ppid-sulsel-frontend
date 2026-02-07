@@ -100,7 +100,7 @@
 		<div class="flex items-center gap-3 md:gap-4">
 			<!-- Contact Desktop -->
 			<a
-				href="/contact"
+				href="/kontak"
 				class="hidden text-sm font-medium text-[#4A5568] transition-colors hover:text-[#D4AF37] lg:block dark:text-gray-300"
 				>{m['header.contact']()}</a
 			>
@@ -279,49 +279,49 @@
 						>
 							<li>
 								<a
-									href="/profil-ppid"
+									href="/profil/ppid"
 									class="block border-l-4 border-transparent px-10 py-3 transition-colors hover:border-[#D4AF37] hover:bg-[#1A305E]/5 hover:text-[#D4AF37] lg:px-6"
 									>Profil PPID</a
 								>
 							</li>
 							<li>
 								<a
-									href="/sambutan"
+									href="/profil/sambutan"
 									class="block border-l-4 border-transparent px-10 py-3 transition-colors hover:border-[#D4AF37] hover:bg-[#1A305E]/5 hover:text-[#D4AF37] lg:px-6"
-									>Sambutan</a
+									>Kata Sambutan</a
 								>
 							</li>
 							<li>
 								<a
-									href="/struktur-organisasi"
+									href="/profil/struktur-organisasi"
 									class="block border-l-4 border-transparent px-10 py-3 transition-colors hover:border-[#D4AF37] hover:bg-[#1A305E]/5 hover:text-[#D4AF37] lg:px-6"
 									>Struktur Organisasi</a
 								>
 							</li>
 							<li>
 								<a
-									href="/visi-misi"
+									href="/profil/visi-misi"
 									class="block border-l-4 border-transparent px-10 py-3 transition-colors hover:border-[#D4AF37] hover:bg-[#1A305E]/5 hover:text-[#D4AF37] lg:px-6"
 									>Visi Misi</a
 								>
 							</li>
 							<li>
 								<a
-									href="/tupoksi"
+									href="/profil/tupoksi"
 									class="block border-l-4 border-transparent px-10 py-3 transition-colors hover:border-[#D4AF37] hover:bg-[#1A305E]/5 hover:text-[#D4AF37] lg:px-6"
 									>Tupoksi</a
 								>
 							</li>
 							<li>
 								<a
-									href="/maklumat-pelayanan"
+									href="/profil/maklumat"
 									class="block border-l-4 border-transparent px-10 py-3 transition-colors hover:border-[#D4AF37] hover:bg-[#1A305E]/5 hover:text-[#D4AF37] lg:px-6"
-									>Maklumat</a
+									>Maklumat Pelayanan</a
 								>
 							</li>
 							<li>
 								<a
-									href="/profil-pemprov"
+									href="/profil/pemerintah-sulsel"
 									class="block border-l-4 border-transparent px-10 py-3 transition-colors hover:border-[#D4AF37] hover:bg-[#1A305E]/5 hover:text-[#D4AF37] lg:px-6"
 									>Profil Pemerintah Sulsel</a
 								>
@@ -589,7 +589,7 @@
 				<!-- Contact Mobile Only -->
 				<li class="border-b border-white/10 lg:hidden">
 					<a
-						href="/contact"
+						href="/kontak"
 						class="block px-6 py-4 transition-all hover:bg-white/10 hover:text-white"
 						>{m['header.contact']()}</a
 					>

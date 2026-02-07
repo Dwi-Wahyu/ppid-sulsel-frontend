@@ -37,24 +37,29 @@
 	const sections = [
 		{
 			title: 'header.profile',
-			links: ['footer.about_us', 'footer.vision_mission', 'footer.org_structure', 'footer.tasks']
+			links: [
+				{ label: 'footer.about_us', href: '/profil/ppid' },
+				{ label: 'footer.vision_mission', href: '/profil/visi-misi' },
+				{ label: 'footer.org_structure', href: '/profil/struktur-organisasi' },
+				{ label: 'footer.tasks', href: '/profil/tupoksi' }
+			]
 		},
 		{
 			title: 'header.services',
 			links: [
-				'footer.info_request',
-				'footer.objection',
-				'footer.check_status',
-				'footer.service_survey'
+				{ label: 'footer.info_request', href: '/layanan/permohonan-informasi' },
+				{ label: 'footer.objection', href: '/layanan/pengajuan-keberatan' },
+				{ label: 'footer.check_status', href: '/layanan/permohonan-informasi' },
+				{ label: 'footer.service_survey', href: '/survey/isi-survey' }
 			]
 		},
 		{
 			title: 'header.public_info',
 			links: [
-				'footer.latest_news',
-				'footer.public_info_list',
-				'footer.activity_gallery',
-				'footer.contact'
+				{ label: 'footer.latest_news', href: '/berita' },
+				{ label: 'footer.public_info_list', href: '/informasi-publik' },
+				{ label: 'footer.activity_gallery', href: '#' },
+				{ label: 'footer.contact', href: '/kontak' }
 			]
 		}
 	];
@@ -176,13 +181,13 @@
 						{#each section.links as link}
 							<li>
 								<a
-									href="#"
+									href={link.href}
 									class="group flex items-center justify-center gap-2 text-sm text-gray-400 transition-colors duration-300 hover:text-ppid-accent sm:justify-start md:text-base"
 								>
 									<span
 										class="hidden h-1.5 w-1.5 rounded-full bg-ppid-accent opacity-0 transition-opacity group-hover:opacity-100 sm:block"
 									></span>
-									{m[link]()}
+									{m[link.label]()}
 								</a>
 							</li>
 						{/each}
