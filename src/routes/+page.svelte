@@ -1,3 +1,9 @@
+<script>
+	import Header from '$lib/components/Header.svelte';
+</script>
+
+<Header />
+
 <div
 	class="content container mx-auto space-y-8 p-8 transition-colors duration-300 dark:bg-page-bg-dark dark:text-white"
 >
