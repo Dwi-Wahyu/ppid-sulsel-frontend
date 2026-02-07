@@ -1,0 +1,57 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+/* Tambahkan ini untuk mengaktifkan dark mode via class .dark */
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+	--font-sans:
+		'Figtree', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+		'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+		'Segoe UI Symbol', 'Noto Color Emoji';
+
+	--color-ppid-primary: #800020;
+	--color-ppid-primary-hover: #4a0012;
+	--color-ppid-primary-light: #9b1c31;
+	--color-ppid-primary-dark: #2a000a;
+
+	--color-ppid-accent: #d4af37;
+	--color-ppid-accent-hover: #b08d26;
+	--color-ppid-accent-light: #eac548;
+
+	--color-ppid-text: #000000;
+	--color-ppid-text-light: #666666;
+
+	--color-sidebar-bg: #000000;
+	--color-sidebar-active: #ffffff;
+	--color-sidebar-hover: rgba(255, 255, 255, 0.05);
+
+	--color-ppid-error: #d1001f;
+	--color-ppid-success: #10b981;
+	--color-ppid-warning: #f59e0b;
+	--color-ppid-info: #3b82f6;
+
+	--color-ppid-purple: #800020;
+	--color-ppid-purple-light: #9b1c31;
+	--color-ppid-blue: #800020;
+
+	--color-page-bg: #ffffff;
+	--color-page-bg-dark: #000000;
+
+	--color-dark-blue-gradient: #000000;
+
+	--color-access-primary: #800020;
+	--color-access-primary-hover: #4a0012;
+	--color-access-bg: #ffffff;
+	--color-access-bg-gray: #f9fafb;
+	--color-access-border: #f3f4f6;
+	--color-access-border-orange: #c2410c;
+	--color-access-button: #f9fafb;
+	--color-access-button-hover: #f3f4f6;
+	--color-access-text: #374151;
+	--color-access-text-muted: #9ca3af;
+
+	--background-image-ppid-gradient-main: linear-gradient(to right, #1a305e, #2c3e50);
+	--background-image-ppid-gradient-hover: linear-gradient(to right, #122143, #1a305e);
+}

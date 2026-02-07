@@ -1,0 +1,66 @@
+/* Sidebar specific styles */
+
+.sidebar-link-active {
+    background-color: var(--color-page-bg);
+    border-radius: 20px 0 0 20px;
+    position: relative;
+    color: var(--color-ppid-primary);
+}
+
+/* Inverted border radius effect */
+.sidebar-link-active::before {
+    content: "";
+    position: absolute;
+    top: -20px;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    background-color: transparent;
+    border-bottom-right-radius: 20px;
+    box-shadow: 10px 10px 0 10px var(--color-page-bg);
+    pointer-events: none;
+}
+
+.sidebar-link-active::after {
+    content: "";
+    position: absolute;
+    bottom: -20px;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    background-color: transparent;
+    border-top-right-radius: 20px;
+    box-shadow: 10px -10px 0 10px var(--color-page-bg);
+    pointer-events: none;
+}
+
+/* Scrollbar hiding */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Transitions */
+.sidebar-transition {
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* View Transitions */
+::view-transition-group(active-sidebar-indicator),
+::view-transition-group(active-sidebar-dot) {
+    animation-duration: 0.5s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Ensure only the active indicator moves, not the whole page */
+::view-transition-old(active-sidebar-indicator),
+::view-transition-new(active-sidebar-indicator),
+::view-transition-old(active-sidebar-dot),
+::view-transition-new(active-sidebar-dot) {
+    height: 100%;
+    width: 100%;
+    mix-blend-mode: normal;
+}

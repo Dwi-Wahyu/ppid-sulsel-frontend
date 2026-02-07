@@ -1,0 +1,125 @@
+/* Accessibility Feature Styles */
+
+/* Hide Images */
+body.acc-hide-images img {
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+/* Text Alignment */
+body.acc-text-left main *,
+body.acc-text-left article *,
+body.acc-text-left .content * {
+    text-align: left !important;
+}
+
+body.acc-text-center main *,
+body.acc-text-center article *,
+body.acc-text-center .content * {
+    text-align: center !important;
+}
+
+body.acc-text-right main *,
+body.acc-text-right article *,
+body.acc-text-right .content * {
+    text-align: right !important;
+}
+
+/* Saturation */
+body.acc-high-saturation {
+    filter: saturate(200%);
+}
+
+body.acc-low-saturation {
+    filter: grayscale(100%);
+}
+
+/* Text Spacing - Dyslexia Friendly */
+body.acc-text-spacing * {
+    letter-spacing: 0.12em !important;
+    line-height: 1.8 !important;
+}
+
+/* Widget Hidden State */
+body.acc-widget-hidden #accessibility-widget {
+    display: none !important;
+}
+
+/* High Contrast */
+body.high-contrast {
+    background-color: #000 !important;
+    color: #fff !important;
+}
+body.high-contrast * {
+    background-color: #000 !important;
+    color: #fff !important;
+    border-color: #fff !important;
+}
+
+/* Monochrome */
+body.monochrome {
+    filter: grayscale(100%);
+}
+
+/* Dyslexic Font */
+body.dyslexic-font {
+    font-family: 'OpenDyslexic', sans-serif !important;
+}
+
+/* Bold Text */
+body.bold-text * {
+    font-weight: bold !important;
+}
+
+/* Highlight Links */
+body.highlight-links a {
+    background-color: yellow !important;
+    color: black !important;
+    text-decoration: underline !important;
+    font-weight: bold !important;
+}
+
+/* Highlight Titles */
+body.highlight-titles h1, 
+body.highlight-titles h2, 
+body.highlight-titles h3, 
+body.highlight-titles h4, 
+body.highlight-titles h5, 
+body.highlight-titles h6 {
+    background-color: #ff0 !important;
+    color: #000 !important;
+    padding: 2px 5px !important;
+}
+
+/* Big Cursor */
+body.acc-cursor-big, body.acc-cursor-big * {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="black" stroke="white" stroke-width="1"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/></svg>'), auto !important;
+}
+
+/* Reduce Motion */
+body.reduce-motion * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+}
+
+/* Speech Mode Highlight */
+body.speech-mode *:hover {
+    outline: 2px solid #ff9800 !important;
+    cursor: help !important;
+}
+
+/* Custom Scrollbar for the menu */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
