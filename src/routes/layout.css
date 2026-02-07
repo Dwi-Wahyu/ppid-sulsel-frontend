@@ -5,6 +5,14 @@
 /* Tambahkan ini untuk mengaktifkan dark mode via class .dark */
 @variant dark (&:where(.dark, .dark *));
 
+/* :global(body) {
+	font-family: 'Figtree Variable', sans-serif;
+} */
+
+* {
+	font-family: 'Figtree Variable', sans-serif;
+}
+
 @theme {
 	--font-sans:
 		'Figtree', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,

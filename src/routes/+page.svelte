@@ -1,5 +1,4 @@
 <script>
-	import Header from '$lib/components/Header.svelte';
 	import Hero from '$lib/components/Hero.svelte';
 	import ServiceCards from '$lib/components/ServiceCards.svelte';
 	import ProcessTimeline from '$lib/components/ProcessTimeline.svelte';
@@ -10,8 +9,6 @@
 	import FAQ from '$lib/components/FAQ.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 </script>
-
-<Header />
 
 <Hero />
 

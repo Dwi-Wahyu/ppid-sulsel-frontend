@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import Header from '$lib/components/Header.svelte';
+
 	import Footer from '$lib/components/Footer.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 
@@ -107,8 +107,6 @@
 		fetchBerita();
 	});
 </script>
-
-<Header />
 
 <!-- Breadcrumb + Title Section -->
 <div

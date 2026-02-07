@@ -1,8 +1,8 @@
 <script>
-	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 
+	// Form state
 	let formData = $state({
 		name: '',
 		phone: '',
@@ -11,22 +11,47 @@
 		message: ''
 	});
 
-	function handleSubmit(e) {
+	let isSubmitting = $state(false);
+	let showSuccess = $state(false);
+
+	async function handleSubmit(e) {
 		e.preventDefault();
-		console.log('Form submitted:', formData);
-		// TODO: Implement form submission logic
-		alert('Pesan Anda telah terkirim!');
+		isSubmitting = true;
+
+		try {
+			// Simulate API call
+			await new Promise((resolve) => setTimeout(resolve, 1000));
+
+			// Show success message
+			showSuccess = true;
+
+			// Reset form
+			formData = {
+				name: '',
+				phone: '',
+				email: '',
+				subject: '',
+				message: ''
+			};
+
+			// Hide success message after 5 seconds
+			setTimeout(() => {
+				showSuccess = false;
+			}, 5000);
+		} catch (error) {
+			console.error('Error submitting form:', error);
+		} finally {
+			isSubmitting = false;
+		}
 	}
 </script>
-
-<Header />
 
 <!-- Main Container -->
 <div
 	class="flex min-h-[calc(100vh-80px)] flex-col justify-center bg-gray-50 py-4 font-['Plus_Jakarta_Sans'] lg:py-0 dark:bg-slate-900"
 >
 	<div class="container mx-auto h-full px-4 lg:max-w-7xl">
-		<!-- 1. BREADCRUMB & TITLE (Compact) -->
+		<!-- Breadcrumb & Title -->
 		<div class="mb-4 pt-2 lg:mb-6">
 			<nav class="mb-2 flex text-sm font-medium text-gray-500" aria-label="Breadcrumb">
 				<ol class="inline-flex items-center space-x-1 md:space-x-2">
@@ -37,7 +62,7 @@
 									d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"
 								></path></svg
 							>
-							{m['common.home']()}
+							{m['header.home']()}
 						</a>
 					</li>
 					<li><span class="text-gray-400">/</span></li>
@@ -53,9 +78,9 @@
 			</h1>
 		</div>
 
-		<!-- 2. CONTENT GRID (Fit Screen on Desktop) -->
+		<!-- Content Grid -->
 		<div class="mb-12 grid h-auto gap-4 lg:h-[600px] lg:grid-cols-12 lg:gap-8">
-			<!-- LEFT COLUMN: INFO & MAP (4 Columns) -->
+			<!-- LEFT COLUMN: Info & Map -->
 			<div class="flex h-full flex-col gap-4 lg:col-span-4">
 				<!-- Info Card -->
 				<div
@@ -114,7 +139,7 @@
 							</div>
 						</div>
 
-						<!-- Jam -->
+						<!-- Hours -->
 						<div class="group flex items-center gap-3">
 							<div
 								class="flex h-10 w-10 items-center justify-center rounded-full bg-ppid-primary/10 text-ppid-primary transition-all group-hover:bg-ppid-primary group-hover:text-ppid-accent dark:text-white"
@@ -138,7 +163,7 @@
 							</div>
 						</div>
 
-						<!-- Alamat -->
+						<!-- Address -->
 						<div class="group flex items-start gap-3">
 							<div
 								class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-ppid-primary/10 text-ppid-primary transition-all group-hover:bg-ppid-primary group-hover:text-ppid-accent dark:text-white"
@@ -169,7 +194,7 @@
 					</div>
 				</div>
 
-				<!-- Map (Fills remaining height on desktop) -->
+				<!-- Map -->
 				<div
 					class="min-h-[200px] flex-grow overflow-hidden rounded-xl border border-gray-200 bg-gray-200 shadow-sm dark:border-slate-700"
 				>
@@ -181,13 +206,12 @@
 						allowfullscreen=""
 						loading="lazy"
 						referrerpolicy="no-referrer-when-downgrade"
-						title="Location Map"
-					>
-					</iframe>
+						title="Lokasi Kantor Gubernur Sulawesi Selatan"
+					></iframe>
 				</div>
 			</div>
 
-			<!-- RIGHT COLUMN: FORM (8 Columns) -->
+			<!-- RIGHT COLUMN: Form -->
 			<div class="flex h-full flex-col lg:col-span-8">
 				<div
 					class="flex h-full flex-col justify-between rounded-xl border-t-4 border-ppid-accent bg-white p-6 shadow-lg lg:p-8 dark:bg-slate-800"
@@ -198,8 +222,28 @@
 						</h2>
 						<p class="mb-6 text-sm text-gray-500 dark:text-gray-400">{m['contact.form_desc']()}</p>
 
+						<!-- Success Message -->
+						{#if showSuccess}
+							<div
+								class="mb-6 rounded-lg border-l-4 border-green-500 bg-green-50 p-4 dark:bg-green-900/30"
+							>
+								<div class="flex items-center">
+									<svg class="mr-2 h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+										<path
+											fill-rule="evenodd"
+											d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+											clip-rule="evenodd"
+										/>
+									</svg>
+									<span class="font-semibold text-green-800 dark:text-green-300"
+										>Pesan berhasil dikirim!</span
+									>
+								</div>
+							</div>
+						{/if}
+
 						<form onsubmit={handleSubmit} class="space-y-4">
-							<!-- Row 1: Nama & HP (Grid) -->
+							<!-- Row 1: Name & Phone -->
 							<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 								<div>
 									<label
@@ -210,7 +254,6 @@
 									<input
 										type="text"
 										id="name"
-										name="name"
 										bind:value={formData.name}
 										class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm transition-all focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:border-slate-700 dark:bg-slate-900 dark:text-white"
 										placeholder={m['contact.name_placeholder']()}
@@ -226,7 +269,6 @@
 									<input
 										type="tel"
 										id="phone"
-										name="phone"
 										bind:value={formData.phone}
 										class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm transition-all focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:border-slate-700 dark:bg-slate-900 dark:text-white"
 										placeholder={m['contact.phone_placeholder']()}
@@ -235,7 +277,7 @@
 								</div>
 							</div>
 
-							<!-- Row 2: Email & Subject (Grid) -->
+							<!-- Row 2: Email & Subject -->
 							<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 								<div>
 									<label
@@ -246,7 +288,6 @@
 									<input
 										type="email"
 										id="email"
-										name="email"
 										bind:value={formData.email}
 										class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm transition-all focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:border-slate-700 dark:bg-slate-900 dark:text-white"
 										placeholder={m['contact.email_placeholder']()}
@@ -261,11 +302,11 @@
 									>
 									<select
 										id="subject"
-										name="subject"
 										bind:value={formData.subject}
 										class="w-full cursor-pointer rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm transition-all focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+										required
 									>
-										<option value="" disabled selected>{m['contact.select_topic']()}</option>
+										<option value="" disabled>{m['contact.select_topic']()}</option>
 										<option value="permohonan">{m['contact.topic_request']()}</option>
 										<option value="pengaduan">{m['contact.topic_complaint']()}</option>
 										<option value="saran">{m['contact.topic_suggestion']()}</option>
@@ -282,7 +323,6 @@
 								>
 								<textarea
 									id="message"
-									name="message"
 									bind:value={formData.message}
 									class="h-32 w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-4 py-2.5 text-sm transition-all focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:border-slate-700 dark:bg-slate-900 dark:text-white"
 									placeholder={m['contact.message_placeholder']()}
@@ -290,29 +330,49 @@
 								></textarea>
 							</div>
 
-							<!-- Submit Action -->
+							<!-- Submit Button -->
 							<div class="pt-6">
 								<button
 									type="submit"
-									class="flex w-full transform items-center justify-center gap-2 rounded-lg bg-ppid-primary px-6 py-3 font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-ppid-accent"
+									disabled={isSubmitting}
+									class="flex w-full transform items-center justify-center gap-2 rounded-lg bg-ppid-primary px-6 py-3 font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-ppid-accent disabled:opacity-50"
 								>
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										class="h-5 w-5"
-										viewBox="0 0 20 20"
-										fill="currentColor"
-									>
-										<path
-											d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"
-										/>
-									</svg>
-									{m['contact.submit_btn']()}
+									{#if isSubmitting}
+										<svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
+											<circle
+												class="opacity-25"
+												cx="12"
+												cy="12"
+												r="10"
+												stroke="currentColor"
+												stroke-width="4"
+											></circle>
+											<path
+												class="opacity-75"
+												fill="currentColor"
+												d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+											></path>
+										</svg>
+										<span>Mengirim...</span>
+									{:else}
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-5 w-5"
+											viewBox="0 0 20 20"
+											fill="currentColor"
+										>
+											<path
+												d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"
+											/>
+										</svg>
+										<span>{m['contact.submit_btn']()}</span>
+									{/if}
 								</button>
 							</div>
 						</form>
 					</div>
 
-					<!-- Footer Note in Card -->
+					<!-- Footer Note -->
 					<div class="mt-4 border-t border-gray-100 pt-4">
 						<p class="text-center text-xs text-gray-500 dark:text-gray-400">
 							{m['contact.footer_note']()}

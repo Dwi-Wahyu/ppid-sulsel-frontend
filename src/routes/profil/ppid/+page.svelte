@@ -1,5 +1,4 @@
 <script>
-	import Header from '$lib/components/Header.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import PageTitle from '$lib/components/PageTitle.svelte';
@@ -21,8 +20,6 @@
 		`
 	});
 </script>
-
-<Header />
 
 <!-- Breadcrumb + Title Section -->
 <div

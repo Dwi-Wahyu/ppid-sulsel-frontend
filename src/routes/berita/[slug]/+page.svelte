@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import Header from '$lib/components/Header.svelte';
+
 	import Footer from '$lib/components/Footer.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 
@@ -61,8 +61,6 @@
 		return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 	}
 </script>
-
-<Header />
 
 <!-- Breadcrumb Section -->
 <div class="bg-gray-50 pt-8 pb-4 font-['Plus_Jakarta_Sans'] dark:bg-slate-900">

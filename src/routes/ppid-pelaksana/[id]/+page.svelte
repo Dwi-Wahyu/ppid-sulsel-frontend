@@ -1,6 +1,6 @@
 <script>
 	import { page } from '$app/stores';
-	import Header from '$lib/components/Header.svelte';
+
 	import Footer from '$lib/components/Footer.svelte';
 	import { onMount } from 'svelte';
 
@@ -91,8 +91,6 @@
 		window.scrollTo({ top: 0, behavior: 'smooth' });
 	}
 </script>
-
-<Header />
 
 {#if !skpd}
 	<div class="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-slate-900">

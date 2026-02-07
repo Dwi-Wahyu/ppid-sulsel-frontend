@@ -65,7 +65,7 @@
 </script>
 
 <header
-	class="absolute top-0 left-0 z-50 w-full bg-white font-['Plus_Jakarta_Sans'] shadow-sm transition-colors duration-300 dark:bg-slate-900"
+	class="absolute top-0 left-0 z-50 w-full bg-ppid-primary font-['Plus_Jakarta_Sans'] shadow-md transition-colors duration-300 dark:bg-slate-900"
 >
 	<!-- 1. TOP BAR: LOGO & BAHASA -->
 	<div class="container mx-auto flex items-center justify-between px-4 py-4 md:py-6">
@@ -85,7 +85,7 @@
 			<!-- TEKS SAMPING LOGO -->
 			<div class="flex flex-col justify-center">
 				<span
-					class="font-['Plus_Jakarta_Sans'] text-xs leading-tight font-extrabold text-[#1A305E] transition-colors group-hover:text-[#D4AF37] md:text-base dark:text-white"
+					class="font-['Plus_Jakarta_Sans'] text-xs leading-tight font-extrabold text-white transition-colors group-hover:text-ppid-accent md:text-base dark:text-white"
 				>
 					{m['header.title_1']()}
 				</span>
@@ -98,17 +98,10 @@
 		</a>
 
 		<div class="flex items-center gap-3 md:gap-4">
-			<!-- Contact Desktop -->
-			<a
-				href="/kontak"
-				class="hidden text-sm font-medium text-[#4A5568] transition-colors hover:text-[#D4AF37] lg:block dark:text-gray-300"
-				>{m['header.contact']()}</a
-			>
-
 			<!-- Dark Mode Toggle -->
 			<button
 				onclick={toggleDarkMode}
-				class="rounded-full p-2 text-[#4A5568] transition-all hover:bg-[#1A305E]/5 hover:text-[#D4AF37] dark:text-gray-300 dark:hover:bg-white/10"
+				class="rounded-full p-2 text-white/80 transition-all hover:bg-white/10 hover:text-ppid-accent dark:text-gray-300 dark:hover:bg-white/10"
 				aria-label="Toggle Dark Mode"
 			>
 				{#if !darkMode}
@@ -150,7 +143,7 @@
 			<div class="relative" use:clickOutside={() => (openLang = false)}>
 				<button
 					onclick={() => (openLang = !openLang)}
-					class="flex items-center gap-1 text-sm font-bold text-[#4A5568] uppercase transition-colors hover:text-[#D4AF37] focus:outline-none dark:text-gray-300"
+					class="relative px-3 py-2 text-sm font-bold text-white transition-colors hover:text-ppid-accent focus:outline-none lg:px-4 dark:text-gray-300"
 				>
 					<span>{currentLang}</span>
 					<svg
@@ -186,7 +179,7 @@
 			<!-- TOMBOL HAMBURGER: Hanya muncul di Mobile -->
 			<button
 				onclick={() => (mobileMenu = !mobileMenu)}
-				class="rounded-lg bg-[#1A305E]/5 p-2 text-[#1A305E] lg:hidden dark:bg-white/10 dark:text-white"
+				class="rounded-lg bg-white/10 p-2 text-white lg:hidden dark:bg-white/10 dark:text-white"
 			>
 				{#if !mobileMenu}
 					<svg
@@ -225,12 +218,12 @@
 
 	<!-- 2. NAVIGATION BAR -->
 	<nav
-		class="relative bg-[#1A305E] shadow-md transition-all duration-300 {mobileMenu
+		class="relative bg-ppid-primary shadow-md transition-all duration-300 {mobileMenu
 			? 'block'
 			: 'hidden lg:block'}"
 	>
 		<!-- Gold Line Accent -->
-		<div class="absolute top-0 left-0 h-[2px] w-full bg-[#D4AF37]"></div>
+		<div class="absolute top-0 left-0 h-[1px] w-full bg-white/20"></div>
 
 		<div class="container mx-auto px-0 py-4 lg:px-4">
 			<ul
@@ -244,7 +237,7 @@
 					>
 						{m['header.home']()}
 						<span
-							class="absolute bottom-0 left-0 hidden h-[3px] w-full origin-left scale-x-0 bg-[#D4AF37] transition-transform group-hover:scale-x-100 lg:block"
+							class="absolute bottom-0 left-0 hidden h-[3px] w-full origin-left scale-x-0 bg-ppid-accent transition-transform group-hover:scale-x-100 lg:block"
 						></span>
 					</a>
 				</li>
@@ -257,18 +250,18 @@
 				>
 					<button
 						onclick={() => (window.innerWidth < 1024 ? (openProfil = !openProfil) : null)}
-						class="flex w-full cursor-pointer items-center justify-between px-6 py-4 transition-all hover:text-[#D4AF37] lg:w-auto lg:px-4"
+						class="flex w-full cursor-pointer items-center justify-between px-6 py-4 text-white transition-all hover:text-ppid-accent lg:w-auto lg:px-4"
 					>
 						<span>{m['header.profile']()}</span>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
-							class="h-4 w-4 text-[#D4AF37] transition-transform {openProfil ? 'rotate-180' : ''}"
+							class="h-4 w-4 text-ppid-accent transition-transform {openProfil ? 'rotate-180' : ''}"
 							fill="none"
 							viewBox="0 0 24 24"
 							stroke="currentColor"><path d="m6 9 6 6 6-6" /></svg
 						>
 						<span
-							class="absolute bottom-0 left-0 hidden h-[3px] w-full origin-left scale-x-0 bg-[#D4AF37] transition-transform group-hover:scale-x-100 lg:block"
+							class="absolute bottom-0 left-0 hidden h-[3px] w-full origin-left scale-x-0 bg-ppid-accent transition-transform group-hover:scale-x-100 lg:block"
 						></span>
 					</button>
 
@@ -338,7 +331,7 @@
 					>
 						{m['header.news']()}
 						<span
-							class="absolute bottom-0 left-0 hidden h-[3px] w-full origin-left scale-x-0 bg-[#D4AF37] transition-transform group-hover:scale-x-100 lg:block"
+							class="absolute bottom-0 left-0 hidden h-[3px] w-full origin-left scale-x-0 bg-ppid-accent transition-transform group-hover:scale-x-100 lg:block"
 						></span>
 					</a>
 				</li>
@@ -351,7 +344,7 @@
 				>
 					<button
 						onclick={() => (window.innerWidth < 1024 ? (openDaftar = !openDaftar) : null)}
-						class="flex w-full cursor-pointer items-center justify-between px-6 py-4 transition-all hover:text-[#D4AF37] lg:w-auto lg:px-4"
+						class="flex w-full cursor-pointer items-center justify-between px-6 py-4 text-white transition-all hover:text-ppid-accent lg:w-auto lg:px-4"
 					>
 						<span>{m['header.data_info']()}</span>
 						<svg
@@ -362,7 +355,7 @@
 							stroke="currentColor"><path d="m6 9 6 6 6-6" /></svg
 						>
 						<span
-							class="absolute bottom-0 left-0 hidden h-[3px] w-full origin-left scale-x-0 bg-[#D4AF37] transition-transform group-hover:scale-x-100 lg:block"
+							class="absolute bottom-0 left-0 hidden h-[3px] w-full origin-left scale-x-0 bg-ppid-accent transition-transform group-hover:scale-x-100 lg:block"
 						></span>
 					</button>
 
@@ -411,12 +404,12 @@
 				>
 					<button
 						onclick={() => (window.innerWidth < 1024 ? (openInformasi = !openInformasi) : null)}
-						class="flex w-full cursor-pointer items-center justify-between px-6 py-4 transition-all hover:text-[#D4AF37] lg:w-auto lg:px-4"
+						class="flex w-full cursor-pointer items-center justify-between px-6 py-4 text-white transition-all hover:text-ppid-accent lg:w-auto lg:px-4"
 					>
 						<span>{m['header.public_info']()}</span>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
-							class="h-4 w-4 text-[#D4AF37] transition-transform {openInformasi
+							class="h-4 w-4 text-ppid-accent transition-transform {openInformasi
 								? 'rotate-180'
 								: ''}"
 							fill="none"
@@ -424,7 +417,7 @@
 							stroke="currentColor"><path d="m6 9 6 6 6-6" /></svg
 						>
 						<span
-							class="absolute bottom-0 left-0 hidden h-[3px] w-full origin-left scale-x-0 bg-[#D4AF37] transition-transform group-hover:scale-x-100 lg:block"
+							class="absolute bottom-0 left-0 hidden h-[3px] w-full origin-left scale-x-0 bg-ppid-accent transition-transform group-hover:scale-x-100 lg:block"
 						></span>
 					</button>
 
@@ -479,7 +472,7 @@
 					>
 						{m['header.ppid_implementing']()}
 						<span
-							class="absolute bottom-0 left-0 hidden h-[3px] w-full origin-left scale-x-0 bg-[#D4AF37] transition-transform group-hover:scale-x-100 lg:block"
+							class="absolute bottom-0 left-0 hidden h-[3px] w-full origin-left scale-x-0 bg-ppid-accent transition-transform group-hover:scale-x-100 lg:block"
 						></span>
 					</a>
 				</li>
@@ -492,18 +485,20 @@
 				>
 					<button
 						onclick={() => (window.innerWidth < 1024 ? (openLayanan = !openLayanan) : null)}
-						class="flex w-full cursor-pointer items-center justify-between px-6 py-4 transition-all hover:text-[#D4AF37] lg:w-auto lg:px-4"
+						class="flex w-full cursor-pointer items-center justify-between px-6 py-4 text-white transition-all hover:text-ppid-accent lg:w-auto lg:px-4"
 					>
 						<span>{m['header.services']()}</span>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
-							class="h-4 w-4 text-[#D4AF37] transition-transform {openLayanan ? 'rotate-180' : ''}"
+							class="h-4 w-4 text-ppid-accent transition-transform {openLayanan
+								? 'rotate-180'
+								: ''}"
 							fill="none"
 							viewBox="0 0 24 24"
 							stroke="currentColor"><path d="m6 9 6 6 6-6" /></svg
 						>
 						<span
-							class="absolute bottom-0 left-0 hidden h-[3px] w-full origin-left scale-x-0 bg-[#D4AF37] transition-transform group-hover:scale-x-100 lg:block"
+							class="absolute bottom-0 left-0 hidden h-[3px] w-full origin-left scale-x-0 bg-ppid-accent transition-transform group-hover:scale-x-100 lg:block"
 						></span>
 					</button>
 
@@ -536,6 +531,22 @@
 									SOP
 								</a>
 							</li>
+							<li>
+								<a
+									href="/layanan/cek-status"
+									class="block border-l-4 border-transparent px-10 py-3 transition-colors hover:border-[#D4AF37] hover:bg-[#1A305E]/5 hover:text-[#D4AF37] lg:px-6"
+								>
+									Cek Status
+								</a>
+							</li>
+							<li>
+								<a
+									href="/kontak"
+									class="block border-l-4 border-transparent px-10 py-3 transition-colors hover:border-[#D4AF37] hover:bg-[#1A305E]/5 hover:text-[#D4AF37] lg:px-6"
+								>
+									Kontak
+								</a>
+							</li>
 						</ul>
 					{/if}
 				</li>
@@ -548,18 +559,20 @@
 				>
 					<button
 						onclick={() => (window.innerWidth < 1024 ? (openService = !openService) : null)}
-						class="flex w-full cursor-pointer items-center justify-between px-6 py-4 transition-all hover:text-[#D4AF37] lg:w-auto lg:px-4"
+						class="flex w-full cursor-pointer items-center justify-between px-6 py-4 text-white transition-all hover:text-ppid-accent lg:w-auto lg:px-4"
 					>
 						<span>{m['header.survey']()}</span>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
-							class="h-4 w-4 text-[#D4AF37] transition-transform {openService ? 'rotate-180' : ''}"
+							class="h-4 w-4 text-ppid-accent transition-transform {openService
+								? 'rotate-180'
+								: ''}"
 							fill="none"
 							viewBox="0 0 24 24"
 							stroke="currentColor"><path d="m6 9 6 6 6-6" /></svg
 						>
 						<span
-							class="absolute bottom-0 left-0 hidden h-[3px] w-full origin-left scale-x-0 bg-[#D4AF37] transition-transform group-hover:scale-x-100 lg:block"
+							class="absolute bottom-0 left-0 hidden h-[3px] w-full origin-left scale-x-0 bg-ppid-accent transition-transform group-hover:scale-x-100 lg:block"
 						></span>
 					</button>
 
@@ -584,15 +597,6 @@
 							</li>
 						</ul>
 					{/if}
-				</li>
-
-				<!-- Contact Mobile Only -->
-				<li class="border-b border-white/10 lg:hidden">
-					<a
-						href="/kontak"
-						class="block px-6 py-4 transition-all hover:bg-white/10 hover:text-white"
-						>{m['header.contact']()}</a
-					>
 				</li>
 			</ul>
 		</div>
