@@ -34,7 +34,7 @@
 		updateTheme(darkMode);
 	}
 
-	function updateTheme(isDark: boolean: boolean) {
+	function updateTheme(isDark: boolean) {
 		if (isDark) {
 			document.documentElement.classList.add('dark');
 			localStorage.setItem('theme', 'dark');
