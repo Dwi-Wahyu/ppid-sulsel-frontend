@@ -24,8 +24,6 @@ export const handleAuth: Handle = async ({ event, resolve }) => {
 			}
 		});
 
-		console.log(response);
-
 		if (response.ok) {
 			event.locals.user = await response.json();
 		}

@@ -5,6 +5,7 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { getLocale, localizeHref } from '$lib/paraglide/runtime.js';
 	import { env } from '$env/dynamic/public';
+	import SearchModal from './SearchModal.svelte';
 
 	// State
 	let mobileMenu = $state(false);
@@ -15,6 +16,7 @@
 	let openService = $state(false);
 	let openLang = $state(false);
 	let darkMode = $state(false);
+	let searchModalOpen = $state(false);
 
 	// Computed
 	let currentLang = $derived(getLocale().toUpperCase());
@@ -32,7 +34,7 @@
 		updateTheme(darkMode);
 	}
 
-	function updateTheme(isDark: boolean) {
+	function updateTheme(isDark: boolean: boolean) {
 		if (isDark) {
 			document.documentElement.classList.add('dark');
 			localStorage.setItem('theme', 'dark');
@@ -162,7 +164,33 @@
 				</div>
 			{/if}
 
-			<button onclick={toggleDarkMode} class="rounded-full p-2 text-white/80 hover:bg-white/10">
+			<!-- Search Trigger Button -->
+			<button
+				onclick={() => (searchModalOpen = true)}
+				class="rounded-full p-2 text-white/80 transition-all hover:bg-white/10 hover:text-[#D4AF37]"
+				aria-label="Search"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-5 w-5"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+					/>
+				</svg>
+			</button>
+
+			<button
+				onclick={toggleDarkMode}
+				class="rounded-full p-2 text-white/80 hover:bg-white/10"
+				aria-label="Toggle dark mode"
+			>
 				{#if !darkMode}
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -224,6 +252,7 @@
 			<button
 				onclick={() => (mobileMenu = !mobileMenu)}
 				class="rounded-lg bg-white/10 p-2 text-white lg:hidden"
+				aria-label="Toggle mobile menu"
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -474,4 +503,7 @@
 			</ul>
 		</div>
 	</nav>
+
+	<!-- Search Modal Component -->
+	<SearchModal bind:isOpen={searchModalOpen} />
 </header>

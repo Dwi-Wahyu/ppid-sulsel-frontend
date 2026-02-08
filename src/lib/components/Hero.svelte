@@ -145,7 +145,7 @@
 					<img
 						src={slide}
 						class="pointer-events-none absolute inset-0 h-full w-full bg-white object-cover object-center md:object-contain dark:bg-slate-800"
-						alt="Banner {index + 1}"
+						alt={index}
 					/>
 					<div
 						class="pointer-events-none absolute inset-0 bg-linear-to-t from-ppid-primary/90 via-ppid-primary/40 to-transparent"
