@@ -17,12 +17,14 @@ export const handleAuth: Handle = async ({ event, resolve }) => {
 	const token = event.cookies.get('access_token');
 
 	if (token) {
-		const response = await event.fetch(`${API_URL}/user`, {
+		const response = await event.fetch(`${API_URL}/admin/user`, {
 			headers: {
 				Authorization: `Bearer ${token}`,
 				Accept: 'application/json'
 			}
 		});
+
+		console.log(response);
 
 		if (response.ok) {
 			event.locals.user = await response.json();
