@@ -1,18 +1,34 @@
-<script>
+<script lang="ts">
 	import Footer from '$lib/components/Footer.svelte';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import PageTitle from '$lib/components/PageTitle.svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import { onMount } from 'svelte';
+	import { PUBLIC_API_URL } from '$env/static/public';
 
-	let profil = $state({
-		deskripsi: `
-			<p>Assalamu'alaikum Warahmatullahi Wabarakatuh</p>
-			<p>Segala puji bagi Allah SWT yang telah memberikan rahmat dan karunia-Nya sehingga kita dapat menjalankan tugas dan tanggung jawab dalam melayani masyarakat.</p>
-			<p>Kami menyambut baik kehadiran Anda di portal Pejabat Pengelola Informasi dan Dokumentasi (PPID) Provinsi Sulawesi Selatan. Portal ini merupakan wujud komitmen kami dalam menerapkan prinsip ket erbukaan informasi publik sebagaimana diamanatkan dalam Undang-Undang Nomor 14 Tahun 2008.</p>
-			<p>Melalui portal ini, kami berharap dapat memberikan kemudahan bagi masyarakat dalam mengakses informasi publik yang akurat, relevan, dan terkini. Transparansi merupakan kunci untuk membangun kepercayaan publik dan mewujudkan tata kelola pemerintahan yang baik.</p>
-			<p>Kami terus berkomitmen untuk meningkatkan kualitas pelayanan informasi publik. Kritik dan saran dari masyarakat sangat kami harapkan untuk perbaikan berkelanjutan.</p>
-		`,
+	interface ProfilData {
+		deskripsi: string;
+		foto_kepala: string | null;
+	}
+
+	let profil = $state<ProfilData>({
+		deskripsi: '',
 		foto_kepala: null
+	});
+
+	onMount(async () => {
+		try {
+			const response = await fetch(`${PUBLIC_API_URL}/public/profil/sambutan`);
+			const result = await response.json();
+			if (result.success && result.data) {
+				profil.deskripsi = result.data.deskripsi;
+				if (result.data.foto_kepala) {
+					profil.foto_kepala = `${PUBLIC_API_URL}/storage/${result.data.foto_kepala}`;
+				}
+			}
+		} catch (error) {
+			console.error('Error fetching Sambutan:', error);
+		}
 	});
 </script>
 
@@ -88,7 +104,7 @@
 					</div>
 					<div class="p-5">
 						<div class="rounded-lg border border-ppid-primary/10 bg-ppid-primary/5 p-4">
-							<div class="mb-3 aspect-[3/4] overflow-hidden rounded-lg border-4 border-ppid-accent">
+							<div class="mb-3 aspect-3/4 overflow-hidden rounded-lg border-4 border-ppid-accent">
 								{#if profil.foto_kepala}
 									<img
 										src={profil.foto_kepala}
@@ -97,7 +113,7 @@
 									/>
 								{:else}
 									<div
-										class="flex h-full w-full items-center justify-center bg-gradient-to-br from-ppid-primary to-ppid-text text-white"
+										class="flex h-full w-full items-center justify-center bg-linear-to-br from-ppid-primary to-ppid-text text-white"
 									>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"

@@ -1,23 +1,32 @@
-<script>
+<script lang="ts">
 	import Footer from '$lib/components/Footer.svelte';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import PageTitle from '$lib/components/PageTitle.svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import { onMount } from 'svelte';
+	import { PUBLIC_API_URL } from '$env/static/public';
 
-	let profil = $state({
-		deskripsi: `
-			<h2>Tugas Pokok</h2>
-			<p>PPID memiliki tugas pokok melaksanakan penyimpanan, pendokumentasian, penyediaan, dan pelayanan informasi di lingkungan Pemerintah Provinsi Sulawesi Selatan.</p>
-			
-			<h2>Fungsi</h2>
-			<ol>
-				<li>Penghimpunan informasi publik dari seluruh unit kerja di lingkungan Pemprov Sulsel</li>
-				<li>Penyediaan dan pelayanan informasi publik kepada masyarakat</li>
-				<li>Pendokumentasian informasi publik secara sistematis dan terstruktur</li>
-				<li>Pengujian konsekuensi informasi yang dikecualikan</li>
-				<li>Pengelolaan dan pemeliharaan sistem informasi</li>
-			</ol>
-		`
+	interface ProfilData {
+		deskripsi: string;
+	}
+
+	let profil = $state<ProfilData>({
+		deskripsi: ''
+	});
+	let isLoading = $state(true);
+
+	onMount(async () => {
+		try {
+			const response = await fetch(`${PUBLIC_API_URL}/public/profil/tupoksi`);
+			const result = await response.json();
+			if (result.success && result.data) {
+				profil.deskripsi = result.data.deskripsi;
+			}
+		} catch (error) {
+			console.error('Error fetching Tupoksi profile:', error);
+		} finally {
+			isLoading = false;
+		}
 	});
 </script>
 

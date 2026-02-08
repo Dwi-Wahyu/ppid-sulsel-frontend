@@ -1,15 +1,58 @@
-<script>
+<script lang="ts">
 	import Footer from '$lib/components/Footer.svelte';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import PageTitle from '$lib/components/PageTitle.svelte';
 	import SearchableSelect from '$lib/components/SearchableSelect.svelte';
 	import SuccessModal from '$lib/components/SuccessModal.svelte';
-	import * as m from '$lib/paraglide/messages.js';
+	import { onMount } from 'svelte';
+	import { PUBLIC_API_URL } from '$env/static/public';
+
+	// Interfaces
+	interface Domisili {
+		id: string;
+		nama_daerah: string;
+	}
+
+	interface Pekerjaan {
+		id: string;
+		nama_pekerjaan: string;
+	}
+
+	interface BentukInformasi {
+		id: string;
+		judul: string;
+	}
+
+	interface FormData {
+		nama: string;
+		nik: string;
+		email: string;
+		no_hp: string;
+		pekerjaan_id: string;
+		domisili_id: string;
+		alamat: string;
+		foto_ktp: File | null;
+		dokumen_pendukung: File | null;
+		nmr_pengesahan: string;
+		tujuan: string;
+		rincian: string;
+		id_bentuk_informasi: string;
+		contoh_informasi: string;
+	}
+
+	// Helper function for title case
+	function toTitleCase(str: string) {
+		return str.replace(/\w\S*/g, function (txt) {
+			return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+		});
+	}
 
 	// State
 	let isInstansi = $state(false);
 	let showSuccessModal = $state(false);
-	let formData = $state({
+	let isSubmitting = $state(false);
+	let honeyPot = $state(''); // Honeypot field
+	let formData = $state<FormData>({
 		nama: '',
 		nik: '',
 		email: '',
@@ -26,46 +69,74 @@
 		contoh_informasi: ''
 	});
 
-	// Mock data - replace with actual API calls
-	const masterPekerjaan = [
-		{ id: '1', nama_pekerjaan: 'PNS' },
-		{ id: '2', nama_pekerjaan: 'Swasta' },
-		{ id: '3', nama_pekerjaan: 'Wiraswasta' },
-		{ id: '4', nama_pekerjaan: 'Mahasiswa' },
-		{ id: '5', nama_pekerjaan: 'Pelajar' }
-	];
+	// Data fetching
+	let masterPekerjaan = $state<Pekerjaan[]>([]);
+	let masterDomisili = $state<Domisili[]>([]);
+	let bentukInformasis = $state<BentukInformasi[]>([]);
 
-	const masterDomisili = [
-		{ id: '1', nama_daerah: 'Makassar' },
-		{ id: '2', nama_daerah: 'Gowa' },
-		{ id: '3', nama_daerah: 'Maros' },
-		{ id: '4', nama_daerah: 'Takalar' },
-		{ id: '5', nama_daerah: 'Pangkep' }
-	];
+	onMount(async () => {
+		try {
+			const [resDomisili, resPekerjaan, resBentukInfo] = await Promise.all([
+				fetch(`${PUBLIC_API_URL}/public/domisili`),
+				fetch(`${PUBLIC_API_URL}/public/pekerjaan`),
+				fetch(`${PUBLIC_API_URL}/public/bentuk-informasi`)
+			]);
 
-	const bentukInformasis = [
-		{ id: '1', judul: 'Softcopy (Digital)' },
-		{ id: '2', judul: 'Hardcopy (Cetak)' },
-		{ id: '3', judul: 'Keduanya (Softcopy & Hardcopy)' }
-	];
+			const jsonDomisili = await resDomisili.json();
+			const jsonPekerjaan = await resPekerjaan.json();
+			const jsonBentukInfo = await resBentukInfo.json();
+
+			if (jsonDomisili.data) {
+				masterDomisili = jsonDomisili.data.map((item: any) => ({
+					id: String(item.id),
+					nama_daerah: toTitleCase(item.nama_daerah)
+				}));
+			}
+
+			if (jsonPekerjaan.data) {
+				masterPekerjaan = jsonPekerjaan.data.map((item: any) => ({
+					id: String(item.id),
+					nama_pekerjaan: item.nama_pekerjaan
+				}));
+			}
+
+			if (jsonBentukInfo.data) {
+				bentukInformasis = jsonBentukInfo.data.map((item: any) => ({
+					id: String(item.id),
+					judul: item.judul
+				}));
+			}
+		} catch (error) {
+			console.error('Gagal mengambil data master:', error);
+		}
+	});
 
 	// File upload handlers
-	function handleFileUpload(e, fieldName) {
-		const file = e.target?.files?.[0];
+	function handleFileUpload(e: Event, fieldName: keyof FormData) {
+		const target = e.target as HTMLInputElement;
+		const file = target?.files?.[0];
 		if (file) {
+			// @ts-ignore - dynamic assignment for file
 			formData[fieldName] = file;
 		}
 	}
 
 	// NIK validation
-	function validateNik(e) {
-		const value = e.target.value.replace(/\D/g, '');
+	function validateNik(e: Event) {
+		const target = e.target as HTMLInputElement;
+		const value = target.value.replace(/\D/g, '');
 		formData.nik = value.substring(0, 16);
 	}
 
 	// Form submission
-	async function handleSubmit(e) {
+	async function handleSubmit(e: SubmitEvent) {
 		e.preventDefault();
+
+		// Honeypot check
+		if (honeyPot) {
+			console.warn('Bot detected');
+			return;
+		}
 
 		// Validate NIK
 		if (formData.nik.length !== 16) {
@@ -79,16 +150,70 @@
 			return;
 		}
 
-		// In real app, send to API
-		console.log('Form submitted:', formData);
+		isSubmitting = true;
 
-		// Show success modal
-		showSuccessModal = true;
+		try {
+			const data = new FormData();
 
-		// Reset form after short delay
-		setTimeout(() => {
-			resetForm();
-		}, 2000);
+			// Append simple fields
+			data.append('nama', formData.nama);
+			data.append('nik', formData.nik);
+			data.append('email', formData.email);
+			data.append('no_hp', formData.no_hp);
+			data.append('pekerjaan_id', formData.pekerjaan_id);
+			data.append('domisili_id', formData.domisili_id);
+			data.append('alamat', formData.alamat);
+			data.append('tujuan', formData.tujuan);
+			data.append('rincian', formData.rincian);
+			data.append('id_bentuk_informasi', formData.id_bentuk_informasi);
+
+			// Optional fields
+			if (formData.nmr_pengesahan) data.append('nmr_pengesahan', formData.nmr_pengesahan);
+			if (formData.contoh_informasi) data.append('contoh_informasi', formData.contoh_informasi);
+
+			// Files
+			if (formData.foto_ktp) data.append('foto_ktp', formData.foto_ktp);
+			if (formData.dokumen_pendukung) data.append('dokumen_pendukung', formData.dokumen_pendukung);
+
+			// Honeypot field (should be empty, but sending key for backend check if needed)
+			data.append('website', honeyPot);
+
+			const res = await fetch(`${PUBLIC_API_URL}/public/permohonan-informasi`, {
+				method: 'POST',
+				headers: {
+					Accept: 'application/json'
+				},
+				body: data
+			});
+
+			const json = await res.json();
+
+			if (!res.ok) {
+				if (res.status === 422) {
+					// Validation error
+					const errorMsg = Object.values(json.errors || {})
+						.flat()
+						.join('\n');
+					alert(`Gagal valiasi:\n${errorMsg}`);
+				} else {
+					throw new Error(json.message || 'Terjadi kesalahan pada server');
+				}
+				return;
+			}
+
+			// Show success modal
+			showSuccessModal = true;
+
+			// Reset form after short delay
+			setTimeout(() => {
+				resetForm();
+			}, 2000);
+		} catch (error: any) {
+			console.error('Submission error:', error);
+			alert(error.message || 'Gagal mengirim permohonan. Silakan coba lagi.');
+		} finally {
+			isSubmitting = false;
+		}
 	}
 
 	function resetForm() {
@@ -109,6 +234,7 @@
 			contoh_informasi: ''
 		};
 		isInstansi = false;
+		honeyPot = '';
 	}
 </script>
 
@@ -173,6 +299,15 @@
 				</div>
 
 				<form onsubmit={handleSubmit} class="space-y-8" id="permohonanForm">
+					<!-- Honeypot Field -->
+					<input
+						type="text"
+						name="website"
+						class="hidden"
+						bind:value={honeyPot}
+						autocomplete="off"
+					/>
+
 					<!-- Section 1: Data Pribadi -->
 					<div
 						class="space-y-6 rounded-2xl border border-gray-100 bg-gradient-to-br from-white to-gray-50/50 p-6 dark:border-slate-700 dark:from-slate-800 dark:to-slate-800/50"
@@ -510,29 +645,55 @@
 								type="reset"
 								onclick={resetForm}
 								class="flex items-center justify-center gap-2 rounded-lg bg-gray-100 px-6 py-3 font-semibold text-gray-700 transition-all hover:bg-gray-200"
+								disabled={isSubmitting}
 							>
 								<i class="fas fa-redo"></i>
 								Reset Form
 							</button>
 							<button
 								type="submit"
-								class="flex transform items-center justify-center gap-2 rounded-lg bg-ppid-primary px-8 py-3.5 font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-ppid-primary/90 hover:shadow-xl"
+								class="flex transform items-center justify-center gap-2 rounded-lg bg-ppid-primary px-8 py-3.5 font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-ppid-primary/90 hover:shadow-xl disabled:cursor-not-allowed disabled:bg-gray-400 disabled:hover:translate-y-0"
+								disabled={isSubmitting}
 							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="20"
-									height="20"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								>
-									<line x1="22" x2="11" y1="2" y2="13" />
-									<polygon points="22 2 15 22 11 13 2 9 22 2" />
-								</svg>
-								Kirim Permohonan
+								{#if isSubmitting}
+									<svg
+										class="mr-2 h-5 w-5 animate-spin text-white"
+										xmlns="http://www.w3.org/2000/svg"
+										fill="none"
+										viewBox="0 0 24 24"
+									>
+										<circle
+											class="opacity-25"
+											cx="12"
+											cy="12"
+											r="10"
+											stroke="currentColor"
+											stroke-width="4"
+										></circle>
+										<path
+											class="opacity-75"
+											fill="currentColor"
+											d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+										></path>
+									</svg>
+									Mengirim...
+								{:else}
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="20"
+										height="20"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<line x1="22" x2="11" y1="2" y2="13" />
+										<polygon points="22 2 15 22 11 13 2 9 22 2" />
+									</svg>
+									Kirim Permohonan
+								{/if}
 							</button>
 						</div>
 					</div>

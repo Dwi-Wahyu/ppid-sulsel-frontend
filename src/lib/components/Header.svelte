@@ -32,7 +32,7 @@
 		updateTheme(darkMode);
 	}
 
-	function updateTheme(isDark) {
+	function updateTheme(isDark: boolean) {
 		if (isDark) {
 			document.documentElement.classList.add('dark');
 			localStorage.setItem('theme', 'dark');
@@ -66,28 +66,41 @@
 		waktu: string;
 	}
 
+	interface SocialLink {
+		id_sosmed: number;
+		nm_sosmed: string;
+		link_sosmed: string;
+		icon_sosmed: string;
+	}
+
 	const BACKEND_URL = env.PUBLIC_BACKEND_URL || 'http://localhost:8000';
 
 	// Dynamic Data State
 	let kategoriInformasi = $state<Kategori[]>([]);
 	let listTahun = $state<TahunInfo[]>([]);
+	let socialLinks = $state<SocialLink[]>([]);
 	let isLoading = $state(true);
 
 	onMount(async () => {
 		try {
-			const [resKategori, resTahun] = await Promise.all([
+			const [resKategori, resTahun, resSocial] = await Promise.all([
 				fetch(`${BACKEND_URL}/api/public/informasi/kategori`),
-				fetch(`${BACKEND_URL}/api/public/informasi/tahun`)
+				fetch(`${BACKEND_URL}/api/public/informasi/tahun`),
+				fetch(`${BACKEND_URL}/api/public/social-links`)
 			]);
 
 			const resultKat = await resKategori.json();
 			const resultThn = await resTahun.json();
+			const resultSocial = await resSocial.json();
 
 			if (resultKat.data) {
 				kategoriInformasi = resultKat.data;
 			}
 			if (resultThn.data) {
 				listTahun = resultThn.data;
+			}
+			if (resultSocial.success && resultSocial.data) {
+				socialLinks = resultSocial.data;
 			}
 		} catch (error) {
 			console.error('Gagal mengambil data header:', error);
@@ -117,6 +130,38 @@
 		</a>
 
 		<div class="flex items-center gap-3 md:gap-4">
+			<!-- Social Links -->
+			{#if socialLinks.length > 0}
+				<div class="hidden items-center gap-2 md:flex">
+					{#each socialLinks as social}
+						<a
+							href={social.link_sosmed}
+							target="_blank"
+							rel="noopener noreferrer"
+							title={social.nm_sosmed}
+							class="group flex h-8 w-8 items-center justify-center rounded-full transition-all hover:bg-white/10"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="16"
+								height="16"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								class="text-white/70 transition-all group-hover:scale-110 group-hover:text-white"
+								aria-hidden="true"
+							>
+								{@html social.icon_sosmed}
+							</svg>
+						</a>
+					{/each}
+					<div class="mx-2 h-6 w-px bg-white/20" aria-hidden="true"></div>
+				</div>
+			{/if}
+
 			<button onclick={toggleDarkMode} class="rounded-full p-2 text-white/80 hover:bg-white/10">
 				{#if !darkMode}
 					<svg
@@ -162,7 +207,7 @@
 				{#if openLang}
 					<div
 						transition:fly={{ y: -10, duration: 200 }}
-						class="absolute right-0 z-[60] mt-2 w-24 rounded-xl bg-white py-1 shadow-xl dark:bg-slate-800"
+						class="absolute right-0 z-60 mt-2 w-24 rounded-xl bg-white py-1 shadow-xl dark:bg-slate-800"
 					>
 						<a
 							href={localizeHref(page.url.pathname, { locale: 'id' })}
@@ -199,7 +244,7 @@
 	</div>
 
 	<nav class="relative bg-ppid-primary shadow-md {mobileMenu ? 'block' : 'hidden lg:block'}">
-		<div class="absolute top-0 left-0 h-[1px] w-full bg-white/20"></div>
+		<div class="absolute top-0 left-0 h-px w-full bg-white/20"></div>
 		<div class="container mx-auto py-4">
 			<ul
 				class="flex flex-col items-stretch justify-center text-xs font-medium text-white/90 lg:flex-row lg:items-center lg:text-sm"
@@ -382,6 +427,47 @@
 									>
 								</li>
 							{/each}
+						</ul>
+					{/if}
+				</li>
+
+				<li
+					class="group relative border-b border-white/10 lg:border-none"
+					onmouseenter={() => (window.innerWidth >= 1024 ? (openService = true) : null)}
+					onmouseleave={() => (window.innerWidth >= 1024 ? (openService = false) : null)}
+				>
+					<button
+						onclick={() => (window.innerWidth < 1024 ? (openService = !openService) : null)}
+						class="flex w-full items-center justify-between px-6 py-4 hover:text-ppid-accent lg:px-4"
+					>
+						<span>{m['header.survey']()}</span>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-4 w-4 transition-transform {openService ? 'rotate-180' : ''}"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"><path d="m6 9 6 6 6-6" /></svg
+						>
+					</button>
+					{#if openService}
+						<ul
+							transition:slide
+							class="z-50 w-full bg-white py-2 text-[#1A305E] lg:absolute lg:w-56 lg:rounded-b-lg lg:border-t-4 lg:border-[#D4AF37] dark:bg-slate-800 dark:text-gray-200"
+						>
+							<li>
+								<a
+									href="/survey/isi-survey"
+									class="block border-l-4 border-transparent px-10 py-3 hover:border-[#D4AF37] hover:bg-[#1A305E]/5 lg:px-6"
+									>Isi Survey</a
+								>
+							</li>
+							<li>
+								<a
+									href="/survey/hasil-survey"
+									class="block border-l-4 border-transparent px-10 py-3 hover:border-[#D4AF37] hover:bg-[#1A305E]/5 lg:px-6"
+									>Hasil Survey</a
+								>
+							</li>
 						</ul>
 					{/if}
 				</li>

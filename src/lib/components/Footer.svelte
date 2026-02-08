@@ -1,29 +1,20 @@
-<script>
+<script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
+	import { onMount } from 'svelte';
+	import { env } from '$env/dynamic/public';
 
-	// Mock data - replace with actual API/database data
-	let socials = $state([
-		{
-			name: 'Facebook',
-			link: 'https://www.facebook.com/ppidsulsel',
-			icon: '<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>'
-		},
-		{
-			name: 'Twitter',
-			link: 'https://twitter.com/ppidsulsel',
-			icon: '<path d="M4 4l11.733 16h4.267l-11.733 -16z M4 20l6.768 -6.768 M13.232 10.768l6.768 -6.768"></path>'
-		},
-		{
-			name: 'Instagram',
-			link: 'https://www.instagram.com/ppidsulsel',
-			icon: '<rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>'
-		},
-		{
-			name: 'YouTube',
-			link: 'https://www.youtube.com/@ppidsulsel',
-			icon: '<path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.42a2.78 2.78 0 0 0-1.94 2C1 8.14 1 12 1 12s0 3.86.46 5.58a2.78 2.78 0 0 0 1.94 2c1.72.42 8.6.42 8.6.42s6.88 0 8.6-.42a2.78 2.78 0 0 0 1.94-2C23 15.86 23 12 23 12s0-3.86-.46-5.58z"></path><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"></polygon>'
-		}
-	]);
+	interface SocialLink {
+		id_sosmed: number;
+		nm_sosmed: string;
+		link_sosmed: string;
+		icon_sosmed: string;
+		urutan: number;
+	}
+
+	const BACKEND_URL = env.PUBLIC_BACKEND_URL || 'http://localhost:8000';
+
+	// Social media links from API
+	let socials = $state<SocialLink[]>([]);
 
 	let stats = $state({
 		visitors_total: 125430,
@@ -33,6 +24,19 @@
 
 	let showPrivacyModal = $state(false);
 	let showTermsModal = $state(false);
+
+	onMount(async () => {
+		// Fetch social links from API
+		try {
+			const response = await fetch(`${BACKEND_URL}/api/public/social-links`);
+			const result = await response.json();
+			if (result.success && result.data) {
+				socials = result.data;
+			}
+		} catch (error) {
+			console.error('Failed to fetch social links:', error);
+		}
+	});
 
 	const sections = [
 		{
@@ -177,8 +181,8 @@
 			<div class="flex flex-wrap items-center justify-center gap-2 sm:justify-start xl:gap-3">
 				{#each socials as soc}
 					<a
-						href={soc.link}
-						title={soc.name}
+						href={soc.link_sosmed}
+						title={soc.nm_sosmed}
 						class="group relative flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 transition-all duration-500 hover:-translate-y-1 hover:border-ppid-accent hover:bg-ppid-accent hover:shadow-[0_0_20px_rgba(212,175,55,0.5)]"
 					>
 						<svg
@@ -193,7 +197,7 @@
 							stroke-linejoin="round"
 							class="relative z-10 text-white/70 transition-all duration-500 group-hover:scale-125 group-hover:rotate-12 group-hover:text-ppid-primary"
 						>
-							{@html soc.icon}
+							{@html soc.icon_sosmed}
 						</svg>
 					</a>
 				{/each}
