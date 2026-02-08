@@ -5,9 +5,10 @@
 /* Tambahkan ini untuk mengaktifkan dark mode via class .dark */
 @variant dark (&:where(.dark, .dark *));
 
-/* :global(body) {
-	font-family: 'Figtree Variable', sans-serif;
-} */
+/* Memastikan gambar di dalam konten artikel responsif */
+:global(.prose img) {
+	@apply my-8 h-auto w-full rounded-xl shadow-lg;
+}
 
 * {
 	font-family: 'Figtree Variable', sans-serif;

@@ -107,7 +107,7 @@
 				<!-- Contact Info -->
 				<div class="mb-8 space-y-3 text-sm text-gray-300">
 					<div class="flex items-start justify-center gap-3 sm:justify-start">
-						<div class="mt-1 flex-shrink-0 text-ppid-accent">
+						<div class="mt-1 shrink-0 text-ppid-accent">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								width="18"
@@ -128,7 +128,7 @@
 						<span>{m['footer.address_line']()}</span>
 					</div>
 					<div class="flex items-center justify-center gap-3 sm:justify-start">
-						<div class="flex-shrink-0 text-ppid-accent">
+						<div class="shrink-0 text-ppid-accent">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								width="18"
@@ -147,7 +147,7 @@
 						<span>(0411) 453192</span>
 					</div>
 					<div class="flex items-center justify-center gap-3 sm:justify-start">
-						<div class="flex-shrink-0 text-ppid-accent">
+						<div class="shrink-0 text-ppid-accent">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								width="18"
@@ -167,33 +167,6 @@
 					</div>
 				</div>
 			</div>
-
-			<!-- Links Sections -->
-			{#each sections as section}
-				<div class="text-center sm:text-left">
-					<h4 class="relative mb-6 inline-block text-base font-bold text-white sm:block md:text-lg">
-						{m[section.title]()}
-						<span
-							class="absolute -bottom-2 left-1/2 h-1 w-8 -translate-x-1/2 rounded-full bg-ppid-accent sm:left-0 sm:translate-x-0"
-						></span>
-					</h4>
-					<ul class="mt-4 space-y-3">
-						{#each section.links as link}
-							<li>
-								<a
-									href={link.href}
-									class="group flex items-center justify-center gap-2 text-sm text-gray-400 transition-colors duration-300 hover:text-ppid-accent sm:justify-start md:text-base"
-								>
-									<span
-										class="hidden h-1.5 w-1.5 rounded-full bg-ppid-accent opacity-0 transition-opacity group-hover:opacity-100 sm:block"
-									></span>
-									{m[link.label]()}
-								</a>
-							</li>
-						{/each}
-					</ul>
-				</div>
-			{/each}
 		</div>
 
 		<!-- Top Section: Social Media & Statistics -->
