@@ -5,6 +5,7 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { getLocale, localizeHref } from '$lib/paraglide/runtime.js';
 	import { env } from '$env/dynamic/public';
+	import SearchModal from './SearchModal.svelte';
 
 	// State
 	let mobileMenu = $state(false);
@@ -15,6 +16,7 @@
 	let openService = $state(false);
 	let openLang = $state(false);
 	let darkMode = $state(false);
+	let searchModalOpen = $state(false);
 
 	// Computed
 	let currentLang = $derived(getLocale().toUpperCase());
@@ -32,7 +34,7 @@
 		updateTheme(darkMode);
 	}
 
-	function updateTheme(isDark) {
+	function updateTheme(isDark: boolean) {
 		if (isDark) {
 			document.documentElement.classList.add('dark');
 			localStorage.setItem('theme', 'dark');
@@ -117,7 +119,33 @@
 		</a>
 
 		<div class="flex items-center gap-3 md:gap-4">
-			<button onclick={toggleDarkMode} class="rounded-full p-2 text-white/80 hover:bg-white/10">
+			<!-- Search Trigger Button -->
+			<button
+				onclick={() => (searchModalOpen = true)}
+				class="rounded-full p-2 text-white/80 transition-all hover:bg-white/10 hover:text-[#D4AF37]"
+				aria-label="Search"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-5 w-5"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+					/>
+				</svg>
+			</button>
+
+			<button
+				onclick={toggleDarkMode}
+				class="rounded-full p-2 text-white/80 hover:bg-white/10"
+				aria-label="Toggle dark mode"
+			>
 				{#if !darkMode}
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -162,7 +190,7 @@
 				{#if openLang}
 					<div
 						transition:fly={{ y: -10, duration: 200 }}
-						class="absolute right-0 z-[60] mt-2 w-24 rounded-xl bg-white py-1 shadow-xl dark:bg-slate-800"
+						class="absolute right-0 z-60 mt-2 w-24 rounded-xl bg-white py-1 shadow-xl dark:bg-slate-800"
 					>
 						<a
 							href={localizeHref(page.url.pathname, { locale: 'id' })}
@@ -179,6 +207,7 @@
 			<button
 				onclick={() => (mobileMenu = !mobileMenu)}
 				class="rounded-lg bg-white/10 p-2 text-white lg:hidden"
+				aria-label="Toggle mobile menu"
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -199,7 +228,7 @@
 	</div>
 
 	<nav class="relative bg-ppid-primary shadow-md {mobileMenu ? 'block' : 'hidden lg:block'}">
-		<div class="absolute top-0 left-0 h-[1px] w-full bg-white/20"></div>
+		<div class="absolute top-0 left-0 h-px w-full bg-white/20"></div>
 		<div class="container mx-auto py-4">
 			<ul
 				class="flex flex-col items-stretch justify-center text-xs font-medium text-white/90 lg:flex-row lg:items-center lg:text-sm"
@@ -388,4 +417,7 @@
 			</ul>
 		</div>
 	</nav>
+
+	<!-- Search Modal Component -->
+	<SearchModal bind:isOpen={searchModalOpen} />
 </header>
