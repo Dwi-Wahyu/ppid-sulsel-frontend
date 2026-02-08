@@ -3,6 +3,7 @@
 	import { fly, fade } from 'svelte/transition';
 	import * as m from '$lib/paraglide/messages.js';
 	import { env } from '$env/dynamic/public';
+	import SearchModal from './SearchModal.svelte';
 
 	// Define types based on Laravel API contract
 	interface SlideBanner {
@@ -29,6 +30,7 @@
 	let currentImageSrc = $state('');
 	let timer = $state<ReturnType<typeof setInterval> | null>(null);
 	let isLoading = $state(true);
+	let searchModalOpen = $state(false);
 
 	// Fetch banners from API
 	async function fetchBanners() {
@@ -202,6 +204,7 @@
 
 								<div class="mx-auto max-w-2xl scale-90 sm:scale-100">
 									<button
+										onclick={() => (searchModalOpen = true)}
 										class="group/search hover:shadow-3xl flex w-full items-center gap-1.5 rounded-xl border-2 border-transparent bg-white/95 px-3 py-1.5 shadow-2xl backdrop-blur-md transition-all duration-300 hover:border-ppid-accent/50 hover:shadow-ppid-accent/20 sm:gap-3 sm:rounded-2xl sm:px-6 sm:py-4 dark:bg-slate-800/95"
 									>
 										<div class="shrink-0">
@@ -387,3 +390,6 @@
 		</div>
 	</div>
 {/if}
+
+<!-- Search Modal Component -->
+<SearchModal bind:isOpen={searchModalOpen} />

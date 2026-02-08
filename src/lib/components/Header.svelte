@@ -113,14 +113,14 @@
 </script>
 
 <header
-	class="absolute top-0 left-0 z-50 w-full bg-ppid-primary font-['Plus_Jakarta_Sans'] shadow-md transition-colors duration-300 dark:bg-slate-900"
+	class="absolute top-0 left-0 z-50 w-full bg-white font-['Plus_Jakarta_Sans'] shadow-md transition-colors duration-300 dark:bg-slate-900"
 >
 	<div class="container mx-auto flex items-center justify-between px-4 py-4 md:py-6">
 		<a href="/" class="group flex items-center gap-3">
-			<img src="/logo/ppid-light.png" alt="Logo" class="block h-10 w-auto md:h-14 dark:hidden" />
+			<img src="/images/ppid-3.png" alt="Logo" class="block h-10 w-auto md:h-14 dark:hidden" />
 			<img src="/logo/ppid-dark.png" alt="Logo" class="hidden h-10 w-auto md:h-14 dark:block" />
 			<div class="flex flex-col justify-center">
-				<span class="font-['Plus_Jakarta_Sans'] text-xs font-extrabold text-white md:text-base">
+				<span class="font-['Plus_Jakarta_Sans'] text-xs font-extrabold text-gray-700 md:text-base">
 					{m['header.title_1']()}
 				</span>
 				<span
@@ -167,7 +167,7 @@
 			<!-- Search Trigger Button -->
 			<button
 				onclick={() => (searchModalOpen = true)}
-				class="rounded-full p-2 text-white/80 transition-all hover:bg-white/10 hover:text-[#D4AF37]"
+				class="rounded-full p-2 text-gray-700 transition-all hover:bg-white/10 hover:text-[#D4AF37]"
 				aria-label="Search"
 			>
 				<svg
@@ -188,7 +188,7 @@
 
 			<button
 				onclick={toggleDarkMode}
-				class="rounded-full p-2 text-white/80 hover:bg-white/10"
+				class="rounded-full p-2 text-gray-700 hover:bg-white/10"
 				aria-label="Toggle dark mode"
 			>
 				{#if !darkMode}
@@ -221,7 +221,7 @@
 			<div class="relative" use:clickOutside={() => (openLang = false)}>
 				<button
 					onclick={() => (openLang = !openLang)}
-					class="px-3 py-2 text-sm font-bold text-white hover:text-ppid-accent"
+					class="px-3 py-2 text-sm font-bold text-gray-700 hover:text-ppid-accent"
 				>
 					<span>{currentLang}</span>
 					<svg
