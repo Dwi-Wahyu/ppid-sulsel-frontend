@@ -1,58 +1,75 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { api } from '$lib/api'; // Gunakan helper proxy
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 
+	// State Management (Svelte 5 Runes)
 	let pertanyaan = $state('');
 	let jawaban = $state('');
 	let is_active = $state('1');
 	let urutan = $state<number | null>(null);
 	let isSaving = $state(false);
-
-	// Notification
-	let showNotification = $state(false);
-	let notificationType = $state<'success' | 'error'>('success');
-	let notificationMessage = $state('');
-
-	// Confirmation
 	let showConfirm = $state(false);
 
+	// State untuk error validasi dari backend
+	let errors = $state<Record<string, string[]>>({});
+
+	// Objek notification terpadu untuk menghindari error "Cannot find name notificationType"
+	let notification = $state({
+		show: false,
+		type: 'success' as 'success' | 'error',
+		message: ''
+	});
+
+	/**
+	 * Mengirim data FAQ ke backend menggunakan helper api.post.
+	 * Endpoint: /admin/faq [cite: 1, 24]
+	 */
 	async function handleSubmit() {
 		isSaving = true;
+		showConfirm = false;
+		errors = {};
 
 		try {
-			const formData = new FormData();
-			formData.append('pertanyaan', pertanyaan);
-			formData.append('jawaban', jawaban);
-			formData.append('is_active', is_active);
-			if (urutan !== null) formData.append('urutan', urutan.toString());
-
-			const response = await fetch(`${PUBLIC_API_URL}/admin/faq`, {
-				method: 'POST',
-				credentials: 'include',
-				body: formData
+			// Kirim data sebagai JSON melalui proxy
+			const result = await api.post('/admin/faq', {
+				pertanyaan,
+				jawaban,
+				is_active: parseInt(is_active),
+				urutan
 			});
 
-			const result = await response.json();
+			if (result.success) {
+				notification = {
+					show: true,
+					type: 'success',
+					message: 'FAQ berhasil ditambahkan ke sistem.'
+				};
 
-			if (response.ok) {
-				notificationType = 'success';
-				notificationMessage = 'FAQ berhasil ditambahkan';
-				showNotification = true;
-
+				// Redirect ke halaman daftar setelah sukses [cite: 25]
 				setTimeout(() => {
 					goto('/admin/faq');
 				}, 1500);
-			} else {
-				notificationType = 'error';
-				notificationMessage = result.message || 'Gagal menyimpan FAQ';
-				showNotification = true;
 			}
-		} catch (error) {
-			notificationType = 'error';
-			notificationMessage = 'Terjadi kesalahan saat menyimpan data';
-			showNotification = true;
+		} catch (error: any) {
+			console.error('Submit error:', error);
+
+			// Tangani error validasi (422)
+			if (error.errors) {
+				errors = error.errors;
+				notification = {
+					show: true,
+					type: 'error',
+					message: 'Validasi gagal. Silakan periksa kembali input Anda.'
+				};
+			} else {
+				notification = {
+					show: true,
+					type: 'error',
+					message: error.message || 'Terjadi kesalahan saat menyimpan data.'
+				};
+			}
 		} finally {
 			isSaving = false;
 		}
@@ -63,12 +80,11 @@
 	<title>Tambah FAQ - Admin PPID</title>
 </svelte:head>
 
-<div class="mx-auto max-w-4xl">
-	<!-- Back Button -->
-	<div class="mb-6 flex items-center gap-4">
+<div class="mx-auto max-w-4xl p-6">
+	<header class="mb-8 flex items-center gap-4">
 		<a
 			href="/admin/faq"
-			class="rounded-xl border border-slate-200 bg-white p-2 text-slate-400 transition-all hover:text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:hover:text-slate-300"
+			class="rounded-xl border border-slate-200 bg-white p-2.5 text-slate-400 transition-all hover:text-ppid-primary dark:border-slate-700 dark:bg-slate-800 dark:hover:text-white"
 			aria-label="Kembali ke daftar FAQ"
 		>
 			<svg
@@ -77,23 +93,20 @@
 				fill="none"
 				viewBox="0 0 24 24"
 				stroke="currentColor"
-				aria-hidden="true"
+				stroke-width="2.5"
 			>
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					stroke-width="2"
-					d="M10 19l-7-7m0 0l7-7m-7 7h18"
-				/>
+				<path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
 			</svg>
 		</a>
 		<div>
-			<h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">Form Tambah FAQ</h1>
-			<p class="text-sm text-slate-500 dark:text-slate-400">
-				Tambahkan pertanyaan yang sering diajukan.
+			<h1 class="text-3xl font-black tracking-tight text-slate-800 uppercase dark:text-white">
+				Tambah FAQ
+			</h1>
+			<p class="text-sm font-medium text-slate-500 dark:text-slate-400">
+				Tambahkan pertanyaan bantuan untuk publik
 			</p>
 		</div>
-	</div>
+	</header>
 
 	<form
 		onsubmit={(e) => {
@@ -103,13 +116,12 @@
 		class="space-y-6"
 	>
 		<div
-			class="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+			class="space-y-6 rounded-4xl border border-slate-200 bg-white p-10 shadow-xl shadow-slate-200/50 dark:border-slate-700 dark:bg-slate-800 dark:shadow-none"
 		>
-			<!-- Pertanyaan -->
 			<div>
 				<label
 					for="pertanyaan"
-					class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300"
+					class="mb-3 block text-[10px] font-black tracking-widest text-slate-500 uppercase"
 				>
 					Pertanyaan <span class="text-rose-500">*</span>
 				</label>
@@ -118,104 +130,105 @@
 					id="pertanyaan"
 					bind:value={pertanyaan}
 					required
-					aria-required="true"
-					class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-slate-900 placeholder-slate-400 transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:placeholder-slate-500"
-					placeholder="Masukkan pertanyaan"
+					placeholder="Masukkan kalimat pertanyaan..."
+					class="w-full rounded-2xl border-2 {errors.pertanyaan
+						? 'border-red-400'
+						: 'border-slate-100'} px-5 py-4 text-sm font-bold transition-all outline-none focus:border-ppid-primary dark:bg-slate-900 dark:text-white"
 				/>
+				{#if errors.pertanyaan}
+					<p class="mt-2 text-xs font-bold text-red-500">{errors.pertanyaan[0]}</p>
+				{/if}
 			</div>
 
-			<!-- Jawaban -->
 			<div>
 				<label
 					for="jawaban"
-					class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300"
+					class="mb-3 block text-[10px] font-black tracking-widest text-slate-500 uppercase"
 				>
-					Jawaban <span class="text-rose-500">*</span>
+					Jawaban Lengkap <span class="text-rose-500">*</span>
 				</label>
 				<textarea
 					id="jawaban"
 					bind:value={jawaban}
 					required
-					aria-required="true"
-					rows="5"
-					class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-slate-900 placeholder-slate-400 transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:placeholder-slate-500"
-					placeholder="Masukkan jawaban"
+					rows="6"
+					placeholder="Masukkan penjelasan jawaban..."
+					class="w-full rounded-2xl border-2 {errors.jawaban
+						? 'border-red-400'
+						: 'border-slate-100'} px-5 py-4 text-sm font-bold transition-all outline-none focus:border-ppid-primary dark:bg-slate-900 dark:text-white"
 				></textarea>
+				{#if errors.jawaban}
+					<p class="mt-2 text-xs font-bold text-red-500">{errors.jawaban[0]}</p>
+				{/if}
 			</div>
 
-			<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-				<!-- Status Active -->
+			<div class="grid grid-cols-1 gap-8 md:grid-cols-2">
 				<div>
 					<label
 						for="is_active"
-						class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300"
+						class="mb-3 block text-[10px] font-black tracking-widest text-slate-500 uppercase"
+						>Status Publikasi</label
 					>
-						Status
-					</label>
 					<select
 						id="is_active"
 						bind:value={is_active}
-						class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-slate-900 transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
+						class="w-full rounded-2xl border-2 border-slate-100 px-5 py-4 text-sm font-bold transition-all outline-none focus:border-ppid-primary dark:bg-slate-900 dark:text-white"
 					>
-						<option value="1">Aktif</option>
-						<option value="0">Tidak Aktif</option>
+						<option value="1">Tampilkan (Aktif)</option>
+						<option value="0">Sembunyikan (Draf)</option>
 					</select>
 				</div>
 
-				<!-- Urutan -->
 				<div>
 					<label
 						for="urutan"
-						class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300"
+						class="mb-3 block text-[10px] font-black tracking-widest text-slate-500 uppercase"
+						>Urutan Tampil</label
 					>
-						Urutan (Opsional)
-					</label>
 					<input
 						type="number"
 						id="urutan"
 						bind:value={urutan}
-						class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-slate-900 placeholder-slate-400 transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
 						placeholder="Contoh: 1"
+						class="w-full rounded-2xl border-2 border-slate-100 px-5 py-4 text-sm font-bold transition-all outline-none focus:border-ppid-primary dark:bg-slate-900 dark:text-white"
 					/>
 				</div>
 			</div>
 		</div>
 
-		<!-- Actions -->
-		<div class="flex items-center justify-end gap-3">
+		<footer
+			class="flex items-center justify-end gap-4 border-t border-slate-50 pt-8 dark:border-slate-700"
+		>
 			<a
 				href="/admin/faq"
-				class="rounded-xl border border-slate-200 px-6 py-2.5 text-sm font-semibold text-slate-600 transition-all hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+				class="px-8 py-4 text-xs font-black tracking-widest text-slate-400 uppercase transition-colors hover:text-slate-600"
 			>
 				Batal
 			</a>
 			<button
 				type="submit"
 				disabled={isSaving}
-				aria-busy={isSaving}
-				class="rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+				class="rounded-2xl bg-ppid-primary px-12 py-4 text-xs font-black text-white shadow-xl shadow-ppid-primary/30 transition-all hover:opacity-90 active:scale-95 disabled:opacity-50"
 			>
-				{isSaving ? 'Menyimpan...' : 'Simpan FAQ'}
+				{isSaving ? 'MEMPROSES...' : 'SIMPAN FAQ'}
 			</button>
-		</div>
+		</footer>
 	</form>
 </div>
 
-<!-- Confirmation Dialog -->
 <ConfirmationDialog
 	bind:show={showConfirm}
 	title="Simpan FAQ?"
-	description="Apakah Anda yakin ingin menyimpan FAQ ini?"
+	description="Pastikan data yang dimasukkan sudah benar sebelum dipublikasikan ke website."
 	confirmText="Ya, Simpan"
 	theme="primary"
 	onConfirm={handleSubmit}
 	isLoading={isSaving}
 />
 
-<!-- Notification -->
 <NotificationDialog
-	bind:show={showNotification}
-	theme={notificationType}
-	title={notificationType === 'success' ? 'Berhasil!' : 'Gagal!'}
-	description={notificationMessage}
+	bind:show={notification.show}
+	theme={notification.type}
+	title={notification.type === 'success' ? 'BERHASIL' : 'GAGAL'}
+	description={notification.message}
 />

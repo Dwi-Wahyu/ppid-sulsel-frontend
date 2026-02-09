@@ -349,6 +349,7 @@
 										type="date"
 										bind:value={formData.tanggal}
 										required
+										disabled
 										class="w-full rounded-xl border-2 border-gray-300 bg-white px-5 py-3.5 text-base transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:border-slate-600 dark:bg-slate-800 dark:text-white"
 									/>
 								</div>

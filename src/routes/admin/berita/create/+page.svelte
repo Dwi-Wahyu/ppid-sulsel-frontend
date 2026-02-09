@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { api } from '$lib/api'; // Helper Proxy API
 	import TinyMCE from '$lib/components/TinyMCE.svelte';
 	import FilePond from '$lib/components/FilePond.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
@@ -12,23 +12,29 @@
 		nm_skpd: string;
 	}
 
+	// State Management
 	let judul = $state('');
 	let deskripsi = $state('');
 	let id_skpd = $state('');
-	let verify = $state('t');
+	let verify = $state('n');
+
+	/**
+	 * PERBAIKAN: Pastikan menangani berkas dari FilePond dengan benar.
+	 * Laravel mengharapkan berkas fisik tunggal.
+	 */
 	let img_berita = $state<any>(null);
 
 	let skpdList = $state<SKPD[]>([]);
 	let isLoading = $state(true);
 	let isSaving = $state(false);
-
-	// Notification
-	let showNotification = $state(false);
-	let notificationType = $state<'success' | 'error'>('success');
-	let notificationMessage = $state('');
-
-	// Confirmation
 	let showConfirm = $state(false);
+	let errors = $state<Record<string, string[]>>({});
+
+	let notification = $state({
+		show: false,
+		type: 'success' as 'success' | 'error',
+		message: ''
+	});
 
 	onMount(async () => {
 		await fetchSKPD();
@@ -36,15 +42,8 @@
 
 	async function fetchSKPD() {
 		try {
-			const response = await fetch(`${PUBLIC_API_URL}/admin/skpd`, {
-				credentials: 'include'
-			});
-			const result = await response.json();
-			if (result.data) {
-				skpdList = result.data;
-			}
-		} catch (error) {
-			console.error('Failed to fetch SKPD:', error);
+			const result = await api.get('/admin/skpd');
+			if (result.success) skpdList = result.data || [];
 		} finally {
 			isLoading = false;
 		}
@@ -52,43 +51,59 @@
 
 	async function handleSubmit() {
 		isSaving = true;
+		showConfirm = false;
+		errors = {};
 
 		try {
-			const formData = new FormData();
-			formData.append('judul', judul);
-			formData.append('deskripsi', deskripsi);
-			if (id_skpd) formData.append('id_skpd', id_skpd);
-			formData.append('verify', verify);
+			const data = new FormData();
+			data.append('judul', judul);
+			data.append('deskripsi', deskripsi);
+			data.append('id_skpd', id_skpd);
+			data.append('verify', verify);
 
+			/**
+			 * LOGIKA UNGGAH:
+			 * Jika FilePond mengembalikan array, ambil indeks pertama.
+			 * Laravel mewajibkan 'img_berita' berupa image.
+			 */
 			if (img_berita) {
-				formData.append('img_berita', img_berita);
+				const fileToUpload = Array.isArray(img_berita) ? img_berita[0] : img_berita;
+				data.append('img_berita', fileToUpload);
 			}
 
-			const response = await fetch(`${PUBLIC_API_URL}/admin/berita`, {
-				method: 'POST',
-				credentials: 'include',
-				body: formData
-			});
+			if (img_berita && img_berita.length > 0) {
+				// Mengambil file asli dari item pertama FilePond
+				const rawFile = img_berita[0].file;
+				data.append('img_berita', rawFile);
+			}
 
-			const result = await response.json();
+			// Kirim via helper api.post yang menangani FormData secara otomatis
+			const result = await api.post('/admin/berita', data);
 
-			if (response.ok) {
-				notificationType = 'success';
-				notificationMessage = 'Berita berhasil ditambahkan';
-				showNotification = true;
-
-				setTimeout(() => {
-					goto('/admin/berita');
-				}, 1500);
+			if (result.success) {
+				notification = {
+					show: true,
+					type: 'success',
+					message: 'Berita dan gambar berhasil disimpan.'
+				};
+				setTimeout(() => goto('/admin/berita'), 1500);
+			}
+		} catch (error: any) {
+			console.error('Upload Error:', error);
+			if (error.errors) {
+				errors = error.errors;
+				notification = {
+					show: true,
+					type: 'error',
+					message: errors.img_berita ? errors.img_berita[0] : 'Gagal memvalidasi data.'
+				};
 			} else {
-				notificationType = 'error';
-				notificationMessage = result.message || 'Gagal menyimpan berita';
-				showNotification = true;
+				notification = {
+					show: true,
+					type: 'error',
+					message: error.message || 'Terjadi kesalahan sistem.'
+				};
 			}
-		} catch (error) {
-			notificationType = 'error';
-			notificationMessage = 'Terjadi kesalahan saat menyimpan data';
-			showNotification = true;
 		} finally {
 			isSaving = false;
 		}
@@ -99,144 +114,152 @@
 	<title>Tambah Berita - Admin PPID</title>
 </svelte:head>
 
-<div class="mx-auto max-w-4xl">
-	<div
-		class="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
-	>
-		<!-- Header -->
-		<div class="border-b border-slate-100 p-6 dark:border-slate-700">
-			<h3 class="text-lg font-bold text-ppid-primary dark:text-white">Form Tambah Berita</h3>
-		</div>
+<div class="p-8">
+	<div class="mx-auto max-w-5xl">
+		<header class="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+			<div>
+				<h1 class="text-3xl font-black text-slate-800 uppercase dark:text-white">Tambah Berita</h1>
+				<p class="text-sm font-medium text-slate-500">
+					Publikasikan informasi terbaru ke masyarakat.
+				</p>
+			</div>
+			<a
+				href="/admin/berita"
+				class="rounded-xl border-2 border-slate-100 bg-white px-6 py-3 text-sm font-bold text-slate-400 transition-colors hover:text-slate-600 dark:border-slate-800 dark:bg-slate-800"
+			>
+				KEMBALI KE DAFTAR
+			</a>
+		</header>
 
-		<!-- Form -->
-		<form
-			onsubmit={(e) => {
-				e.preventDefault();
-				showConfirm = true;
-			}}
-			class="space-y-6 p-6"
+		<div
+			class="rounded-4xl border border-slate-200 bg-white shadow-xl shadow-slate-200/50 dark:border-slate-700 dark:bg-slate-800"
 		>
-			<!-- Judul -->
-			<div>
-				<label
-					for="judul"
-					class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-				>
-					Judul Berita
-				</label>
-				<input
-					type="text"
-					id="judul"
-					bind:value={judul}
-					required
-					aria-required="true"
-					class="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm focus:border-ppid-accent focus:ring-1 focus:ring-ppid-accent focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-					placeholder="Masukkan judul berita"
-				/>
-			</div>
-
-			<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-				<!-- SKPD -->
-				<div>
+			<form
+				onsubmit={(e) => {
+					e.preventDefault();
+					showConfirm = true;
+				}}
+				class="space-y-8 p-10"
+			>
+				<div class="space-y-2">
 					<label
-						for="id_skpd"
-						class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
+						for="judul"
+						class="block text-[10px] font-black tracking-widest text-slate-500 uppercase"
+						>Judul Berita</label
 					>
-						SKPD Terkait
-					</label>
-					<select
-						id="id_skpd"
-						bind:value={id_skpd}
-						class="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm focus:border-ppid-accent focus:ring-1 focus:ring-ppid-accent focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-					>
-						<option value="">-- Pilih SKPD --</option>
-						{#each skpdList as skpd}
-							<option value={skpd.id_skpd}>{skpd.nm_skpd}</option>
-						{/each}
-					</select>
-				</div>
-
-				<!-- Status Verifikasi -->
-				<div>
-					<label
-						for="verify"
-						class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-					>
-						Status Verifikasi
-					</label>
-					<select
-						id="verify"
-						bind:value={verify}
+					<input
+						type="text"
+						id="judul"
+						bind:value={judul}
 						required
-						class="w-full rounded-lg border border-slate-200 px-4 py-2 text-sm focus:border-ppid-accent focus:ring-1 focus:ring-ppid-accent focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-					>
-						<option value="n">Belum Verifikasi</option>
-						<option value="y">Terverifikasi</option>
-						<option value="t">Ditolak</option>
-					</select>
+						class="w-full rounded-2xl border-2 {errors.judul
+							? 'border-red-400'
+							: 'border-slate-100'} px-5 py-4 text-sm font-bold outline-none focus:border-ppid-primary dark:bg-slate-900"
+					/>
+					{#if errors.judul}<p class="text-xs font-bold text-red-500">{errors.judul[0]}</p>{/if}
 				</div>
-			</div>
 
-			<!-- Gambar Sampul -->
-			<div>
-				<label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-					Gambar Sampul
-				</label>
-				<FilePond
-					bind:value={img_berita}
-					name="img_berita"
-					acceptedFileTypes={['image/png', 'image/jpeg', 'image/gif']}
-					label="Seret & Letakkan file atau <span class='filepond--label-action'>Telusuri</span>"
-				/>
-			</div>
+				<div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+					<div class="space-y-2">
+						<label
+							for="id_skpd"
+							class="block text-[10px] font-black tracking-widest text-slate-500 uppercase"
+							>SKPD Pengirim</label
+						>
+						<select
+							id="id_skpd"
+							bind:value={id_skpd}
+							required
+							class="w-full rounded-2xl border-2 {errors.id_skpd
+								? 'border-red-400'
+								: 'border-slate-100'} px-5 py-4 text-sm font-bold outline-none focus:border-ppid-primary dark:bg-slate-900 dark:text-white"
+						>
+							<option value="">-- Pilih Unit Kerja --</option>
+							{#each skpdList as skpd}<option value={skpd.id_skpd}>{skpd.nm_skpd}</option>{/each}
+						</select>
+					</div>
 
-			<!-- Konten Berita -->
-			<div>
-				<label
-					for="deskripsi"
-					class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-				>
-					Konten Berita
-				</label>
-				<TinyMCE bind:value={deskripsi} id="deskripsi" height={500} />
-			</div>
+					<div class="space-y-2">
+						<label
+							for="verify"
+							class="block text-[10px] font-black tracking-widest text-slate-500 uppercase"
+							>Status Verifikasi</label
+						>
+						<select
+							id="verify"
+							bind:value={verify}
+							class="w-full rounded-2xl border-2 border-slate-100 px-5 py-4 text-sm font-bold outline-none focus:border-ppid-primary dark:bg-slate-900 dark:text-white"
+						>
+							<option value="n">Draft / Belum Verifikasi</option>
+							<option value="y">Terbit / Verifikasi</option>
+							<option value="t">Tolak</option>
+						</select>
+					</div>
+				</div>
 
-			<!-- Actions -->
-			<div class="flex justify-end gap-3 border-t border-slate-100 pt-6 dark:border-slate-700">
-				<a
-					href="/admin/berita"
-					class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
-				>
-					Batal
-				</a>
-				<button
-					type="submit"
-					disabled={isSaving}
-					aria-busy={isSaving}
-					class="hover:bg-ppid-dark rounded-lg bg-ppid-primary px-4 py-2 text-sm font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-				>
-					{isSaving ? 'Menyimpan...' : 'Simpan Berita'}
-				</button>
-			</div>
-		</form>
+				<div class="space-y-2">
+					<label class="block text-[10px] font-black tracking-widest text-slate-500 uppercase"
+						>Gambar Utama (Max 2MB)</label
+					>
+					<div
+						class="rounded-3xl border-2 {errors.img_berita
+							? 'border-red-400'
+							: 'border-dashed border-slate-200'} p-2 dark:border-slate-700"
+					>
+						<FilePond
+							bind:value={img_berita}
+							name="img_berita"
+							acceptedFileTypes={['image/png', 'image/jpeg', 'image/jpg']}
+							label="Klik atau seret gambar ke sini"
+						/>
+					</div>
+					{#if errors.img_berita}<p class="text-xs font-bold text-red-500">
+							{errors.img_berita[0]}
+						</p>{/if}
+				</div>
+
+				<div class="space-y-2">
+					<label
+						for="deskripsi"
+						class="block text-[10px] font-black tracking-widest text-slate-500 uppercase"
+						>Isi Berita</label
+					>
+					<div class={errors.deskripsi ? 'rounded-2xl border-2 border-red-400' : ''}>
+						<TinyMCE bind:value={deskripsi} id="deskripsi" height={400} />
+					</div>
+				</div>
+
+				<footer class="flex justify-end gap-4 border-t border-slate-50 pt-10 dark:border-slate-700">
+					<button
+						type="button"
+						onclick={() => goto('/admin/berita')}
+						class="px-8 py-4 text-xs font-black text-slate-400 uppercase transition-colors hover:text-slate-600"
+						>Batal</button
+					>
+					<button
+						type="submit"
+						disabled={isSaving}
+						class="rounded-2xl bg-ppid-primary px-12 py-4 text-xs font-black text-white shadow-xl shadow-ppid-primary/30 transition-all hover:opacity-90 disabled:opacity-50"
+					>
+						{isSaving ? 'MEMPROSES...' : 'SIMPAN BERITA'}
+					</button>
+				</footer>
+			</form>
+		</div>
 	</div>
 </div>
 
-<!-- Confirmation Dialog -->
 <ConfirmationDialog
 	bind:show={showConfirm}
 	title="Simpan Berita?"
-	description="Apakah Anda yakin ingin menyimpan berita ini?"
-	confirmText="Ya, Simpan"
+	description="Pastikan gambar dan konten sudah sesuai standar publikasi."
 	theme="primary"
 	onConfirm={handleSubmit}
 	isLoading={isSaving}
 />
-
-<!-- Notification -->
 <NotificationDialog
-	bind:show={showNotification}
-	theme={notificationType}
-	title={notificationType === 'success' ? 'Berhasil!' : 'Gagal!'}
-	description={notificationMessage}
+	bind:show={notification.show}
+	theme={notification.type}
+	title={notification.type === 'success' ? 'BERHASIL' : 'GAGAL'}
+	description={notification.message}
 />

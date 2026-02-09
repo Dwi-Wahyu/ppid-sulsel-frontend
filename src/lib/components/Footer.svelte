@@ -2,6 +2,7 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { onMount } from 'svelte';
 	import { env } from '$env/dynamic/public';
+	import Sosmed from './Sosmed.svelte';
 
 	interface SocialLink {
 		id_sosmed: number;
@@ -13,9 +14,6 @@
 
 	const BACKEND_URL = env.PUBLIC_BACKEND_URL || 'http://localhost:8000';
 
-	// Social media links from API
-	let socials = $state<SocialLink[]>([]);
-
 	let stats = $state({
 		visitors_total: 125430,
 		visitors_today: 234,
@@ -24,19 +22,6 @@
 
 	let showPrivacyModal = $state(false);
 	let showTermsModal = $state(false);
-
-	onMount(async () => {
-		// Fetch social links from API
-		try {
-			const response = await fetch(`${BACKEND_URL}/api/public/social-links`);
-			const result = await response.json();
-			if (result.success && result.data) {
-				socials = result.data;
-			}
-		} catch (error) {
-			console.error('Failed to fetch social links:', error);
-		}
-	});
 
 	const sections = [
 		{
@@ -74,7 +59,7 @@
 	<div class="pointer-events-none absolute inset-0">
 		<img src="/images/kantor.jpeg" class="h-full w-full object-cover" alt="Sulsel Background" />
 		<div
-			class="absolute inset-0 bg-gradient-to-t from-ppid-primary via-ppid-primary/95 to-ppid-primary/90"
+			class="absolute inset-0 bg-linear-to-t from-ppid-primary via-ppid-primary/95 to-ppid-primary/90"
 		></div>
 	</div>
 
@@ -177,31 +162,7 @@
 		<div
 			class="mb-8 flex flex-col items-center gap-8 border-t border-white/10 pt-8 lg:flex-row lg:items-center lg:justify-between"
 		>
-			<!-- Social Media Section -->
-			<div class="flex flex-wrap items-center justify-center gap-2 sm:justify-start xl:gap-3">
-				{#each socials as soc}
-					<a
-						href={soc.link_sosmed}
-						title={soc.nm_sosmed}
-						class="group relative flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/5 transition-all duration-500 hover:-translate-y-1 hover:border-ppid-accent hover:bg-ppid-accent hover:shadow-[0_0_20px_rgba(212,175,55,0.5)]"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="20"
-							height="20"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="relative z-10 text-white/70 transition-all duration-500 group-hover:scale-125 group-hover:rotate-12 group-hover:text-ppid-primary"
-						>
-							{@html soc.icon_sosmed}
-						</svg>
-					</a>
-				{/each}
-			</div>
+			<Sosmed />
 
 			<!-- Statistics Section -->
 			{#if stats}

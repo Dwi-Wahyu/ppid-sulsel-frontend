@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { page } from '$app/state'; // Gunakan parameter dari URL di Svelte 5
+	import { api } from '$lib/api'; // Gunakan helper api
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 
@@ -13,7 +14,7 @@
 		urutan: number | null;
 	}
 
-	let faqId = $state('');
+	let faqId = $state(page.params.id);
 	let pertanyaan = $state('');
 	let jawaban = $state('');
 	let is_active = $state('1');
@@ -21,26 +22,25 @@
 	let isLoading = $state(true);
 	let isSaving = $state(false);
 
-	// Notification
-	let showNotification = $state(false);
-	let notificationType = $state<'success' | 'error'>('success');
-	let notificationMessage = $state('');
+	// Notification states
+	let notification = $state({
+		show: false,
+		type: 'success' as 'success' | 'error',
+		message: ''
+	});
 
-	// Confirmation
 	let showConfirm = $state(false);
 
 	onMount(async () => {
-		faqId = window.location.pathname.split('/')[3]; // Extract ID from URL
 		await fetchFAQ();
 	});
 
+	/**
+	 * Mengambil data FAQ menggunakan api.get
+	 */
 	async function fetchFAQ() {
 		try {
-			const response = await fetch(`${PUBLIC_API_URL}/admin/faq/${faqId}`, {
-				credentials: 'include'
-			});
-			const result = await response.json();
-
+			const result = await api.get(`/admin/faq/${faqId}`);
 			if (result.success) {
 				const data: FAQ = result.data;
 				pertanyaan = data.pertanyaan;
@@ -50,50 +50,38 @@
 			}
 		} catch (error) {
 			console.error('Failed to fetch FAQ:', error);
-			notificationType = 'error';
-			notificationMessage = 'Gagal memuat data FAQ';
-			showNotification = true;
+			notification = { show: true, type: 'error', message: 'Gagal memuat data FAQ' };
 		} finally {
 			isLoading = false;
 		}
 	}
 
+	/**
+	 * Mengirim pembaruan FAQ menggunakan api.put
+	 */
 	async function handleSubmit() {
 		isSaving = true;
+		showConfirm = false;
 
 		try {
-			const formData = new FormData();
-			formData.append('pertanyaan', pertanyaan);
-			formData.append('jawaban', jawaban);
-			formData.append('is_active', is_active);
-			if (urutan !== null) formData.append('urutan', urutan.toString());
-			formData.append('_method', 'PUT');
-
-			const response = await fetch(`${PUBLIC_API_URL}/admin/faq/${faqId}`, {
-				method: 'POST',
-				credentials: 'include',
-				body: formData
+			const result = await api.put(`/admin/faq/${faqId}`, {
+				pertanyaan,
+				jawaban,
+				is_active: parseInt(is_active),
+				urutan
 			});
 
-			const result = await response.json();
-
-			if (response.ok) {
-				notificationType = 'success';
-				notificationMessage = 'FAQ berhasil diperbarui';
-				showNotification = true;
-
-				setTimeout(() => {
-					goto('/admin/faq');
-				}, 1500);
-			} else {
-				notificationType = 'error';
-				notificationMessage = result.message || 'Gagal memperbarui FAQ';
-				showNotification = true;
+			if (result.success) {
+				notification = { show: true, type: 'success', message: 'FAQ berhasil diperbarui' };
+				setTimeout(() => goto('/admin/faq'), 1500);
 			}
-		} catch (error) {
-			notificationType = 'error';
-			notificationMessage = 'Terjadi kesalahan saat menyimpan data';
-			showNotification = true;
+		} catch (error: any) {
+			console.error('Submit error:', error);
+			notification = {
+				show: true,
+				type: 'error',
+				message: error.message || 'Terjadi kesalahan saat menyimpan data'
+			};
 		} finally {
 			isSaving = false;
 		}
@@ -105,12 +93,11 @@
 </svelte:head>
 
 <div class="mx-auto max-w-4xl space-y-6">
-	<!-- Header -->
 	<div class="flex items-center gap-4">
 		<a
 			href="/admin/faq"
-			class="rounded-xl border border-slate-200 bg-white p-2 text-slate-400 transition-all hover:text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:hover:text-slate-300"
-			aria-label="Kembali ke daftar FAQ"
+			class="rounded-xl border border-slate-200 bg-white p-2 text-slate-400 transition-all hover:text-slate-600 dark:border-slate-700 dark:bg-slate-800"
+			aria-label="Kembali"
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -118,7 +105,6 @@
 				fill="none"
 				viewBox="0 0 24 24"
 				stroke="currentColor"
-				aria-hidden="true"
 			>
 				<path
 					stroke-linecap="round"
@@ -129,32 +115,20 @@
 			</svg>
 		</a>
 		<div>
-			<h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">Form Edit FAQ</h1>
-			<p class="text-sm text-slate-500 dark:text-slate-400">Perbarui informasi FAQ.</p>
+			<h1 class="text-2xl font-bold text-slate-900 dark:text-white">Form Edit FAQ</h1>
+			<p class="text-sm text-slate-500 dark:text-slate-400">Perbarui informasi pertanyaan umum.</p>
 		</div>
 	</div>
 
 	{#if isLoading}
 		<div
-			class="flex items-center justify-center rounded-2xl border border-slate-200 bg-white p-12 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+			class="flex items-center justify-center rounded-2xl border border-slate-200 bg-white p-12 dark:border-slate-700 dark:bg-slate-800"
 		>
 			<div class="flex flex-col items-center gap-3">
-				<svg
-					class="h-8 w-8 animate-spin text-indigo-600"
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-					aria-hidden="true"
-				>
-					<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"
-					></circle>
-					<path
-						class="opacity-75"
-						fill="currentColor"
-						d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-					></path>
-				</svg>
-				<p class="text-sm text-slate-500 dark:text-slate-400">Memuat data...</p>
+				<div
+					class="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent"
+				></div>
+				<p class="text-sm text-slate-500">Memuat data...</p>
 			</div>
 		</div>
 	{:else}
@@ -166,9 +140,8 @@
 			class="space-y-6"
 		>
 			<div
-				class="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+				class="space-y-6 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-800"
 			>
-				<!-- Pertanyaan -->
 				<div>
 					<label
 						for="pertanyaan"
@@ -181,13 +154,10 @@
 						id="pertanyaan"
 						bind:value={pertanyaan}
 						required
-						aria-required="true"
-						class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-slate-900 placeholder-slate-400 transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:placeholder-slate-500"
-						placeholder="Masukkan pertanyaan"
+						class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
 					/>
 				</div>
 
-				<!-- Jawaban -->
 				<div>
 					<label
 						for="jawaban"
@@ -199,64 +169,54 @@
 						id="jawaban"
 						bind:value={jawaban}
 						required
-						aria-required="true"
 						rows="5"
-						class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-slate-900 placeholder-slate-400 transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:placeholder-slate-500"
-						placeholder="Masukkan jawaban"
+						class="w-full rounded-xl border border-slate-200 px-4 py-3 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
 					></textarea>
 				</div>
 
 				<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-					<!-- Status Active -->
 					<div>
 						<label
 							for="is_active"
 							class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300"
+							>Status</label
 						>
-							Status
-						</label>
 						<select
 							id="is_active"
 							bind:value={is_active}
-							class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-slate-900 transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
+							class="w-full rounded-xl border border-slate-200 px-4 py-3 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
 						>
 							<option value="1">Aktif</option>
 							<option value="0">Tidak Aktif</option>
 						</select>
 					</div>
 
-					<!-- Urutan -->
 					<div>
 						<label
 							for="urutan"
 							class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300"
+							>Urutan (Opsional)</label
 						>
-							Urutan (Opsional)
-						</label>
 						<input
 							type="number"
 							id="urutan"
 							bind:value={urutan}
-							class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-slate-900 placeholder-slate-400 transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-							placeholder="Contoh: 1"
+							class="w-full rounded-xl border border-slate-200 px-4 py-3 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
 						/>
 					</div>
 				</div>
 			</div>
 
-			<!-- Actions -->
 			<div class="flex items-center justify-end gap-3">
 				<a
 					href="/admin/faq"
-					class="rounded-xl border border-slate-200 px-6 py-2.5 text-sm font-semibold text-slate-600 transition-all hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+					class="rounded-xl border border-slate-200 px-6 py-3 text-sm font-semibold text-slate-600 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+					>Batal</a
 				>
-					Batal
-				</a>
 				<button
 					type="submit"
 					disabled={isSaving}
-					aria-busy={isSaving}
-					class="rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+					class="rounded-xl bg-indigo-600 px-8 py-3 text-sm font-semibold text-white shadow-md hover:bg-indigo-700 disabled:opacity-50"
 				>
 					{isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}
 				</button>
@@ -265,21 +225,19 @@
 	{/if}
 </div>
 
-<!-- Confirmation Dialog -->
 <ConfirmationDialog
 	bind:show={showConfirm}
 	title="Simpan Perubahan?"
-	description="Apakah Anda yakin ingin menyimpan perubahan FAQ ini?"
+	description="Pastikan data FAQ sudah benar sebelum diperbarui."
 	confirmText="Ya, Simpan"
 	theme="primary"
 	onConfirm={handleSubmit}
 	isLoading={isSaving}
 />
 
-<!-- Notification -->
 <NotificationDialog
-	bind:show={showNotification}
-	theme={notificationType}
-	title={notificationType === 'success' ? 'Berhasil!' : 'Gagal!'}
-	description={notificationMessage}
+	bind:show={notification.show}
+	theme={notification.type}
+	title={notification.type === 'success' ? 'Berhasil!' : 'Gagal!'}
+	description={notification.message}
 />

@@ -18,6 +18,7 @@
 		method?: FormMethod;
 		onConfirm?: (() => void) | null;
 		children?: Snippet; // Snippet untuk menangani konten di dalam tag
+		isLoading?: boolean;
 	}
 
 	let {
@@ -30,7 +31,8 @@
 		action = '',
 		method = 'POST',
 		onConfirm = null,
-		children
+		children,
+		isLoading = false
 	}: Props = $props();
 
 	// Logika warna dan icon berbasis tema menggunakan $derived (reaktif)
@@ -165,6 +167,11 @@
 								onclick={handleConfirm}
 								class="flex-1 transform rounded-xl bg-linear-to-r px-4 py-3 text-sm font-bold text-white shadow-lg transition-all hover:scale-105 active:scale-95 {themeConfig.btnPrimary} {themeConfig.btnShadow}"
 							>
+								{#if isLoading}
+									<div
+										class="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"
+									></div>
+								{/if}
 								{confirmText}
 							</button>
 						{/if}

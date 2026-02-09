@@ -27,8 +27,8 @@
 		if (searchQuery) params.set('search', searchQuery);
 		else params.delete('search');
 
-		if (selectedYear) params.set('tahun', selectedYear);
-		else params.delete('tahun');
+		if (selectedYear) params.set('year', selectedYear);
+		else params.delete('year');
 
 		params.set('page', '1');
 		await goto(`?${params.toString()}`, { keepFocus: true, noScroll: true });
@@ -146,7 +146,7 @@
 					>
 						Cari
 					</button>
-					{#if page.url.searchParams.get('search') || page.url.searchParams.get('tahun')}
+					{#if page.url.searchParams.get('search') || page.url.searchParams.get('year')}
 						<a
 							href={page.url.pathname}
 							class="flex items-center justify-center rounded-lg bg-gray-200 px-6 py-2 font-medium text-gray-700 hover:bg-gray-300 dark:bg-slate-700 dark:text-gray-200"

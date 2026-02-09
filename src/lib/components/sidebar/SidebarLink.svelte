@@ -13,11 +13,19 @@
 	let { href, label, icon, badge }: Props = $props();
 
 	let isActive = $derived(page.url.pathname === href || page.url.pathname.startsWith(href + '/'));
+
+	// Fungsi untuk menangani klik saat sidebar tertutup
+	function handleClick() {
+		if (!sidebar.isOpen) {
+			sidebar.isOpen = true;
+		}
+	}
 </script>
 
 <li>
 	<a
 		{href}
+		onclick={handleClick}
 		class="group relative mx-3 my-1 flex items-center overflow-hidden rounded-xl py-3 font-semibold whitespace-nowrap transition-all duration-200
 		{isActive
 			? 'bg-ppid-accent text-ppid-primary shadow-lg shadow-ppid-accent/20'

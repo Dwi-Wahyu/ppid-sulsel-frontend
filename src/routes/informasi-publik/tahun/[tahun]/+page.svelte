@@ -15,11 +15,7 @@
 		searchQuery = data.matriksData.filters.search || '';
 	});
 
-	/** * REAKTIVITAS:
-	 * Kita harus mengakses `data.matriksData` secara langsung di dalam $derived.
-	 * Jika kita membuat `const matriksData = data.matriksData` di luar sini,
-	 * referensi tersebut akan "stuck" pada objek data yang lama.
-	 */
+	// Derived stores untuk mempermudah akses data
 	let matriks = $derived(data.matriksData.data.data);
 	let pagination = $derived(data.matriksData.data);
 	let filters = $derived(data.matriksData.filters);
@@ -51,7 +47,11 @@
 >
 	<div class="container mx-auto px-4 py-6">
 		<nav class="mb-4 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-			<a href="/" class="transition-colors hover:text-ppid-primary dark:text-white">
+			<a
+				title="Kembali ke Beranda"
+				href="/"
+				class="transition-colors hover:text-ppid-primary dark:text-white"
+			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					width="16"

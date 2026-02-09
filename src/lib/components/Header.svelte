@@ -3,9 +3,10 @@
 	import { onMount } from 'svelte';
 	import { fly, fade, slide } from 'svelte/transition';
 	import * as m from '$lib/paraglide/messages.js';
-	import { getLocale, localizeHref } from '$lib/paraglide/runtime.js';
+	import { getLocale, localizeHref, setLocale } from '$lib/paraglide/runtime.js';
 	import { env } from '$env/dynamic/public';
 	import SearchModal from './SearchModal.svelte';
+	import Sosmed from './Sosmed.svelte';
 
 	// State
 	let mobileMenu = $state(false);
@@ -68,41 +69,28 @@
 		waktu: string;
 	}
 
-	interface SocialLink {
-		id_sosmed: number;
-		nm_sosmed: string;
-		link_sosmed: string;
-		icon_sosmed: string;
-	}
-
 	const BACKEND_URL = env.PUBLIC_BACKEND_URL || 'http://localhost:8000';
 
 	// Dynamic Data State
 	let kategoriInformasi = $state<Kategori[]>([]);
 	let listTahun = $state<TahunInfo[]>([]);
-	let socialLinks = $state<SocialLink[]>([]);
 	let isLoading = $state(true);
 
 	onMount(async () => {
 		try {
-			const [resKategori, resTahun, resSocial] = await Promise.all([
+			const [resKategori, resTahun] = await Promise.all([
 				fetch(`${BACKEND_URL}/api/public/informasi/kategori`),
-				fetch(`${BACKEND_URL}/api/public/informasi/tahun`),
-				fetch(`${BACKEND_URL}/api/public/social-links`)
+				fetch(`${BACKEND_URL}/api/public/informasi/tahun`)
 			]);
 
 			const resultKat = await resKategori.json();
 			const resultThn = await resTahun.json();
-			const resultSocial = await resSocial.json();
 
 			if (resultKat.data) {
 				kategoriInformasi = resultKat.data;
 			}
 			if (resultThn.data) {
 				listTahun = resultThn.data;
-			}
-			if (resultSocial.success && resultSocial.data) {
-				socialLinks = resultSocial.data;
 			}
 		} catch (error) {
 			console.error('Gagal mengambil data header:', error);
@@ -132,38 +120,6 @@
 		</a>
 
 		<div class="flex items-center gap-3 md:gap-4">
-			<!-- Social Links -->
-			{#if socialLinks.length > 0}
-				<div class="hidden items-center gap-2 md:flex">
-					{#each socialLinks as social}
-						<a
-							href={social.link_sosmed}
-							target="_blank"
-							rel="noopener noreferrer"
-							title={social.nm_sosmed}
-							class="group flex h-8 w-8 items-center justify-center rounded-full transition-all hover:bg-white/10"
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="16"
-								height="16"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								class="text-white/70 transition-all group-hover:scale-110 group-hover:text-white"
-								aria-hidden="true"
-							>
-								{@html social.icon_sosmed}
-							</svg>
-						</a>
-					{/each}
-					<div class="mx-2 h-6 w-px bg-white/20" aria-hidden="true"></div>
-				</div>
-			{/if}
-
 			<!-- Search Trigger Button -->
 			<button
 				onclick={() => (searchModalOpen = true)}
@@ -237,17 +193,19 @@
 						transition:fly={{ y: -10, duration: 200 }}
 						class="absolute right-0 z-60 mt-2 w-24 rounded-xl bg-white py-1 shadow-xl dark:bg-slate-800"
 					>
-						<a
-							href={localizeHref(page.url.pathname, { locale: 'id' })}
-							class="block px-4 py-2 text-sm hover:bg-[#D4AF37]/10 dark:text-gray-200">🇮🇩 ID</a
+						<button
+							onclick={() => setLocale('id')}
+							class="block px-4 py-2 text-sm hover:bg-[#D4AF37]/10 dark:text-gray-200">🇮🇩 ID</button
 						>
-						<a
-							href={localizeHref(page.url.pathname, { locale: 'en' })}
-							class="block px-4 py-2 text-sm hover:bg-[#D4AF37]/10 dark:text-gray-200">🇺🇸 EN</a
+						<button
+							onclick={() => setLocale('en')}
+							class="block px-4 py-2 text-sm hover:bg-[#D4AF37]/10 dark:text-gray-200">🇺🇸 EN</button
 						>
 					</div>
 				{/if}
 			</div>
+
+			<Sosmed />
 
 			<button
 				onclick={() => (mobileMenu = !mobileMenu)}
@@ -408,10 +366,10 @@
 							{/each}
 							<li>
 								<a
-									href="/informasi-publik/kategori/pengadaan"
+									href="/informasi-publik/pengadaan-barang-jasa"
 									class="block border-l-4 border-transparent px-10 py-3 hover:border-[#D4AF37] hover:bg-[#1A305E]/5 lg:px-6"
 								>
-									Pengadaan
+									Pengadaan Barang & Jasa
 								</a>
 							</li>
 						</ul>
