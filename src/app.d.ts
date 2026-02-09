@@ -16,6 +16,7 @@ declare global {
 					nm_skpd: string;
 				} | null;
 			} | null;
+			token: string | null;
 		}
 		// interface PageData {}
 		// interface PageState {}

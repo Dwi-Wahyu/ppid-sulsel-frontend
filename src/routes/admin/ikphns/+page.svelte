@@ -3,7 +3,6 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 	import FilePond from '$lib/components/FilePond.svelte';
-	import { onMount } from 'svelte';
 
 	let { data } = $props();
 
@@ -103,17 +102,35 @@
 		return isValid;
 	}
 
+	function getCookie(name: string) {
+		const value = `; ${document.cookie}`;
+		const parts = value.split(`; ${name}=`);
+		if (parts.length === 2) return parts.pop()?.split(';').shift();
+	}
+
 	// Handle create
 	async function handleCreate() {
 		if (!validateForm()) return;
 
 		loading = true;
-		const token = document.cookie
-			.split('; ')
-			.find((row) => row.startsWith('access_token='))
-			?.split('=')[1];
 
 		try {
+			const csrfRequest = await fetch(`${PUBLIC_API_URL}/sanctum/csrf-cookie`, {
+				method: 'GET',
+				credentials: 'include'
+			});
+
+			if (!csrfRequest.ok) {
+				throw new Error('Failed to retrieve CSRF cookie');
+			}
+
+			const csrfData = await csrfRequest.json();
+
+			console.log(csrfData);
+
+			const accessToken = getCookie('access_token');
+			const xsrfToken = getCookie('xsrf-token');
+
 			const formData = new FormData();
 			formData.append('nama_jabatan', namaJabatan);
 			if (uploadedFile) {
@@ -123,8 +140,9 @@
 			const response = await fetch(`${PUBLIC_API_URL}/admin/ikphn`, {
 				method: 'POST',
 				headers: {
-					Authorization: `Bearer ${token}`,
-					Accept: 'application/json'
+					Authorization: `Bearer ${accessToken}`,
+					Accept: 'application/json',
+					'X-XSRF-TOKEN': decodeURIComponent(xsrfToken || '')
 				},
 				body: formData
 			});
