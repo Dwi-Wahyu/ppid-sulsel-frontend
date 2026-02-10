@@ -48,7 +48,7 @@
 					<div class="flex flex-row md:flex-col">
 						<!-- Header with Icon & Badge -->
 						<div
-							class="relative flex-shrink-0 overflow-hidden bg-ppid-primary p-4 text-white transition-colors group-hover:bg-[#15264a] md:p-5 lg:p-6"
+							class="relative shrink-0 overflow-hidden bg-ppid-primary p-4 text-white transition-colors group-hover:bg-[#15264a] md:p-5 lg:p-6"
 						>
 							<!-- Decorative Pattern -->
 							<div

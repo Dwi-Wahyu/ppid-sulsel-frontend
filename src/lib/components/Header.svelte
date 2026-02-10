@@ -240,7 +240,7 @@
 					<a href="/" class="group relative block px-6 py-4 hover:text-[#D4AF37] lg:px-4">
 						{m['header.home']()}
 						<span
-							class="absolute bottom-0 left-0 hidden h-[3px] w-full scale-x-0 bg-ppid-accent transition-transform group-hover:scale-x-100 lg:block"
+							class="absolute bottom-0 left-0 hidden h-0.75 w-full scale-x-0 bg-ppid-accent transition-transform group-hover:scale-x-100 lg:block"
 						></span>
 					</a>
 				</li>

@@ -84,7 +84,7 @@
 			<div class="flex h-full flex-col gap-4 lg:col-span-4">
 				<!-- Info Card -->
 				<div
-					class="flex-shrink-0 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+					class="shrink-0 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800"
 				>
 					<div class="space-y-4">
 						<!-- Phone -->
@@ -166,7 +166,7 @@
 						<!-- Address -->
 						<div class="group flex items-start gap-3">
 							<div
-								class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-ppid-primary/10 text-ppid-primary transition-all group-hover:bg-ppid-primary group-hover:text-ppid-accent dark:text-white"
+								class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ppid-primary/10 text-ppid-primary transition-all group-hover:bg-ppid-primary group-hover:text-ppid-accent dark:text-white"
 							>
 								<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 									><path

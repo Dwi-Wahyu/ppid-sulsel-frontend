@@ -43,7 +43,7 @@
 						<div class="relative z-10 flex h-full flex-row gap-4 md:flex-col md:gap-0">
 							<!-- Icon Container -->
 							<div
-								class="mb-0 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-ppid-primary/5 text-ppid-primary transition-colors duration-300 group-hover:bg-ppid-primary group-hover:text-ppid-accent md:mb-6 md:h-14 md:w-14 dark:bg-white/10 dark:text-white"
+								class="mb-0 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-ppid-primary/5 text-ppid-primary transition-colors duration-300 group-hover:bg-ppid-primary group-hover:text-ppid-accent md:mb-6 md:h-14 md:w-14 dark:bg-white/10 dark:text-white"
 							>
 								<svg
 									class="h-6 w-6 md:h-7 md:w-7"

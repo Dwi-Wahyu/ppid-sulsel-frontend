@@ -70,7 +70,7 @@
 			aria-hidden="true"
 		/>
 		<div
-			class="absolute inset-0 bg-gradient-to-br from-ppid-primary/95 via-ppid-primary/85 to-ppid-primary-hover/95 mix-blend-multiply"
+			class="absolute inset-0 bg-linear-to-br from-ppid-primary/95 via-ppid-primary/85 to-ppid-primary-hover/95 mix-blend-multiply"
 			aria-hidden="true"
 		></div>
 		<div
@@ -80,11 +80,10 @@
 	</div>
 
 	<main
-		class="relative z-10 flex h-auto w-full max-w-[1100px] flex-col overflow-hidden rounded-3xl border border-white/40 bg-white shadow-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] lg:h-[650px] lg:flex-row"
-		role="main"
+		class="relative z-10 flex h-auto w-full max-w-275 flex-col overflow-hidden rounded-3xl border border-white/40 bg-white shadow-2xl lg:h-162.5 lg:flex-row"
 	>
 		<div
-			class="group relative hidden flex-col items-center justify-between overflow-hidden border-r border-white/10 bg-gradient-to-b from-ppid-primary to-ppid-primary-dark p-12 text-center lg:flex lg:w-5/12"
+			class="group relative hidden flex-col items-center justify-between overflow-hidden border-r border-white/10 bg-linear-to-b from-ppid-primary to-ppid-primary-dark p-12 text-center lg:flex lg:w-5/12"
 		>
 			<div class="pointer-events-none absolute top-0 left-0 h-full w-full overflow-hidden">
 				<div class="absolute -top-24 -left-24 h-64 w-64 rounded-full bg-white/5 blur-3xl"></div>
@@ -151,10 +150,14 @@
 
 		<div class="relative flex h-full w-full flex-col justify-center bg-white lg:w-7/12">
 			<div
-				class="absolute top-0 left-0 flex w-full items-start justify-between border-b border-gray-100/50 bg-gradient-to-b from-gray-50 to-white p-6 lg:hidden"
+				class="absolute top-0 left-0 flex w-full items-start justify-between border-b border-gray-100/50 bg-linear-to-b from-gray-50 to-white p-6 lg:hidden"
 			>
 				<img src="/images/ppid-3.png" alt="Logo PPID Sulsel" class="h-12 w-auto" />
-				<a href="/" class="rounded-full bg-gray-100 p-2 text-gray-600 hover:bg-gray-200">
+				<a
+					title="Kembali ke beranda"
+					href="/"
+					class="rounded-full bg-gray-100 p-2 text-gray-600 hover:bg-gray-200"
+				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						width="20"
@@ -328,7 +331,7 @@
 					<button
 						type="submit"
 						disabled={$delayed}
-						class="mt-4 flex w-full transform justify-center rounded-xl border border-transparent bg-gradient-to-r from-ppid-primary to-ppid-primary-dark px-6 py-4 text-base font-bold text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:from-ppid-primary-hover hover:to-ppid-primary hover:shadow-xl focus:ring-4 focus:ring-ppid-primary/30 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+						class="mt-4 flex w-full transform justify-center rounded-xl border border-transparent bg-linear-to-r from-ppid-primary to-ppid-primary-dark px-6 py-4 text-base font-bold text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:from-ppid-primary-hover hover:to-ppid-primary hover:shadow-xl focus:ring-4 focus:ring-ppid-primary/30 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
 					>
 						{$delayed ? 'MEMPROSES...' : 'MASUK SEKARANG'}
 					</button>

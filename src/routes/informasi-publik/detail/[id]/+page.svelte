@@ -241,7 +241,7 @@
 							<ul class="space-y-4 text-sm">
 								<li class="flex items-start gap-3">
 									<div
-										class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-ppid-primary/10"
+										class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-ppid-primary/10"
 									>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
@@ -271,7 +271,7 @@
 								</li>
 								<li class="flex items-start gap-3">
 									<div
-										class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-ppid-primary/10"
+										class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-ppid-primary/10"
 									>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"

@@ -218,7 +218,7 @@
 							{#each ['Meningkatkan kualitas dan aksesibilitas pelayanan dasar', 'Mengembangkan ekonomi kerakyatan berbasis potensi lokal', 'Membangun infrastruktur yang merata dan berkualitas', 'Memperkuat tata kelola pemerintahan yang baik', 'Melestarikan nilai-nilai budaya dan kearifan lokal'] as item, index}
 								<div class="flex items-start gap-3">
 									<div
-										class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg bg-ppid-primary text-xs font-bold text-white"
+										class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-ppid-primary text-xs font-bold text-white"
 									>
 										{index + 1}
 									</div>

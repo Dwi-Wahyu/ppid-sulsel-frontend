@@ -730,7 +730,7 @@
 							<div
 								class="transition-hover flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 p-3 hover:border-blue-200 dark:border-slate-700 dark:bg-slate-900/50 dark:hover:border-blue-500/50"
 							>
-								<div class="flex-shrink-0">
+								<div class="shrink-0">
 									<img
 										src={`https://ui-avatars.com/api/?name=${encodeURIComponent(log.user?.name || 'U')}&background=1A305E&color=fff`}
 										alt="Avatar {log.user?.name || 'User'}"

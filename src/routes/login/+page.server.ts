@@ -3,7 +3,7 @@ import { superValidate } from 'sveltekit-superforms';
 import { yup } from 'sveltekit-superforms/adapters';
 import { object, string, boolean } from 'yup';
 import type { PageServerLoad, Actions } from './$types';
-import { RECAPTCHA_SECRET_KEY } from '$env/static/private';
+import { API_URL, RECAPTCHA_SECRET_KEY } from '$env/static/private';
 import { dev } from '$app/environment';
 
 // Schema validasi form
@@ -70,16 +70,14 @@ export const actions: Actions = {
 				}
 			}
 
-			// === 2. Proses Login ke API Backend ===
-			// Pastikan URL API backend benar sesuai konfigurasi Laravel Anda
-			const loginRes = await fetch('http://localhost:8000/api/auth/login', {
+			const loginRes = await fetch(`${API_URL}/auth/login`, {
 				method: 'POST',
 				body: JSON.stringify({
 					username: form.data.username,
 					password: form.data.password
 				}),
 				headers: {
-					'Accept': 'application/json',
+					Accept: 'application/json',
 					'Content-Type': 'application/json'
 				}
 			});
@@ -109,16 +107,15 @@ export const actions: Actions = {
 			// Cek role/skpd user untuk redirect
 			const user = result.user;
 
-			// === PENTING: Throw Redirect di sini ===
+			// === Throw Redirect di sini ===
 			if (user.id_skpd === null) {
 				throw redirect(303, '/admin/dashboard');
 			} else {
 				throw redirect(303, '/opd/dashboard');
 			}
-
 		} catch (error) {
 			// === PERBAIKAN KRUSIAL DI SINI ===
-			// SvelteKit menggunakan throw untuk redirect. 
+			// SvelteKit menggunakan throw untuk redirect.
 			// Kita harus menangkapnya dan melemparnya kembali agar navigasi terjadi.
 			if (isRedirect(error)) {
 				throw error;

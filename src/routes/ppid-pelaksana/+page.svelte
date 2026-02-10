@@ -186,7 +186,7 @@
 
 						<!-- Logo with Animated Ring -->
 						<div
-							class="relative mx-auto mb-6 h-24 w-24 flex-shrink-0 transform transition-transform duration-500 group-hover:scale-105"
+							class="relative mx-auto mb-6 h-24 w-24 shrink-0 transform transition-transform duration-500 group-hover:scale-105"
 						>
 							<div
 								class="absolute inset-0 rounded-full bg-gradient-to-br from-ppid-primary to-ppid-accent opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-10 dark:group-hover:opacity-30"
@@ -217,7 +217,7 @@
 
 							<!-- Divider -->
 							<div
-								class="mx-auto h-1 w-12 flex-shrink-0 rounded-full bg-gradient-to-r from-ppid-primary to-ppid-accent opacity-50 transition-opacity group-hover:opacity-100"
+								class="mx-auto h-1 w-12 shrink-0 rounded-full bg-gradient-to-r from-ppid-primary to-ppid-accent opacity-50 transition-opacity group-hover:opacity-100"
 							></div>
 
 							<!-- Info Grid -->
@@ -236,7 +236,7 @@
 										stroke-width="2"
 										stroke-linecap="round"
 										stroke-linejoin="round"
-										class="mt-0.5 flex-shrink-0 text-ppid-accent"
+										class="mt-0.5 shrink-0 text-ppid-accent"
 									>
 										<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
 										<circle cx="12" cy="10" r="3" />

@@ -303,7 +303,7 @@
 								: 'border-blue-200 bg-blue-50/30 dark:border-blue-500/50 dark:bg-blue-900/10'}"
 						>
 							<div class="flex items-start gap-4">
-								<div class="mt-1 flex-shrink-0">
+								<div class="mt-1 shrink-0">
 									{#if notif.type == 'success'}
 										<div
 											class="rounded-xl bg-green-100 p-2 text-green-600 dark:bg-green-900/30 dark:text-green-400"

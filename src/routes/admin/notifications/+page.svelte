@@ -98,7 +98,7 @@
 						: 'border-blue-200 bg-blue-50/30 dark:border-blue-500/50 dark:bg-blue-900/10'}"
 				>
 					<div class="flex items-start gap-4">
-						<div class="mt-1 flex-shrink-0">
+						<div class="mt-1 shrink-0">
 							<div
 								class="rounded-xl p-2.5 {notif.read_at
 									? 'bg-slate-100 text-slate-400'

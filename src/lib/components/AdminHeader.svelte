@@ -232,7 +232,7 @@
 							Pengaturan
 						</a>
 						<div class="my-1 border-t border-slate-100 dark:border-slate-700"></div>
-						<form action="/auth/logout" method="POST">
+						<form action="/logout" method="POST">
 							<button
 								type="submit"
 								class="flex w-full items-center rounded-lg px-3 py-2 text-sm font-bold text-red-600 transition-colors hover:bg-red-50 dark:hover:bg-red-900/20"

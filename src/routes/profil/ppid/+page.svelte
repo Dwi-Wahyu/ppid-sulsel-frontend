@@ -170,19 +170,19 @@
 					<h3 class="mb-4 text-sm font-bold tracking-wide uppercase">Landasan Hukum</h3>
 					<div class="space-y-3 text-sm">
 						<div class="flex items-start gap-2">
-							<div class="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-ppid-accent"></div>
+							<div class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ppid-accent"></div>
 							<p class="text-white/90">UU No. 14 Tahun 2008 tentang Keterbukaan Informasi Publik</p>
 						</div>
 						<div class="flex items-start gap-2">
-							<div class="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-ppid-accent"></div>
+							<div class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ppid-accent"></div>
 							<p class="text-white/90">PP No. 61 Tahun 2010 tentang Pelaksanaan UU KIP</p>
 						</div>
 						<div class="flex items-start gap-2">
-							<div class="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-ppid-accent"></div>
+							<div class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ppid-accent"></div>
 							<p class="text-white/90">Peraturan Komisi Informasi No. 1 Tahun 2010</p>
 						</div>
 						<div class="flex items-start gap-2">
-							<div class="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-ppid-accent"></div>
+							<div class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ppid-accent"></div>
 							<p class="text-white/90">Peraturan Gubernur Sulawesi Selatan</p>
 						</div>
 					</div>

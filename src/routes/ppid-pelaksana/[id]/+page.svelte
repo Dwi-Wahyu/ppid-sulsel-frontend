@@ -84,7 +84,7 @@
 
 				<div class="relative z-10 flex flex-col items-center gap-8 md:flex-row md:items-center">
 					<!-- Logo -->
-					<div class="relative flex-shrink-0">
+					<div class="relative shrink-0">
 						<div
 							class="relative flex h-32 w-32 items-center justify-center rounded-3xl border-2 border-gray-100 bg-white shadow-xl md:h-40 md:w-40 dark:border-slate-600 dark:bg-slate-700"
 						>
@@ -124,7 +124,7 @@
 										stroke-width="2"
 										stroke-linecap="round"
 										stroke-linejoin="round"
-										class="flex-shrink-0 text-ppid-accent"
+										class="shrink-0 text-ppid-accent"
 									>
 										<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
 										<circle cx="12" cy="10" r="3" />
@@ -148,7 +148,7 @@
 										stroke-width="2"
 										stroke-linecap="round"
 										stroke-linejoin="round"
-										class="flex-shrink-0 text-ppid-accent"
+										class="shrink-0 text-ppid-accent"
 									>
 										<circle cx="12" cy="12" r="10" />
 										<line x1="2" x2="22" y1="12" y2="12" />
