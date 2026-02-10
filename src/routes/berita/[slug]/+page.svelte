@@ -170,11 +170,7 @@
 								class="mb-8 overflow-hidden rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none"
 							>
 								{#if news.image}
-									<img
-										src={`${PUBLIC_API_URL.replace('/api', '')}/storage/img_berita/${news.image}`}
-										class="aspect-video w-full object-cover"
-										alt={news.title}
-									/>
+									<img src={news.image} class="aspect-video w-full object-cover" alt={news.title} />
 								{:else}
 									<div
 										class="flex aspect-video w-full items-center justify-center bg-slate-200 dark:bg-slate-800"
