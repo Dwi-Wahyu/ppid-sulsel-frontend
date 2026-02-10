@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 
 	let {
@@ -39,7 +39,7 @@
 		}
 	}
 
-	function selectOption(option) {
+	function selectOption(option: any) {
 		value = option[idKey];
 		isOpen = false;
 		dispatch('change', { value: option[idKey], option });
@@ -72,7 +72,7 @@
 		}
 	}
 
-	function handleClickOutside(e) {
+	function handleClickOutside(e: any) {
 		if (
 			buttonRef &&
 			dropdownRef &&

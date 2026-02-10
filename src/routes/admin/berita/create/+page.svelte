@@ -198,9 +198,9 @@
 				</div>
 
 				<div class="space-y-2">
-					<label class="block text-[10px] font-black tracking-widest text-slate-500 uppercase"
-						>Gambar Utama (Max 2MB)</label
-					>
+					<h1 class="block text-[10px] font-black tracking-widest text-slate-500 uppercase">
+						Gambar Utama (Max 2MB)
+					</h1>
 					<div
 						class="rounded-3xl border-2 {errors.img_berita
 							? 'border-red-400'

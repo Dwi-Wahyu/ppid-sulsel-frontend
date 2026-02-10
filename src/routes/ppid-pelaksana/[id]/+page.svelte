@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { PUBLIC_API_URL, PUBLIC_BACKEND_URL } from '$env/static/public';
 	import { onMount } from 'svelte';
 
 	let { data } = $props();
@@ -27,7 +27,7 @@
 
 <div class="relative min-h-screen overflow-x-hidden bg-gray-50 pb-20 dark:bg-slate-900">
 	<!-- Hero Header with Pattern  -->
-	<div class="relative h-[400px] overflow-hidden bg-ppid-primary">
+	<div class="relative h-100 overflow-hidden bg-ppid-primary">
 		<!-- Modern Geometric Pattern Overlay -->
 		<div class="absolute inset-0 opacity-10">
 			<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
@@ -45,7 +45,7 @@
 
 		<!-- Gradient Overlay -->
 		<div
-			class="absolute inset-0 bg-gradient-to-b from-ppid-primary/80 via-ppid-primary/90 to-ppid-primary"
+			class="absolute inset-0 bg-linear-to-b from-ppid-primary/80 via-ppid-primary/90 to-ppid-primary"
 		></div>
 
 		<!-- Breadcrumb & Title Area -->
@@ -90,7 +90,7 @@
 						>
 							<img
 								src={data.skpd.logo
-									? `${PUBLIC_API_URL}/storage/logo-skpd/${data.skpd.logo}`
+									? `${PUBLIC_BACKEND_URL}/uploads/${data.skpd.logo}`
 									: '/images/logo-sulsel.png'}
 								alt="Logo {data.skpd.nm_skpd}"
 								class="h-28 w-28 object-contain p-2 md:h-32 md:w-32"
@@ -101,7 +101,7 @@
 					<!-- Info -->
 					<div class="flex-1 text-center md:text-left">
 						<div
-							class="mb-4 inline-flex items-center gap-2 rounded-full border border-ppid-accent/30 bg-gradient-to-r from-ppid-accent/15 to-ppid-accent/5 px-3 py-1.5 text-xs font-bold text-[#C4941F]"
+							class="mb-4 inline-flex items-center gap-2 rounded-full border border-ppid-accent/30 bg-linear-to-r from-ppid-accent/15 to-ppid-accent/5 px-3 py-1.5 text-xs font-bold text-[#C4941F]"
 						>
 							<span class="h-2 w-2 rounded-full bg-ppid-accent"></span>
 							PPID PELAKSANA PROVINSI SULSEL
@@ -206,7 +206,7 @@
 									class="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-8 shadow-lg transition-shadow hover:shadow-xl dark:border-slate-700 dark:bg-slate-800"
 								>
 									<div
-										class="absolute top-0 right-0 h-20 w-20 rounded-bl-[3rem] bg-gradient-to-br from-ppid-primary/3 to-ppid-accent/3 transition-transform group-hover:scale-110"
+										class="absolute top-0 right-0 h-20 w-20 rounded-bl-[3rem] bg-linear-to-br from-ppid-primary/3 to-ppid-accent/3 transition-transform group-hover:scale-110"
 									></div>
 									<p class="mb-3 text-sm font-bold tracking-wider text-ppid-accent uppercase">
 										Kepala Dinas
@@ -224,7 +224,7 @@
 									class="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-8 shadow-lg transition-shadow hover:shadow-xl dark:border-slate-700 dark:bg-slate-800"
 								>
 									<div
-										class="absolute top-0 right-0 h-20 w-20 rounded-bl-[3rem] bg-gradient-to-br from-ppid-primary/3 to-ppid-accent/3 transition-transform group-hover:scale-110"
+										class="absolute top-0 right-0 h-20 w-20 rounded-bl-[3rem] bg-linear-to-br from-ppid-primary/3 to-ppid-accent/3 transition-transform group-hover:scale-110"
 									></div>
 									<p class="mb-3 text-sm font-bold tracking-wider text-ppid-accent uppercase">
 										Sekretaris
@@ -247,7 +247,7 @@
 					>
 						<!-- Decorative -->
 						<div
-							class="absolute top-0 left-0 h-full w-1.5 bg-gradient-to-b from-ppid-primary to-ppid-accent"
+							class="absolute top-0 left-0 h-full w-1.5 bg-linear-to-b from-ppid-primary to-ppid-accent"
 						></div>
 
 						<div class="mb-6 flex items-center gap-4">
@@ -314,11 +314,49 @@
 									Tugas Pokok & Fungsi
 								</h3>
 							</div>
-							<div class="prose prose-lg max-w-none prose-slate dark:prose-invert">
-								<div class="text-base leading-relaxed text-gray-700 md:text-lg dark:text-gray-200">
-									{@html data.skpd.tupoksi}
+
+							{#if data.skpd.tupoksi.toLowerCase().endsWith('.pdf')}
+								<div
+									class="w-full overflow-hidden rounded-xl border border-gray-200 dark:border-slate-600"
+								>
+									<iframe
+										src={`${PUBLIC_BACKEND_URL}/uploads/${data.skpd.tupoksi}`}
+										title="Dokumen Tupoksi"
+										class="h-150 w-full bg-gray-50"
+									></iframe>
 								</div>
-							</div>
+								<div class="mt-4 text-right">
+									<a
+										href={`${PUBLIC_BACKEND_URL}/uploads/${data.skpd.tupoksi}`}
+										target="_blank"
+										class="inline-flex items-center gap-2 text-sm font-medium text-ppid-primary hover:text-ppid-accent dark:text-gray-300"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											width="16"
+											height="16"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="2"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline
+												points="7 10 12 15 17 10"
+											/><line x1="12" x2="12" y1="15" y2="3" /></svg
+										>
+										Buka File Penuh
+									</a>
+								</div>
+							{:else}
+								<div class="prose prose-lg max-w-none prose-slate dark:prose-invert">
+									<div
+										class="text-base leading-relaxed text-gray-700 md:text-lg dark:text-gray-200"
+									>
+										{@html data.skpd.tupoksi}
+									</div>
+								</div>
+							{/if}
 						</div>
 					{/if}
 
@@ -365,7 +403,7 @@
 				<!-- Sticky Contact Card -->
 				<div class="lg:sticky lg:top-24">
 					<div
-						class="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-ppid-primary to-[#2d4a8f] p-8 text-white shadow-2xl"
+						class="relative overflow-hidden rounded-4xl bg-linear-to-br from-ppid-primary to-[#2d4a8f] p-8 text-white shadow-2xl"
 					>
 						<!-- Pattern Overlay -->
 						<div class="absolute inset-0 opacity-10">
@@ -459,6 +497,7 @@
 {#if showScrollTop}
 	<button
 		onclick={scrollToTop}
+		title="Scroll To Top"
 		class="fixed right-8 bottom-8 z-50 rounded-full bg-ppid-primary p-4 text-white shadow-2xl transition-all duration-300 hover:bg-[#2d4a8f]"
 	>
 		<svg

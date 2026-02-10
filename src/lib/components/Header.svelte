@@ -177,7 +177,7 @@
 			<div class="relative" use:clickOutside={() => (openLang = false)}>
 				<button
 					onclick={() => (openLang = !openLang)}
-					class="px-3 py-2 text-sm font-bold text-gray-700 hover:text-ppid-accent"
+					class="flex items-center px-3 py-2 text-sm font-bold text-gray-700 hover:text-ppid-accent"
 				>
 					<span>{currentLang}</span>
 					<svg

@@ -110,7 +110,7 @@
 								{role.display_name || role.name}
 							</span>
 						{:else}
-							<span class="text-xs italic text-slate-400 text-sm">Tidak ada peran akses.</span>
+							<span class="text-xs italic text-slate-400">Tidak ada peran akses.</span>
 						{/each}
 					</div>
 				</div>

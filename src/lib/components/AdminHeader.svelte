@@ -71,11 +71,11 @@
 	</button>
 
 	<div class="hidden items-center gap-2 md:flex">
-		<span class="text-sm font-medium text-slate-400">Panel Admin</span>
-		<span class="text-slate-300 dark:text-slate-700">/</span>
-		<h1 class="text-sm font-bold tracking-wider text-slate-800 uppercase dark:text-white">
-			PPID PROV SULSEL
-		</h1>
+		{#if theme.darkMode}
+			<img src="/images/ppid-4.png" alt="ppid light" class="w-20" />
+		{:else}
+			<img src="/images/ppid-3.png" alt="ppid dark" class="w-20" />
+		{/if}
 	</div>
 
 	<div class="ml-auto flex items-center gap-2 md:gap-4">
@@ -84,7 +84,7 @@
 			class="rounded-full p-2 text-slate-500 transition-colors hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
 			aria-label="Ganti Tema"
 		>
-			{#if theme.current === 'dark'}
+			{#if theme.darkMode}
 				<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 					><path
 						d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707m12.728 12.728L5.121 5.121M19 12a7 7 0 11-14 0 7 7 0 0114 0z"

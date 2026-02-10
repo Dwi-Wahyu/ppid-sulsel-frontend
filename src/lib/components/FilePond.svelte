@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 
+	// Definisi Props menggunakan Svelte 5 [cite: 3, 31, 32]
 	interface Props {
 		name?: string;
 		id?: string;
@@ -14,9 +15,9 @@
 		name = 'file',
 		id = 'filepond-' + Math.random().toString(36).substr(2, 9),
 		allowMultiple = false,
-		acceptedFileTypes = ['image/png', 'image/jpeg', 'image/gif'],
+		acceptedFileTypes = ['image/png', 'image/jpeg', 'image/gif', 'application/pdf'],
 		label = 'Seret & Letakkan file atau <span class="filepond--label-action">Telusuri</span>',
-		value = $bindable()
+		value = $bindable() // Memungkinkan binding dua arah [cite: 32]
 	}: Props = $props();
 
 	let element: HTMLInputElement;
@@ -26,49 +27,65 @@
 		if (typeof window === 'undefined' || !(window as any).FilePond) return;
 
 		const FilePond = (window as any).FilePond;
-		const FilePondPluginImagePreview = (window as any).FilePondPluginImagePreview;
+		const ImagePreview = (window as any).FilePondPluginImagePreview;
+		const PdfPreview = (window as any).FilePondPluginPdfPreview; // Plugin PDF [cite: 34]
 
-		if (FilePondPluginImagePreview) {
-			FilePond.registerPlugin(FilePondPluginImagePreview);
+		// Registrasi Plugin [cite: 34, 35]
+		const plugins = [];
+		if (ImagePreview) plugins.push(ImagePreview);
+		if (PdfPreview) plugins.push(PdfPreview);
+
+		if (plugins.length > 0) {
+			FilePond.registerPlugin(...plugins);
 		}
 
+		// Inisialisasi Instance FilePond [cite: 35]
 		pond = FilePond.create(element, {
 			name: name,
 			allowMultiple: allowMultiple,
 			acceptedFileTypes: acceptedFileTypes,
 			labelIdle: label,
 			imagePreviewHeight: 170,
-			storeAsFile: true, // Crucial for standard form submission
+			storeAsFile: true, // Crucial agar file asli dikirim saat submit form [cite: 35]
+
+			// Konfigurasi PDF Preview
+			allowPdfPreview: true,
+			pdfPreviewHeight: 320,
+			pdfComponentExtraParams: 'toolbar=0&view=fit&page=1',
+
 			onaddfile: (error: any, fileItem: any) => {
 				if (!error) {
-					value = fileItem.file;
+					value = fileItem.file; // Update binding value [cite: 35]
 				}
 			},
 			onremovefile: () => {
-				value = null;
+				value = null; // Reset binding value [cite: 35]
 			}
 		});
 	};
 
 	onMount(async () => {
-		// Load styles
-		if (!document.getElementById('filepond-css')) {
-			const link = document.createElement('link');
-			link.id = 'filepond-css';
-			link.rel = 'stylesheet';
-			link.href = '/vendor/filepond/index.css';
-			document.head.appendChild(link);
-		}
+		// Load Styles secara dinamis [cite: 36]
+		const styles = [
+			{ id: 'filepond-css', href: '/vendor/filepond/index.css' },
+			{ id: 'filepond-image-preview-css', href: '/vendor/filepond/image-preview.css' },
+			{
+				id: 'filepond-pdf-preview-css',
+				href: '/vendor/filepond/filepond-plugin-pdf-preview.min.css'
+			}
+		];
 
-		if (!document.getElementById('filepond-image-preview-css')) {
-			const link = document.createElement('link');
-			link.id = 'filepond-image-preview-css';
-			link.rel = 'stylesheet';
-			link.href = '/vendor/filepond/image-preview.css';
-			document.head.appendChild(link);
-		}
+		styles.forEach((style) => {
+			if (!document.getElementById(style.id)) {
+				const link = document.createElement('link');
+				link.id = style.id;
+				link.rel = 'stylesheet';
+				link.href = style.href;
+				document.head.appendChild(link);
+			}
+		});
 
-		// Load scripts sequentially
+		// Helper untuk memuat Script secara berurutan [cite: 36]
 		const loadScript = (src: string, id: string) => {
 			return new Promise((resolve, reject) => {
 				if (document.getElementById(id)) return resolve(true);
@@ -82,17 +99,23 @@
 		};
 
 		try {
+			// Memuat aset JS vendor
 			await loadScript('/vendor/filepond/index.js', 'filepond-js');
 			await loadScript('/vendor/filepond/image-preview.js', 'filepond-image-preview-js');
+			await loadScript(
+				'/vendor/filepond/filepond-plugin-pdf-preview.min.js',
+				'filepond-pdf-preview-js'
+			);
+
 			initFilePond();
 		} catch (e) {
-			console.error('Failed to load FilePond assets', e);
+			console.error('Gagal memuat aset FilePond', e);
 		}
 	});
 
 	onDestroy(() => {
 		if (pond) {
-			pond.destroy();
+			pond.destroy(); // Bersihkan instance saat komponen dihancurkan [cite: 37]
 		}
 	});
 </script>
@@ -102,6 +125,7 @@
 </div>
 
 <style>
+	/* Styling FilePond agar sesuai dengan desain dashboard [cite: 38, 39, 40] */
 	:global(.filepond--root) {
 		margin-bottom: 0;
 		font-family: inherit;
