@@ -230,7 +230,7 @@
 								<div class="relative aspect-video overflow-hidden">
 									{#if item.image}
 										<img
-											src={`${PUBLIC_API_URL.replace('/api', '')}/storage/img_berita/${item.image}`}
+											src={item.image}
 											alt=""
 											role="presentation"
 											class="size-full object-cover transition-transform duration-500 group-hover:scale-105"

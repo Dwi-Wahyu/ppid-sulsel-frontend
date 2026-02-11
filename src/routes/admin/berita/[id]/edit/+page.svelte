@@ -246,7 +246,7 @@
 							class="relative flex items-center gap-4 rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-600 dark:bg-slate-700/50"
 						>
 							<img
-								src={`${PUBLIC_API_URL.replace('/api', '')}/storage/img_berita/${currentImage}`}
+								src={`${PUBLIC_API_URL.replace('/api', '')}/storage/berita/${currentImage}`}
 								alt="Current"
 								class="h-20 w-20 rounded-lg object-cover"
 							/>
