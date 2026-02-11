@@ -32,7 +32,8 @@
 						{ href: '/admin/struktur-organisasi', label: 'Struktur Organisasi' },
 						{ href: '/admin/tugas-fungsi', label: 'Tugas & Fungsi' },
 						{ href: '/admin/visi-misi', label: 'Visi & Misi' },
-						{ href: '/admin/maklumat-pelayanan', label: 'Maklumat Pelayanan' }
+						{ href: '/admin/maklumat-pelayanan', label: 'Maklumat Pelayanan' },
+						{ href: '/admin/sosial-media', label: 'Sosial Media' }
 					]
 				},
 				{

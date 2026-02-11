@@ -1,117 +1,85 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { PUBLIC_API_URL } from '$env/static/public';
-	import TinyMCE from '$lib/components/TinyMCE.svelte';
-	import FilePond from '$lib/components/FilePond.svelte';
-	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
-	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
+	import { api } from '$lib/api'; // [cite: 23]
+	import TinyMCE from '$lib/components/TinyMCE.svelte'; // [cite: 24]
+	import FilePond from '$lib/components/FilePond.svelte'; // [cite: 24]
+	import NotificationDialog from '$lib/components/NotificationDialog.svelte'; // [cite: 24]
+	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte'; // [cite: 24]
+	import type { FooterData } from '$lib/types/footer';
 
-	interface Settings {
-		is_stats_visible: boolean;
-		footer_logo: string | null;
-		footer_description: string;
-		footer_phone: string;
-		footer_email: string;
-		footer_address: string;
-		social_facebook: string;
-		social_twitter: string;
-		social_instagram: string;
-		social_youtube: string;
-		privacy_policy: string;
-		terms_conditions: string;
-	}
-
-	let settings = $state<Settings>({
-		is_stats_visible: true,
-		footer_logo: null,
-		footer_description: '',
-		footer_phone: '',
-		footer_email: '',
-		footer_address: '',
-		social_facebook: '',
-		social_twitter: '',
-		social_instagram: '',
-		social_youtube: '',
-		privacy_policy: '',
-		terms_conditions: ''
-	});
-
-	let newLogo = $state<any>(null);
+	// State Management Svelte 5 Runes [cite: 3, 25]
 	let isLoading = $state(true);
 	let isSaving = $state(false);
-
-	// Notification
-	let showNotification = $state(false);
-	let notificationType = $state<'success' | 'error'>('success');
-	let notificationMessage = $state('');
-
-	// Confirmation
 	let showConfirm = $state(false);
 
-	onMount(async () => {
-		await fetchSettings();
+	let settings = $state<FooterData>({
+		footer_logo: null,
+		footer_description: '',
+		footer_address: '',
+		footer_phone: '',
+		footer_email: '',
+		privacy_policy: '',
+		terms_conditions: '',
+		is_stats_visible: false
 	});
 
-	async function fetchSettings() {
-		try {
-			const response = await fetch(`${PUBLIC_API_URL}/admin/footer-settings`, {
-				credentials: 'include'
-			});
-			const result = await response.json();
+	// State khusus untuk FilePond (berkas gambar) [cite: 27, 34]
+	let logoFile = $state<any>(null);
 
+	let notification = $state({
+		show: false,
+		type: 'success' as 'success' | 'error',
+		message: ''
+	});
+
+	onMount(async () => {
+		try {
+			const result = await api.get('/admin/footer-setting');
 			if (result.success) {
-				settings = result.data;
+				settings = {
+					...result.data,
+					// Konversi "0"/"1" dari database ke boolean untuk checkbox
+					is_stats_visible: result.data.is_stats_visible === '1'
+				};
 			}
-		} catch (error) {
-			console.error('Failed to fetch settings:', error);
+		} catch (error: any) {
+			showNotification('error', 'Gagal memuat data pengaturan.');
 		} finally {
 			isLoading = false;
 		}
+	});
+
+	function showNotification(type: 'success' | 'error', message: string) {
+		notification = { show: true, type, message };
 	}
 
 	async function handleSubmit() {
 		isSaving = true;
+		showConfirm = false;
 
 		try {
-			const formData = new FormData();
-			formData.append('is_stats_visible', settings.is_stats_visible ? '1' : '0');
-			formData.append('footer_description', settings.footer_description);
-			formData.append('footer_phone', settings.footer_phone);
-			formData.append('footer_email', settings.footer_email);
-			formData.append('footer_address', settings.footer_address);
-			formData.append('social_facebook', settings.social_facebook);
-			formData.append('social_twitter', settings.social_twitter);
-			formData.append('social_instagram', settings.social_instagram);
-			formData.append('social_youtube', settings.social_youtube);
-			formData.append('privacy_policy', settings.privacy_policy);
-			formData.append('terms_conditions', settings.terms_conditions);
+			const data = new FormData(); // [cite: 32]
+			data.append('footer_description', settings.footer_description);
+			data.append('footer_address', settings.footer_address);
+			data.append('footer_phone', settings.footer_phone);
+			data.append('footer_email', settings.footer_email);
+			data.append('privacy_policy', settings.privacy_policy);
+			data.append('terms_conditions', settings.terms_conditions);
+			data.append('is_stats_visible', settings.is_stats_visible ? '1' : '0');
 
-			if (newLogo) {
-				formData.append('footer_logo', newLogo);
+			// Penanganan Unggah Logo menggunakan FilePond
+			if (logoFile && logoFile.length > 0) {
+				const rawFile = logoFile[0].file;
+				data.append('footer_logo', rawFile);
 			}
 
-			const response = await fetch(`${PUBLIC_API_URL}/admin/footer-settings`, {
-				method: 'POST',
-				credentials: 'include',
-				body: formData
-			});
+			const result = await api.post('/admin/footer-setting', data); // [cite: 37]
 
-			const result = await response.json();
-
-			if (response.ok) {
-				notificationType = 'success';
-				notificationMessage = 'Pengaturan footer berhasil diperbarui';
-				showNotification = true;
-				await fetchSettings();
-			} else {
-				notificationType = 'error';
-				notificationMessage = result.message || 'Gagal memperbarui pengaturan';
-				showNotification = true;
+			if (result.success) {
+				showNotification('success', 'Pengaturan footer berhasil diperbarui.');
 			}
-		} catch (error) {
-			notificationType = 'error';
-			notificationMessage = 'Terjadi kesalahan saat menyimpan data';
-			showNotification = true;
+		} catch (error: any) {
+			showNotification('error', error.message || 'Terjadi kesalahan sistem.');
 		} finally {
 			isSaving = false;
 		}
@@ -122,304 +90,200 @@
 	<title>Footer Settings - Admin PPID</title>
 </svelte:head>
 
-<div class="space-y-6">
-	<!-- Header -->
-	<div
-		class="flex items-center justify-between rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
-	>
-		<div>
-			<h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100">Footer Settings</h1>
-			<p class="mt-1 text-slate-500 dark:text-slate-400">
-				Kelola konten footer website (Logo, Kontak, Sosial Media, Legal)
-			</p>
-		</div>
-	</div>
-
-	{#if isLoading}
-		<div
-			class="flex items-center justify-center rounded-2xl border border-slate-200 bg-white p-12 shadow-sm dark:border-slate-700 dark:bg-slate-800"
-		>
-			<div class="flex flex-col items-center gap-3">
-				<svg
-					class="h-8 w-8 animate-spin text-blue-600"
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-				>
-					<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"
-					></circle>
-					<path
-						class="opacity-75"
-						fill="currentColor"
-						d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-					></path>
-				</svg>
-				<p class="text-sm text-slate-500 dark:text-slate-400">Memuat pengaturan...</p>
+<div class="p-8">
+	<div class="mx-auto max-w-5xl">
+		<header class="mb-10 flex items-center justify-between">
+			<div>
+				<h1 class="text-3xl font-black text-slate-800 uppercase dark:text-white">
+					Footer Settings
+				</h1>
+				<p class="text-sm font-medium text-slate-500">
+					Kelola identitas, kontak, dan dokumen legal.
+				</p>
 			</div>
-		</div>
-	{:else}
-		<form
-			onsubmit={(e) => {
-				e.preventDefault();
-				showConfirm = true;
-			}}
-			class="space-y-6"
-		>
-			<!-- Branding Section -->
-			<div
-				class="space-y-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
-			>
-				<h2
-					class="border-b border-slate-100 pb-4 text-lg font-bold text-slate-800 dark:border-slate-700 dark:text-slate-100"
-				>
-					Branding & Logo
-				</h2>
+		</header>
 
-				<!-- Statistics Visibility -->
+		{#if isLoading}
+			<div class="flex h-64 items-center justify-center">
 				<div
-					class="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-600 dark:bg-slate-700/50"
+					class="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-ppid-primary"
+				></div>
+			</div>
+		{:else}
+			<form
+				onsubmit={(e) => {
+					e.preventDefault();
+					showConfirm = true; // [cite: 42]
+				}}
+				class="space-y-8"
+			>
+				<section
+					class="rounded-4xl border border-slate-200 bg-white p-10 shadow-xl shadow-slate-200/50 dark:border-slate-700 dark:bg-slate-800"
 				>
-					<div>
-						<h3 class="text-sm font-semibold text-slate-800 dark:text-slate-100">
-							Tampilkan Statistik Website
-						</h3>
-						<p class="text-xs text-slate-500 dark:text-slate-400">
-							Tampilkan jumlah pengunjung dan download di footer.
-						</p>
-					</div>
-					<label class="relative inline-flex cursor-pointer items-center">
-						<input type="checkbox" bind:checked={settings.is_stats_visible} class="peer sr-only" />
-						<div
-							class="peer h-6 w-11 rounded-full bg-slate-200 peer-checked:bg-blue-600 peer-focus:ring-4 peer-focus:ring-blue-300 peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white dark:border-slate-600 dark:bg-slate-700 dark:peer-focus:ring-blue-800"
-						></div>
-					</label>
-				</div>
-
-				<!-- Logo -->
-				<div class="space-y-4">
-					<label class="block text-sm font-medium text-slate-700 dark:text-slate-300"
-						>Logo Footer</label
+					<div
+						class="mb-8 flex items-center justify-between border-b border-slate-50 pb-6 dark:border-slate-700"
 					>
-					<div class="flex items-center gap-6">
-						<div
-							class="flex h-32 w-32 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-100 dark:border-slate-600 dark:bg-slate-700"
-						>
-							{#if settings.footer_logo}
-								<img
-									src={`${PUBLIC_API_URL.replace('/api', '')}/storage/${settings.footer_logo}`}
-									alt="Current Logo"
-									class="h-full w-full object-contain"
+						<h2 class="text-sm font-black tracking-widest text-slate-800 uppercase dark:text-white">
+							Branding & Logo
+						</h2>
+
+						<label class="flex cursor-pointer items-center gap-3">
+							<span class="text-xs font-bold text-slate-500 uppercase">Tampilkan Statistik</span>
+							<div class="relative inline-flex items-center">
+								<input
+									type="checkbox"
+									bind:checked={settings.is_stats_visible as boolean}
+									class="peer sr-only"
 								/>
-							{:else}
-								<span class="text-center text-xs text-slate-400">No Logo</span>
-							{/if}
+								<div
+									class="h-6 w-11 rounded-full bg-slate-200 transition-all peer-checked:bg-ppid-primary peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all peer-checked:after:translate-x-full"
+								></div>
+							</div>
+						</label>
+					</div>
+
+					<div class="grid grid-cols-1 gap-10 lg:grid-cols-3">
+						<div class="space-y-4">
+							<h1 class="block text-[10px] font-black tracking-widest text-slate-500 uppercase">
+								Logo Footer
+							</h1>
+							<div
+								class="rounded-3xl border-2 border-dashed border-slate-200 p-2 dark:border-slate-700"
+							>
+								<FilePond
+									bind:value={logoFile}
+									name="footer_logo"
+									acceptedFileTypes={['image/png', 'image/jpeg']}
+									label="Seret Logo"
+								/>
+							</div>
 						</div>
-						<div class="flex-1">
-							<FilePond
-								bind:value={newLogo}
-								name="footer_logo"
-								acceptedFileTypes={['image/png', 'image/jpeg']}
-								label="Seret & Letakkan file atau <span class='filepond--label-action'>Telusuri</span>"
-								maxFileSize="2MB"
+
+						<div class="space-y-2 lg:col-span-2">
+							<label
+								for="footer_description"
+								class="block text-[10px] font-black tracking-widest text-slate-500 uppercase"
+								>Deskripsi Singkat</label
+							>
+							<textarea
+								id="footer_description"
+								bind:value={settings.footer_description}
+								rows="5"
+								class="w-full rounded-2xl border-2 border-slate-100 bg-slate-50 p-5 text-sm font-bold outline-none focus:border-ppid-primary dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+							></textarea>
+						</div>
+					</div>
+				</section>
+
+				<section
+					class="rounded-4xl border border-slate-200 bg-white p-10 shadow-xl shadow-slate-200/50 dark:border-slate-700 dark:bg-slate-800"
+				>
+					<h2
+						class="mb-8 border-b border-slate-50 pb-6 text-sm font-black tracking-widest text-slate-800 uppercase dark:border-slate-700 dark:text-white"
+					>
+						Informasi Kontak
+					</h2>
+
+					<div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+						<div class="space-y-2">
+							<label
+								for="footer_phone"
+								class="block text-[10px] font-black tracking-widest text-slate-500 uppercase"
+								>Nomor Telepon</label
+							>
+							<input
+								type="text"
+								id="footer_phone"
+								bind:value={settings.footer_phone}
+								class="w-full rounded-2xl border-2 border-slate-100 px-5 py-4 text-sm font-bold outline-none focus:border-ppid-primary dark:bg-slate-900 dark:text-white"
 							/>
-							<p class="mt-2 text-xs text-slate-500 dark:text-slate-400">
-								Format: JPG, PNG. Max: 2MB. Disarankan background transparan.
-							</p>
+						</div>
+						<div class="space-y-2">
+							<label
+								for="footer_email"
+								class="block text-[10px] font-black tracking-widest text-slate-500 uppercase"
+								>Email</label
+							>
+							<input
+								type="email"
+								id="footer_email"
+								bind:value={settings.footer_email}
+								class="w-full rounded-2xl border-2 border-slate-100 px-5 py-4 text-sm font-bold outline-none focus:border-ppid-primary dark:bg-slate-900 dark:text-white"
+							/>
 						</div>
 					</div>
-				</div>
 
-				<!-- Description -->
-				<div>
-					<label
-						for="footer_description"
-						class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-						>Deskripsi Singkat</label
-					>
-					<textarea
-						id="footer_description"
-						bind:value={settings.footer_description}
-						rows="3"
-						class="w-full rounded-lg border-slate-200 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-					></textarea>
-				</div>
-			</div>
+					<div class="mt-8 space-y-2">
+						<label
+							for="footer_address"
+							class="block text-[10px] font-black tracking-widest text-slate-500 uppercase"
+							>Alamat</label
+						>
+						<textarea
+							id="footer_address"
+							bind:value={settings.footer_address}
+							rows="2"
+							class="w-full rounded-2xl border-2 border-slate-100 px-5 py-4 text-sm font-bold outline-none focus:border-ppid-primary dark:bg-slate-900 dark:text-white"
+						></textarea>
+					</div>
+				</section>
 
-			<!-- Contact Info -->
-			<div
-				class="space-y-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
-			>
-				<h2
-					class="border-b border-slate-100 pb-4 text-lg font-bold text-slate-800 dark:border-slate-700 dark:text-slate-100"
+				<section
+					class="rounded-4xl border border-slate-200 bg-white p-10 shadow-xl shadow-slate-200/50 dark:border-slate-700 dark:bg-slate-800"
 				>
-					Informasi Kontak
-				</h2>
-
-				<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-					<div>
-						<label
-							for="footer_phone"
-							class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-							>Nomor Telepon</label
-						>
-						<input
-							type="text"
-							id="footer_phone"
-							bind:value={settings.footer_phone}
-							class="w-full rounded-lg border-slate-200 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-						/>
-					</div>
-					<div>
-						<label
-							for="footer_email"
-							class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Email</label
-						>
-						<input
-							type="email"
-							id="footer_email"
-							bind:value={settings.footer_email}
-							class="w-full rounded-lg border-slate-200 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-						/>
-					</div>
-				</div>
-
-				<div>
-					<label
-						for="footer_address"
-						class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Alamat</label
+					<h2
+						class="mb-8 border-b border-slate-50 pb-6 text-sm font-black tracking-widest text-slate-800 uppercase dark:border-slate-700 dark:text-white"
 					>
-					<textarea
-						id="footer_address"
-						bind:value={settings.footer_address}
-						rows="2"
-						class="w-full rounded-lg border-slate-200 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-					></textarea>
-				</div>
-			</div>
+						Dokumen Legal
+					</h2>
 
-			<!-- Social Media -->
-			<div
-				class="space-y-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
-			>
-				<h2
-					class="border-b border-slate-100 pb-4 text-lg font-bold text-slate-800 dark:border-slate-700 dark:text-slate-100"
-				>
-					Social Media Links
-				</h2>
+					<div class="space-y-8">
+						<div class="space-y-4">
+							<label
+								for="privacy_policy"
+								class="block text-[10px] font-black tracking-widest text-slate-500 uppercase"
+								>Privacy Policy</label
+							>
+							<TinyMCE bind:value={settings.privacy_policy} id="privacy_policy" height={300} />
+						</div>
 
-				<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-					<div>
-						<label
-							for="social_facebook"
-							class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-							>Facebook URL</label
-						>
-						<input
-							type="url"
-							id="social_facebook"
-							bind:value={settings.social_facebook}
-							class="w-full rounded-lg border-slate-200 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-						/>
+						<div class="space-y-4">
+							<label
+								for="terms_conditions"
+								class="block text-[10px] font-black tracking-widest text-slate-500 uppercase"
+								>Terms & Conditions</label
+							>
+							<TinyMCE bind:value={settings.terms_conditions} id="terms_conditions" height={300} />
+						</div>
 					</div>
-					<div>
-						<label
-							for="social_twitter"
-							class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-							>Twitter/X URL</label
-						>
-						<input
-							type="url"
-							id="social_twitter"
-							bind:value={settings.social_twitter}
-							class="w-full rounded-lg border-slate-200 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-						/>
-					</div>
-					<div>
-						<label
-							for="social_instagram"
-							class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-							>Instagram URL</label
-						>
-						<input
-							type="url"
-							id="social_instagram"
-							bind:value={settings.social_instagram}
-							class="w-full rounded-lg border-slate-200 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-						/>
-					</div>
-					<div>
-						<label
-							for="social_youtube"
-							class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-							>YouTube URL</label
-						>
-						<input
-							type="url"
-							id="social_youtube"
-							bind:value={settings.social_youtube}
-							class="w-full rounded-lg border-slate-200 focus:border-blue-500 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-						/>
-					</div>
-				</div>
-			</div>
+				</section>
 
-			<!-- Legal Documents -->
-			<div
-				class="space-y-6 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
-			>
-				<h2
-					class="border-b border-slate-100 pb-4 text-lg font-bold text-slate-800 dark:border-slate-700 dark:text-slate-100"
-				>
-					Dokumen Legal
-				</h2>
-
-				<div>
-					<label
-						for="privacy_policy"
-						class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-						>Privacy Policy</label
+				<footer class="flex justify-end gap-4 pt-4">
+					<button
+						type="submit"
+						disabled={isSaving}
+						class="rounded-2xl bg-ppid-primary px-12 py-4 text-xs font-black text-white shadow-xl shadow-ppid-primary/30 transition-all hover:opacity-90 disabled:opacity-50"
 					>
-					<TinyMCE bind:value={settings.privacy_policy} height={300} />
-				</div>
-
-				<div>
-					<label
-						for="terms_conditions"
-						class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-						>Terms & Conditions</label
-					>
-					<TinyMCE bind:value={settings.terms_conditions} height={300} />
-				</div>
-			</div>
-
-			<div class="flex justify-end pt-6">
-				<button
-					type="submit"
-					disabled={isSaving}
-					class="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white shadow-lg transition-all hover:bg-blue-700 hover:shadow-blue-500/30 focus:ring-4 focus:ring-blue-300 disabled:cursor-not-allowed disabled:opacity-50"
-				>
-					{isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}
-				</button>
-			</div>
-		</form>
-	{/if}
+						{isSaving ? 'MEMPROSES...' : 'SIMPAN PERUBAHAN'}
+					</button>
+				</footer>
+			</form>
+		{/if}
+	</div>
 </div>
 
-<!-- Confirmation Dialog -->
 <ConfirmationDialog
 	bind:show={showConfirm}
 	title="Simpan Perubahan?"
-	description="Apakah Anda yakin ingin menyimpan perubahan pengaturan footer?"
-	confirmText="Ya, Simpan"
+	description="Pengaturan ini akan langsung berdampak pada tampilan footer portal publik."
 	theme="primary"
 	onConfirm={handleSubmit}
 	isLoading={isSaving}
 />
 
-<!-- Notification -->
 <NotificationDialog
-	bind:show={showNotification}
-	theme={notificationType}
-	title={notificationType === 'success' ? 'Berhasil!' : 'Gagal!'}
-	description={notificationMessage}
+	bind:show={notification.show}
+	theme={notification.type}
+	title={notification.type === 'success' ? 'BERHASIL' : 'GAGAL'}
+	description={notification.message}
 />

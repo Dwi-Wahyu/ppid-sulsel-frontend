@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import { fly, fade, slide } from 'svelte/transition';
 	import * as m from '$lib/paraglide/messages.js';
-	import { getLocale, localizeHref, setLocale } from '$lib/paraglide/runtime.js';
+	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
 	import { env } from '$env/dynamic/public';
 	import SearchModal from './SearchModal.svelte';
 	import Sosmed from './Sosmed.svelte';
+	import { theme } from '$lib/state/theme.svelte';
 
 	// State
 	let mobileMenu = $state(false);
@@ -16,23 +16,13 @@
 	let openLayanan = $state(false);
 	let openService = $state(false);
 	let openLang = $state(false);
-	let darkMode = $state(false);
 	let searchModalOpen = $state(false);
 
 	// Computed
 	let currentLang = $derived(getLocale().toUpperCase());
 
-	// Effects & Lifecycle
-	onMount(() => {
-		const theme = localStorage.getItem('theme');
-		darkMode =
-			theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
-		updateTheme(darkMode);
-	});
-
 	function toggleDarkMode() {
-		darkMode = !darkMode;
-		updateTheme(darkMode);
+		theme.toggle();
 	}
 
 	function updateTheme(isDark: boolean) {
@@ -105,10 +95,16 @@
 >
 	<div class="container mx-auto flex items-center justify-between px-4 py-4 md:py-6">
 		<a href="/" class="group flex items-center gap-3">
-			<img src="/images/ppid-3.png" alt="Logo" class="block h-10 w-auto md:h-14 dark:hidden" />
-			<img src="/logo/ppid-dark.png" alt="Logo" class="hidden h-10 w-auto md:h-14 dark:block" />
+			{#if theme.darkMode}
+				<img src="/images/ppid-4.png" alt="Logo" class=" h-10 w-auto md:h-14" />
+			{:else}
+				<img src="/images/ppid-3.png" alt="Logo" class=" h-10 w-auto md:h-14" />
+			{/if}
+
 			<div class="flex flex-col justify-center">
-				<span class="font-['Plus_Jakarta_Sans'] text-xs font-extrabold text-gray-700 md:text-base">
+				<span
+					class="font-['Plus_Jakarta_Sans'] text-xs font-extrabold text-gray-700 md:text-base dark:text-white"
+				>
 					{m['header.title_1']()}
 				</span>
 				<span
@@ -123,7 +119,7 @@
 			<!-- Search Trigger Button -->
 			<button
 				onclick={() => (searchModalOpen = true)}
-				class="rounded-full p-2 text-gray-700 transition-all hover:bg-white/10 hover:text-[#D4AF37]"
+				class="rounded-full p-2 text-gray-700 transition-all hover:bg-white/10 hover:text-[#D4AF37] dark:text-white"
 				aria-label="Search"
 			>
 				<svg
@@ -144,10 +140,10 @@
 
 			<button
 				onclick={toggleDarkMode}
-				class="rounded-full p-2 text-gray-700 hover:bg-white/10"
+				class="rounded-full p-2 text-gray-700 hover:bg-white/10 dark:text-white"
 				aria-label="Toggle dark mode"
 			>
-				{#if !darkMode}
+				{#if !theme.darkMode}
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						class="h-5 w-5"
@@ -177,7 +173,7 @@
 			<div class="relative" use:clickOutside={() => (openLang = false)}>
 				<button
 					onclick={() => (openLang = !openLang)}
-					class="flex items-center px-3 py-2 text-sm font-bold text-gray-700 hover:text-ppid-accent"
+					class="flex items-center px-3 py-2 text-sm font-bold text-gray-700 hover:text-ppid-accent dark:text-white"
 				>
 					<span>{currentLang}</span>
 					<svg
@@ -407,7 +403,7 @@
 							transition:slide
 							class="z-50 w-full bg-white py-2 text-[#1A305E] lg:absolute lg:w-64 lg:rounded-b-lg lg:border-t-4 lg:border-[#D4AF37] dark:bg-slate-800 dark:text-gray-200"
 						>
-							{#each ['permohonan-informasi', 'pengajuan-keberatan', 'sop', 'cek-status'] as s}
+							{#each ['permohonan-informasi', 'pengajuan-keberatan', 'sop', 'cek-status', 'kontak'] as s}
 								<li>
 									<a
 										href="/layanan/{s}"
