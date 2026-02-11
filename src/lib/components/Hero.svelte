@@ -192,14 +192,14 @@
 								<h1
 									class="mb-1.5 text-xs leading-tight font-bold text-white drop-shadow-lg sm:mb-4 sm:text-2xl md:text-4xl lg:text-5xl"
 								>
-									Selamat Datang di Portal Resmi<br />
-									<span class="text-ppid-accent">PPID Utama</span><br />
-									Provinsi Sulawesi Selatan
+									{m['hero.welcome']()}<br />
+									<span class="text-ppid-accent">{m['hero.ppid_main']()}</span><br />
+									{m['hero.province']()}
 								</h1>
 								<p
 									class="mb-2 text-[10px] leading-tight font-medium text-white/90 drop-shadow-md sm:mb-6 sm:text-sm md:mb-8 md:text-lg lg:text-xl"
 								>
-									Transparansi Informasi Publik untuk Sulawesi Selatan yang Lebih Baik
+									{m['hero.tagline']()}
 								</p>
 
 								<div class="mx-auto max-w-2xl scale-90 sm:scale-100">
@@ -255,14 +255,14 @@
 							<h1
 								class="mb-1.5 text-xs leading-tight font-bold text-white drop-shadow-lg sm:mb-4 sm:text-2xl"
 							>
-								Selamat Datang di Portal Resmi<br />
-								<span class="text-ppid-accent">PPID Utama</span><br />
-								Provinsi Sulawesi Selatan
+								{m['hero.welcome']()}<br />
+								<span class="text-ppid-accent">{m['hero.ppid_main']()}</span><br />
+								{m['hero.province']()}
 							</h1>
 							<p
 								class="mb-2 text-[10px] leading-tight font-medium text-white/90 drop-shadow-md sm:mb-6 sm:text-sm"
 							>
-								Transparansi Informasi Publik untuk Sulawesi Selatan yang Lebih Baik
+								{m['hero.tagline']()}
 							</p>
 						</div>
 					</div>
@@ -386,7 +386,7 @@
 		</div>
 
 		<div class="absolute bottom-4 left-1/2 -translate-x-1/2 text-sm text-white/70">
-			Klik di luar gambar atau tekan ESC untuk menutup
+			{m['hero.close_modal']()}
 		</div>
 	</div>
 {/if}

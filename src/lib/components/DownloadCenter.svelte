@@ -1,5 +1,5 @@
 <script>
-	// No imports needed for static content
+	import * as m from '$lib/paraglide/messages.js';
 </script>
 
 <section id="informasi" class="bg-white py-8 font-['Plus_Jakarta_Sans'] md:py-16 dark:bg-slate-900">
@@ -23,16 +23,16 @@
 				</svg>
 				<span
 					class="text-xs font-bold tracking-wide text-ppid-primary uppercase md:text-sm dark:text-gray-200"
-					>Akses Cepat</span
+					>{m['download.quick_access']()}</span
 				>
 			</div>
 			<h2
 				class="mb-4 text-2xl leading-tight font-bold text-ppid-primary sm:text-3xl md:text-5xl dark:text-white"
 			>
-				Informasi & Layanan
+				{m['download.info_services']()}
 			</h2>
 			<p class="text-base leading-relaxed text-ppid-text md:text-xl dark:text-gray-300">
-				Akses mudah ke berbagai layanan dan informasi PPID
+				{m['download.easy_access']()}
 			</p>
 		</div>
 
@@ -79,7 +79,7 @@
 									>{card.badge}</span
 								>
 								<span class="hidden md:inline">•</span>
-								<span class="hidden md:inline">PPID Sulsel</span>
+								<span class="hidden md:inline">{m['download.ppid_sulsel']()}</span>
 							</div>
 						</div>
 
@@ -98,7 +98,7 @@
 							<div
 								class="mt-auto flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-[#fafafa] px-3 py-2 text-xs font-bold text-ppid-primary shadow-sm transition-all group-hover:border-ppid-accent group-hover:bg-ppid-accent group-hover:text-ppid-primary group-hover:shadow-md md:px-5 md:py-3 md:text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white"
 							>
-								<span>Akses Sekarang</span>
+								<span>{m['download.access_now']()}</span>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
 									width="16"

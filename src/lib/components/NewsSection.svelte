@@ -62,17 +62,17 @@
 				<h2
 					class="text-3xl font-black tracking-tight text-slate-800 uppercase md:text-4xl dark:text-white"
 				>
-					Berita Terbaru
+					{m['news.latest_title']()}
 				</h2>
 				<p class="mt-2 font-medium text-slate-500 dark:text-slate-400">
-					Informasi terkini seputar Pemerintah Provinsi Sulawesi Selatan
+					{m['news.latest_desc']()}
 				</p>
 			</div>
 			<a
 				href="/berita"
 				class="hidden text-sm font-black tracking-widest text-blue-700 uppercase hover:underline md:block dark:text-blue-400"
 			>
-				Lihat Semua Berita →
+				{m['news.view_all_news']()}
 			</a>
 		</div>
 
@@ -150,7 +150,7 @@
 				href="/berita"
 				class="inline-block rounded-2xl bg-blue-700 px-10 py-4 text-xs font-black tracking-widest text-white uppercase shadow-xl shadow-blue-700/30"
 			>
-				Lihat Semua Berita
+				{m['news.view_all_button']()}
 			</a>
 		</div>
 	</div>

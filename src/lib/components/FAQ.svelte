@@ -2,6 +2,7 @@
 	import { slide } from 'svelte/transition';
 	import { onMount } from 'svelte';
 	import { env } from '$env/dynamic/public';
+	import * as m from '$lib/paraglide/messages.js';
 
 	// Types untuk data FAQ
 	interface FaqItem {
@@ -68,14 +69,14 @@
 					/>
 				</svg>
 				<span class="text-sm font-bold tracking-wide text-blue-700 uppercase dark:text-blue-400">
-					FAQ
+					{m['faq.badge']()}
 				</span>
 			</div>
 			<h2 class="mb-4 text-3xl font-extrabold text-slate-900 md:text-4xl dark:text-white">
-				Pertanyaan Sering Diajukan
+				{m['faq.frequently_asked']()}
 			</h2>
 			<p class="text-lg text-slate-600 dark:text-slate-400">
-				Temukan jawaban cepat untuk pertanyaan umum seputar layanan informasi publik kami.
+				{m['faq.quick_info']()}
 			</p>
 		</div>
 
@@ -138,7 +139,7 @@
 					</div>
 				{/each}
 			{:else}
-				<p class="text-center text-slate-500">Belum ada pertanyaan tersedia.</p>
+				<p class="text-center text-slate-500">{m['faq.no_faq']()}</p>
 			{/if}
 		</div>
 	</div>

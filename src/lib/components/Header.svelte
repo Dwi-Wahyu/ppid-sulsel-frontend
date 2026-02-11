@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { fly, fade, slide } from 'svelte/transition';
 	import * as m from '$lib/paraglide/messages.js';
 	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
@@ -17,9 +17,11 @@
 	let openService = $state(false);
 	let openLang = $state(false);
 	let searchModalOpen = $state(false);
+	let scrollY = $state(0);
 
 	// Computed
 	let currentLang = $derived(getLocale().toUpperCase());
+	let isScrolled = $derived(scrollY > 100);
 
 	function toggleDarkMode() {
 		theme.toggle();
@@ -67,6 +69,12 @@
 	let isLoading = $state(true);
 
 	onMount(async () => {
+		// Scroll tracking with inline handler
+		window.addEventListener('scroll', () => {
+			scrollY = window.scrollY;
+		});
+
+		// Fetch data
 		try {
 			const [resKategori, resTahun] = await Promise.all([
 				fetch(`${BACKEND_URL}/api/public/informasi/kategori`),
@@ -91,9 +99,15 @@
 </script>
 
 <header
-	class="absolute top-0 left-0 z-50 w-full bg-white font-['Plus_Jakarta_Sans'] shadow-md transition-colors duration-300 dark:bg-slate-900"
+	class="fixed top-0 left-0 z-50 w-full font-['Plus_Jakarta_Sans'] transition-all duration-300 {isScrolled
+		? ''
+		: 'bg-white shadow-md dark:bg-slate-900'}"
 >
-	<div class="container mx-auto flex items-center justify-between px-4 py-4 md:py-6">
+	<div
+		class="container mx-auto flex items-center justify-between px-4 transition-all duration-300 {isScrolled
+			? 'h-0 overflow-hidden py-0 opacity-0'
+			: 'py-4 opacity-100 md:py-6'}"
+	>
 		<a href="/" class="group flex items-center gap-3">
 			{#if theme.darkMode}
 				<img src="/images/ppid-4.png" alt="Logo" class=" h-10 w-auto md:h-14" />
@@ -228,7 +242,11 @@
 		</div>
 	</div>
 
-	<nav class="relative bg-ppid-primary shadow-md {mobileMenu ? 'block' : 'hidden lg:block'}">
+	<nav
+		class="relative bg-ppid-primary transition-all duration-300 {mobileMenu
+			? 'block'
+			: 'hidden lg:block'} {isScrolled ? 'shadow-xl' : 'shadow-md'}"
+	>
 		<div class="absolute top-0 left-0 h-px w-full bg-white/20"></div>
 		<div class="container mx-auto py-4">
 			<ul

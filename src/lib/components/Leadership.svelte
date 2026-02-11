@@ -129,13 +129,13 @@
 							<div
 								class="inline-block rounded-full bg-ppid-primary/10 px-4 py-1 text-[10px] font-black tracking-widest text-ppid-primary uppercase dark:bg-ppid-primary/20"
 							>
-								{leader.badge}
+								{m[`leadership.${leader.badge}`]()}
 							</div>
 							<h3 class="text-xl font-black tracking-tight text-slate-800 dark:text-white">
-								{leader.name}
+								{m[`leadership.${leader.name}`]()}
 							</h3>
 							<p class="text-sm font-bold tracking-tighter text-slate-400 uppercase">
-								{leader.pos}
+								{m[`leadership.${leader.pos}`]()}
 							</p>
 						</div>
 					</div>
