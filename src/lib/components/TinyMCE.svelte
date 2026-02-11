@@ -20,14 +20,24 @@
 	let editorInstance: any = null;
 	let element: HTMLTextAreaElement;
 
+	// Perbaikan: Gunakan status loading global
+	const TINY_SCRIPT_ID = 'tinymce-script';
+
 	const initEditor = () => {
+		// Pastikan DOM sudah siap dan tinymce sudah tersedia secara global
 		if (typeof window === 'undefined' || !(window as any).tinymce) return;
 
 		const tinymce = (window as any).tinymce;
+
+		// Bersihkan instance lama jika ada dengan ID yang sama
+		if (tinymce.get(id)) {
+			tinymce.remove(`#${id}`);
+		}
+
 		const isDarkMode = document.documentElement.classList.contains('dark');
 
 		tinymce.init({
-			target: element,
+			target: element, // Menggunakan referensi element langsung lebih aman [cite: 14]
 			height: height,
 			placeholder: placeholder,
 			menubar: 'file edit view insert format tools table help',
@@ -54,49 +64,44 @@
 				'lists',
 				'wordcount',
 				'help',
-				'charmap',
 				'quickbars',
 				'emoticons'
 			],
 			toolbar:
-				'undo redo | bold italic underline strikethrough | fontfamily fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview print | template link anchor | ltr rtl',
+				'undo redo | bold italic underline strikethrough | fontfamily fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen preview | link anchor',
 			skin: isDarkMode ? 'oxide-dark' : 'oxide',
 			content_css: isDarkMode ? 'dark' : 'default',
-			content_style: `
-				@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-				body {
-					font-family: 'Plus Jakarta Sans', Helvetica, Arial, sans-serif;
-					font-size: 16px;
-					color: ${isDarkMode ? '#cbd5e1' : '#334155'};
-					background-color: ${isDarkMode ? '#1e293b' : '#ffffff'};
-				}
-				h1,h2,h3,h4,h5,h6 {
-					color: ${isDarkMode ? '#f8fafc' : '#1e293b'};
-				}
-			`,
 			setup: (editor: any) => {
 				editorInstance = editor;
 				editor.on('change input undo redo', () => {
 					value = editor.getContent();
 				});
-
-				// Handle focus/blur if needed
 			},
 			init_instance_callback: (editor: any) => {
-				if (value) {
-					editor.setContent(value);
-				}
+				if (value) editor.setContent(value);
 			}
 		});
 	};
 
 	onMount(() => {
-		// Load TinyMCE if not already loaded
 		if (!(window as any).tinymce) {
-			const script = document.createElement('script');
-			script.src = '/vendor/tinymce/tinymce.min.js';
-			script.onload = initEditor;
-			document.head.appendChild(script);
+			// Periksa apakah skrip sedang dimuat oleh komponen lain
+			let script = document.getElementById(TINY_SCRIPT_ID) as HTMLScriptElement;
+
+			if (!script) {
+				script = document.createElement('script');
+				script.id = TINY_SCRIPT_ID;
+				script.src = '/vendor/tinymce/tinymce.min.js';
+				script.onload = () => {
+					// Trigger event custom agar komponen lain tahu skrip sudah siap
+					window.dispatchEvent(new Event('tinymce-loaded'));
+					initEditor();
+				};
+				document.head.appendChild(script);
+			} else {
+				// Jika skrip sudah ada tapi belum selesai dimuat, tunggu event
+				window.addEventListener('tinymce-loaded', initEditor);
+			}
 		} else {
 			initEditor();
 		}
@@ -109,21 +114,20 @@
 			}
 		});
 
-		observer.observe(document.documentElement, {
-			attributes: true,
-			attributeFilter: ['class']
-		});
+		observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 
-		return () => observer.disconnect();
+		return () => {
+			observer.disconnect();
+			window.removeEventListener('tinymce-loaded', initEditor);
+		};
 	});
 
 	onDestroy(() => {
 		if (editorInstance && (window as any).tinymce) {
-			(window as any).tinymce.remove(editorInstance);
+			(window as any).tinymce.remove(editorInstance); // Pastikan dibersihkan [cite: 19]
 		}
 	});
 
-	// Sync value changes from outside
 	$effect(() => {
 		if (editorInstance && value !== editorInstance.getContent()) {
 			editorInstance.setContent(value || '');
