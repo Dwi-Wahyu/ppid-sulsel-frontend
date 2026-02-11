@@ -27,16 +27,6 @@
 		theme.toggle();
 	}
 
-	function updateTheme(isDark: boolean) {
-		if (isDark) {
-			document.documentElement.classList.add('dark');
-			localStorage.setItem('theme', 'dark');
-		} else {
-			document.documentElement.classList.remove('dark');
-			localStorage.setItem('theme', 'light');
-		}
-	}
-
 	function clickOutside(node: HTMLElement, callback: () => void) {
 		const handleClick = (event: MouseEvent) => {
 			if (event.target instanceof Node && !node.contains(event.target)) {
@@ -131,6 +121,8 @@
 
 		<div class="flex items-center gap-3 md:gap-4">
 			<!-- Search Trigger Button -->
+			<a href="/login" class="text-sm font-medium text-gray-700 dark:text-white"> Login </a>
+
 			<button
 				onclick={() => (searchModalOpen = true)}
 				class="rounded-full p-2 text-gray-700 transition-all hover:bg-white/10 hover:text-[#D4AF37] dark:text-white"

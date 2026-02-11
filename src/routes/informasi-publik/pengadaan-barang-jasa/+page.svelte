@@ -101,11 +101,7 @@
 
 	// Helper: URL Storage
 	const getFileUrl = (fileName: string) => {
-<<<<<<< HEAD
-		return `${PUBLIC_API_URL.replace('/api', '')}/storage/${fileName}`;
-=======
 		return `${PUBLIC_API_URL.replace('/api', '')}/uploads/${fileName}`;
->>>>>>> a671b4e5aab697cf0824110f57582e30d269fd01
 	};
 </script>
 
@@ -118,7 +114,11 @@
 >
 	<div class="container mx-auto px-4 py-8">
 		<nav class="mb-4 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-			<a href="/" class="transition-colors hover:text-ppid-primary dark:text-white">
+			<a
+				title="Kembali ke beranda"
+				href="/"
+				class="transition-colors hover:text-ppid-primary dark:text-white"
+			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					class="h-4 w-4"
