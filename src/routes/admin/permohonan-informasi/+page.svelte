@@ -130,7 +130,7 @@
 </svelte:head>
 
 <div class="mb-4 flex items-center justify-between">
-	<h2 class="text-xl font-semibold leading-tight text-slate-800 dark:text-slate-100">
+	<h2 class="text-xl leading-tight font-semibold text-slate-800 dark:text-slate-100">
 		Permohonan Informasi
 	</h2>
 </div>
@@ -149,7 +149,9 @@
 		</div>
 
 		<!-- Search/Filter -->
-		<div class="border-b border-slate-100 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-700/30">
+		<div
+			class="border-b border-slate-100 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-700/30"
+		>
 			<form onsubmit={handleSearch} class="flex flex-col gap-4 sm:flex-row">
 				<div class="relative max-w-md flex-1">
 					<label for="search-input" class="sr-only">Cari permohonan informasi</label>
@@ -174,7 +176,7 @@
 						value={data.filters.search}
 						placeholder="Cari nama atau email..."
 						autocomplete="off"
-						class="w-full rounded-lg border border-slate-200 py-2 pr-4 pl-10 text-sm focus:border-ppid-accent focus:outline-none focus:ring-1 focus:ring-ppid-accent dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:placeholder-slate-500"
+						class="w-full rounded-lg border border-slate-200 py-2 pr-4 pl-10 text-sm focus:border-ppid-accent focus:ring-1 focus:ring-ppid-accent focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:placeholder-slate-500"
 					/>
 				</div>
 				<button
@@ -190,7 +192,7 @@
 		<div class="overflow-x-auto">
 			<table class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
 				<thead
-					class="bg-slate-50 text-xs font-semibold uppercase text-slate-700 dark:bg-slate-700/50 dark:text-slate-400"
+					class="bg-slate-50 text-xs font-semibold text-slate-700 uppercase dark:bg-slate-700/50 dark:text-slate-400"
 				>
 					<tr>
 						<th scope="col" class="px-6 py-4">Nama</th>
@@ -209,7 +211,9 @@
 							>
 								<td class="px-6 py-4">
 									<div class="flex items-center">
-										<div class="max-w-xs font-medium text-[#1A305E] line-clamp-2 dark:text-slate-100">
+										<div
+											class="line-clamp-2 max-w-xs font-medium text-[#1A305E] dark:text-slate-100"
+										>
 											{item.nama}
 										</div>
 									</div>
@@ -234,6 +238,28 @@
 								</td>
 								<td class="px-6 py-4 text-right">
 									<div class="flex items-center justify-end space-x-2">
+										<button
+											type="button"
+											onclick={() => goto(`/admin/permohonan-informasi/${item.id_permohonan}`)}
+											class="text-slate-400 transition-colors hover:text-[#1A305E] dark:text-slate-500 dark:hover:text-[#B8860B]"
+											title="Lihat detail permohonan"
+											aria-label="Lihat detail permohonan {item.nama}"
+										>
+											<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+												></path>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+												></path>
+											</svg>
+										</button>
 										<button
 											type="button"
 											onclick={() => confirmDelete(item.id_permohonan)}
