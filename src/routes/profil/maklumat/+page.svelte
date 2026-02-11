@@ -58,7 +58,7 @@
 					class="flex items-center justify-between border-b border-gray-200 bg-gray-50 px-6 py-4 dark:border-slate-700 dark:bg-slate-900"
 				>
 					<h2 class="font-bold text-gray-900 dark:text-white">
-						Maklumat Pelayanan Informasi Publik
+						{m['maklumat.title']()}
 					</h2>
 					<button
 						class="flex items-center gap-2 text-sm font-medium text-ppid-primary transition-colors hover:text-ppid-accent dark:text-white"
@@ -79,7 +79,7 @@
 							<polyline points="7 10 12 15 17 10" />
 							<line x1="12" x2="12" y1="15" y2="3" />
 						</svg>
-						Download
+						{m['common.download']()}
 					</button>
 				</div>
 
@@ -88,19 +88,19 @@
 						{#if profil.file_banner}
 							<img
 								src={profil.file_banner}
-								alt="Maklumat Pelayanan Informasi Publik PPID Sulawesi Selatan"
+								alt={m['maklumat.banner_alt']()}
 								class="h-auto w-full"
 							/>
 						{:else}
 							<img
 								src="/images/20230918134717_Maklumat pelayanan informasi publik.png"
-								alt="Maklumat Pelayanan Informasi Publik PPID Sulawesi Selatan"
+								alt={m['maklumat.banner_alt']()}
 								class="h-auto w-full"
 							/>
 						{/if}
 					</div>
 					<p class="mt-4 text-center text-sm text-gray-600 dark:text-gray-300">
-						Maklumat Pelayanan Informasi Publik - PPID Provinsi Sulawesi Selatan
+						{m['maklumat.caption']()}
 					</p>
 				</div>
 			</div>
@@ -118,10 +118,9 @@
 			<div
 				class="rounded-xl bg-linear-to-br from-ppid-primary to-ppid-text p-6 text-center text-white md:p-8"
 			>
-				<h3 class="mb-2 text-lg font-bold">Informasi & Pengaduan</h3>
+				<h3 class="mb-2 text-lg font-bold">{m['maklumat.info_complaint_title']()}</h3>
 				<p class="text-sm text-white/90">
-					Untuk informasi lebih lanjut atau menyampaikan pengaduan terkait pelayanan informasi
-					publik, silakan hubungi PPID Sulawesi Selatan melalui saluran yang tersedia.
+					{m['maklumat.info_complaint_desc']()}
 				</p>
 			</div>
 		</div>

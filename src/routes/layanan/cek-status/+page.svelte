@@ -1,10 +1,7 @@
 <script>
 	import Footer from '$lib/components/Footer.svelte';
 	import * as m from '$lib/paraglide/messages.js';
-<<<<<<< HEAD
-=======
 	import { api } from '$lib/api';
->>>>>>> a671b4e5aab697cf0824110f57582e30d269fd01
 
 	// State
 	let type = $state('permohonan'); // 'permohonan' or 'keberatan'
@@ -24,50 +21,6 @@
 		results = [];
 
 		try {
-<<<<<<< HEAD
-			// Simulate API call with mock data
-			await new Promise((resolve) => setTimeout(resolve, 1000));
-
-			// Mock results
-			const mockResults =
-				type === 'permohonan'
-					? [
-							{
-								id_permohonan: '1',
-								tgl_permohonan: '2024-02-01',
-								rincian: 'Data Anggaran Pendidikan Tahun 2024',
-								status: 'Diproses',
-								tgl_selesai: null,
-								keterangan: 'Sedang dalam proses verifikasi'
-							},
-							{
-								id_permohonan: '2',
-								tgl_permohonan: '2024-01-15',
-								rincian: 'Laporan Keuangan APBD 2023',
-								status: 'Selesai',
-								tgl_selesai: '2024-01-20',
-								keterangan: 'Informasi telah dikirim via email'
-							}
-						]
-					: [
-							{
-								id_pengajuan: '1',
-								tgl_pengajuan: '2024-02-05',
-								alasan_keberatan: 'Informasi tidak sesuai dengan permintaan',
-								status: 'Ditinjau',
-								tgl_selesai: null,
-								jawaban: 'Sedang dalam proses peninjauan tim'
-							}
-						];
-
-			results = mockResults;
-			error = '';
-
-			// Scroll to results
-			setTimeout(() => {
-				document.getElementById('hasil-pencarian')?.scrollIntoView({ behavior: 'smooth' });
-			}, 100);
-=======
 			// Call API based on type
 			let endpoint = '';
 			if (type === 'permohonan') {
@@ -97,7 +50,6 @@
 			} else {
 				error = response.message || 'Gagal mengambil data.';
 			}
->>>>>>> a671b4e5aab697cf0824110f57582e30d269fd01
 		} catch (err) {
 			error = 'Terjadi kesalahan koneksi. Silakan coba lagi.';
 			console.error('Error:', err);
@@ -472,8 +424,6 @@
 										{type === 'permohonan' ? item.keterangan : item.jawaban}
 									</p>
 								</div>
-<<<<<<< HEAD
-=======
 
 								{#if item.file_url}
 									<div class="mt-4">
@@ -494,7 +444,6 @@
 										</a>
 									</div>
 								{/if}
->>>>>>> a671b4e5aab697cf0824110f57582e30d269fd01
 							</div>
 						</div>
 					</div>

@@ -59,12 +59,11 @@
 						<div class="absolute -top-6 -right-6 text-[120px] leading-none text-white/10">"</div>
 						<div class="relative">
 							<p class="mb-4 text-lg leading-relaxed italic md:text-xl">
-								Transparansi adalah kunci untuk membangun kepercayaan publik dan mewujudkan tata
-								kelola pemerintahan yang baik
+								{m['profile.quote']()}
 							</p>
 							<div class="flex items-center gap-3">
 								<div class="h-0.5 w-12 bg-white dark:bg-slate-800/50"></div>
-								<span class="text-sm text-white/90">Komitmen PPID Sulawesi Selatan</span>
+								<span class="text-sm text-white/90">{m['profile.commitment_label']()}</span>
 							</div>
 						</div>
 					</div>
@@ -77,16 +76,20 @@
 					<!-- Closing -->
 					<div class="mt-8 border-t border-gray-200 pt-6 dark:border-slate-700">
 						<p class="mb-6 font-medium text-gray-900 dark:text-white">
-							Wassalamu'alaikum Warahmatullahi Wabarakatuh
+							{m['profile.closing_greeting']()}
 						</p>
 
 						<div class="flex items-start gap-4">
 							<div class="h-20 w-1 rounded-full bg-ppid-accent"></div>
 							<div>
-								<p class="text-lg font-bold text-gray-900 dark:text-white">Kepala PPID</p>
-								<p class="text-sm text-gray-600 dark:text-gray-300">Provinsi Sulawesi Selatan</p>
+								<p class="text-lg font-bold text-gray-900 dark:text-white">
+									{m['profile.head_ppid']()}
+								</p>
+								<p class="text-sm text-gray-600 dark:text-gray-300">
+									{m['profile.province_name']()}
+								</p>
 								<p class="mt-1 text-xs text-gray-500">
-									Pejabat Pengelola Informasi dan Dokumentasi
+									{m['profile.ppid_officer']()}
 								</p>
 							</div>
 						</div>
@@ -100,7 +103,7 @@
 					class="sticky top-24 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
 				>
 					<div class="bg-ppid-primary px-5 py-4">
-						<h3 class="font-bold text-white">Kepala PPID Utama</h3>
+						<h3 class="font-bold text-white">{m['profile.head_main_ppid']()}</h3>
 					</div>
 					<div class="p-5">
 						<div class="rounded-lg border border-ppid-primary/10 bg-ppid-primary/5 p-4">
@@ -135,10 +138,12 @@
 							<p class="mb-1 text-sm font-bold text-ppid-primary dark:text-white">
 								Dr. H. Andi Sudirman Sulaiman, SE., MM
 							</p>
-							<p class="mb-2 text-xs font-semibold text-ppid-accent">Kepala Dinas Kominfo</p>
+							<p class="mb-2 text-xs font-semibold text-ppid-accent">
+								{m['profile.head_comm_service']()}
+							</p>
 							<div class="mb-2 h-0.5 w-12 rounded-full bg-ppid-accent"></div>
 							<p class="text-xs leading-relaxed text-gray-600 dark:text-gray-400">
-								PPID Utama Provinsi Sulawesi Selatan
+								{m['profile.main_ppid_province']()}
 							</p>
 						</div>
 					</div>

@@ -68,7 +68,7 @@
 					<h3
 						class="mb-4 text-sm font-bold tracking-wide text-ppid-primary uppercase dark:text-white"
 					>
-						Prinsip Layanan
+						{m['profile.service_principles']()}
 					</h3>
 					<div class="space-y-4">
 						<div class="flex items-start gap-3">
@@ -98,10 +98,10 @@
 							</div>
 							<div>
 								<h4 class="mb-0.5 text-sm font-semibold text-gray-900 dark:text-white">
-									Transparansi
+									{m['profile.transparency']()}
 								</h4>
 								<p class="text-xs text-gray-600 dark:text-gray-300">
-									Keterbukaan informasi publik untuk masyarakat
+									{m['profile.transparency_desc']()}
 								</p>
 							</div>
 						</div>
@@ -126,10 +126,10 @@
 							</div>
 							<div>
 								<h4 class="mb-0.5 text-sm font-semibold text-gray-900 dark:text-white">
-									Akuntabilitas
+									{m['profile.accountability']()}
 								</h4>
 								<p class="text-xs text-gray-600 dark:text-gray-300">
-									Pengelolaan informasi yang bertanggung jawab
+									{m['profile.accountability_desc']()}
 								</p>
 							</div>
 						</div>
@@ -155,10 +155,10 @@
 							</div>
 							<div>
 								<h4 class="mb-0.5 text-sm font-semibold text-gray-900 dark:text-white">
-									Profesional
+									{m['profile.professional']()}
 								</h4>
 								<p class="text-xs text-gray-600 dark:text-gray-300">
-									Layanan prima untuk seluruh masyarakat
+									{m['profile.professional_desc']()}
 								</p>
 							</div>
 						</div>
@@ -167,7 +167,9 @@
 
 				<!-- Landasan Hukum -->
 				<div class="rounded-xl bg-ppid-primary p-6 text-white shadow-sm">
-					<h3 class="mb-4 text-sm font-bold tracking-wide uppercase">Landasan Hukum</h3>
+					<h3 class="mb-4 text-sm font-bold tracking-wide uppercase">
+						{m['profile.legal_basis']()}
+					</h3>
 					<div class="space-y-3 text-sm">
 						<div class="flex items-start gap-2">
 							<div class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ppid-accent"></div>
