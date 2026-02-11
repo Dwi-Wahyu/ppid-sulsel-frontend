@@ -35,12 +35,11 @@
 	}
 
 	// --- State (Svelte 5 Runes) ---
-	let beritaId = $state<string>('');
 	let judul = $state('');
 	let deskripsi = $state('');
 	let id_skpd = $state('');
 	let verify = $state('n');
-	let img_berita = $state<any>(null); // State untuk FilePond [cite: 24]
+	let img_berita = $state<any>(null);
 	let currentImage = $state<string | null>(null);
 	let skpdList = $state<SKPD[]>([]);
 	let isLoading = $state(true);
@@ -157,7 +156,7 @@
 			<form
 				onsubmit={(e) => {
 					e.preventDefault();
-					showConfirm = true; // Munculkan dialog konfirmasi sebelum submit [cite: 40]
+					showConfirm = true; // Munculkan dialog konfirmasi sebelum submit
 				}}
 				class="space-y-6 p-6"
 			>

@@ -108,7 +108,7 @@
 
 <!-- Header -->
 <div
-	class="mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-[#1A305E] to-[#2A4A8E] p-8 text-white shadow-xl"
+	class="mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-ppid-primary to-ppid-primary-dark p-8 text-white shadow-xl"
 >
 	<div class="flex items-start justify-between">
 		<div class="flex-1">
@@ -158,7 +158,9 @@
 		<div
 			class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
 		>
-			<div class="border-b border-slate-200 bg-gradient-to-r from-[#1A305E] to-[#2A4A8E] p-4">
+			<div
+				class="border-b border-white/10 bg-gradient-to-r from-ppid-primary to-ppid-primary-light p-4"
+			>
 				<h2 class="flex items-center gap-2 text-lg font-bold text-white">
 					<svg
 						class="h-5 w-5"
@@ -219,7 +221,7 @@
 							href="/uploads/{data.permohonan.foto_ktp}"
 							target="_blank"
 							rel="noopener noreferrer"
-							class="inline-flex items-center gap-2 text-sm text-[#1A305E] hover:text-[#B8860B] dark:text-blue-400 dark:hover:text-blue-300"
+							class="inline-flex items-center gap-2 text-sm text-ppid-primary hover:text-ppid-accent dark:text-blue-400 dark:hover:text-blue-300"
 						>
 							<svg
 								class="h-4 w-4"
@@ -246,7 +248,9 @@
 		<div
 			class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
 		>
-			<div class="border-b border-slate-200 bg-gradient-to-r from-[#1A305E] to-[#2A4A8E] p-4">
+			<div
+				class="border-b border-white/10 bg-gradient-to-r from-ppid-primary to-ppid-primary-light p-4"
+			>
 				<h2 class="flex items-center gap-2 text-lg font-bold text-white">
 					<svg
 						class="h-5 w-5"
@@ -312,7 +316,9 @@
 			<div
 				class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
 			>
-				<div class="border-b border-slate-200 bg-gradient-to-r from-purple-600 to-purple-800 p-4">
+				<div
+					class="border-b border-white/10 bg-gradient-to-r from-ppid-primary to-ppid-primary-light p-4"
+				>
 					<h2 class="flex items-center gap-2 text-lg font-bold text-white">
 						<svg
 							class="h-5 w-5"
@@ -482,7 +488,7 @@
 										<div class="space-y-3">
 											<div class="flex items-center gap-2">
 												<svg
-													class="h-5 w-5 text-purple-600 dark:text-purple-400"
+													class="h-5 w-5 text-ppid-primary dark:text-ppid-primary-light"
 													fill="none"
 													viewBox="0 0 24 24"
 													stroke="currentColor"
@@ -504,14 +510,14 @@
 
 											{#each disposisi.respon as respon, responIndex}
 												<div
-													class="overflow-hidden rounded-lg border-2 border-purple-200 bg-gradient-to-br from-white to-purple-50/30 shadow-md dark:border-purple-800 dark:from-slate-800 dark:to-purple-900/10"
+													class="overflow-hidden rounded-lg border-2 border-ppid-primary/20 bg-gradient-to-br from-white to-ppid-primary/5 shadow-md dark:border-ppid-primary/30 dark:from-slate-800 dark:to-ppid-primary/10"
 												>
 													<div
-														class="flex items-center justify-between border-b border-purple-200 bg-purple-100/50 p-3 dark:border-purple-800 dark:bg-purple-900/20"
+														class="flex items-center justify-between border-b border-ppid-primary/20 bg-ppid-primary/10 p-3 dark:border-ppid-primary/30 dark:bg-ppid-primary/20"
 													>
 														<div class="flex items-center gap-2">
 															<div
-																class="flex h-8 w-8 items-center justify-center rounded-full bg-purple-600 text-xs font-bold text-white"
+																class="flex h-8 w-8 items-center justify-center rounded-full bg-ppid-primary text-xs font-bold text-white"
 															>
 																{responIndex + 1}
 															</div>
@@ -538,7 +544,7 @@
 																	href="/uploads/{respon.file}"
 																	target="_blank"
 																	rel="noopener noreferrer"
-																	class="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 hover:shadow-lg"
+																	class="inline-flex items-center gap-2 rounded-lg bg-ppid-primary px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-ppid-primary-hover hover:shadow-lg"
 																>
 																	<svg
 																		class="h-4 w-4"
@@ -604,7 +610,9 @@
 			<div
 				class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
 			>
-				<div class="border-b border-slate-200 bg-gradient-to-r from-[#1A305E] to-[#2A4A8E] p-4">
+				<div
+					class="border-b border-white/10 bg-gradient-to-r from-ppid-primary to-ppid-primary-light p-4"
+				>
 					<h3 class="flex items-center gap-2 text-lg font-bold text-white">
 						<svg
 							class="h-5 w-5"
@@ -625,83 +633,131 @@
 				</div>
 				<div class="p-4">
 					<p class="mb-4 text-sm text-slate-600 dark:text-slate-400">Pilih tindakan:</p>
-					<div class="grid gap-3">
+					<div class="space-y-4">
 						<button
 							type="button"
 							onclick={() => (showUpdateModal = true)}
-							class="group flex items-center gap-3 rounded-lg border-2 border-slate-200 bg-gradient-to-r from-emerald-50 to-emerald-50/50 p-4 text-left transition-all hover:border-emerald-500 hover:shadow-md dark:border-slate-700 dark:from-emerald-900/20"
+							class="group relative w-full overflow-hidden rounded-xl border-2 border-emerald-100 bg-white p-1 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500 hover:shadow-lg dark:border-emerald-900/50 dark:bg-slate-800"
 							aria-label="Buka form jawab langsung"
 						>
 							<div
-								class="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-600 text-white shadow-md transition-transform group-hover:scale-110"
-								aria-hidden="true"
-							>
-								<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-									/>
-								</svg>
-							</div>
-							<div class="flex-1">
-								<h4 class="font-bold text-slate-900 dark:text-slate-100">Jawab Langsung</h4>
-								<p class="text-sm text-slate-600 dark:text-slate-400">
-									Berikan jawaban dan ubah status
-								</p>
+								class="absolute inset-0 bg-gradient-to-r from-emerald-50 to-transparent opacity-0 transition-opacity group-hover:opacity-100 dark:from-emerald-900/20"
+							></div>
+							<div class="relative flex items-center gap-4 p-4">
+								<div
+									class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 transition-colors group-hover:bg-emerald-600 group-hover:text-white dark:bg-emerald-900/50 dark:text-emerald-400"
+								>
+									<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+										/>
+									</svg>
+								</div>
+								<div>
+									<h4 class="font-bold text-slate-900 dark:text-white">Jawab Langsung</h4>
+									<p class="text-xs text-slate-500 dark:text-slate-400">
+										Berikan jawaban dan selesaikan permohonan ini secara langsung.
+									</p>
+								</div>
+								<div
+									class="ml-auto text-emerald-500 opacity-0 transition-all group-hover:opacity-100"
+								>
+									<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M9 5l7 7-7 7"
+										/>
+									</svg>
+								</div>
 							</div>
 						</button>
 
 						<button
 							type="button"
 							onclick={() => (showDispositionModal = true)}
-							class="group flex items-center gap-3 rounded-lg border-2 border-slate-200 bg-gradient-to-r from-purple-50 to-purple-50/50 p-4 text-left transition-all hover:border-purple-500 hover:shadow-md dark:border-slate-700 dark:from-purple-900/20"
+							class="group relative w-full overflow-hidden rounded-xl border-2 border-purple-100 bg-white p-1 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-purple-500 hover:shadow-lg dark:border-purple-900/50 dark:bg-slate-800"
 							aria-label="Buka form buat disposisi"
 						>
 							<div
-								class="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-600 text-white shadow-md transition-transform group-hover:scale-110"
-								aria-hidden="true"
-							>
-								<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-									/>
-								</svg>
-							</div>
-							<div class="flex-1">
-								<h4 class="font-bold text-slate-900 dark:text-slate-100">Buat Disposisi</h4>
-								<p class="text-sm text-slate-600 dark:text-slate-400">
-									Teruskan ke OPD/SKPD terkait
-								</p>
+								class="absolute inset-0 bg-gradient-to-r from-purple-50 to-transparent opacity-0 transition-opacity group-hover:opacity-100 dark:from-purple-900/20"
+							></div>
+							<div class="relative flex items-center gap-4 p-4">
+								<div
+									class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-ppid-primary/10 text-ppid-primary transition-colors group-hover:bg-ppid-primary group-hover:text-white dark:bg-ppid-primary/20 dark:text-ppid-primary-light"
+								>
+									<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+										/>
+									</svg>
+								</div>
+								<div>
+									<h4 class="font-bold text-slate-900 dark:text-white">Buat Disposisi</h4>
+									<p class="text-xs text-slate-500 dark:text-slate-400">
+										Teruskan permohonan ke SKPD terkait untuk ditindaklanjuti.
+									</p>
+								</div>
+								<div
+									class="ml-auto text-purple-500 opacity-0 transition-all group-hover:opacity-100"
+								>
+									<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M9 5l7 7-7 7"
+										/>
+									</svg>
+								</div>
 							</div>
 						</button>
 
 						<button
 							type="button"
 							onclick={() => (showRejectModal = true)}
-							class="group flex items-center gap-3 rounded-lg border-2 border-slate-200 bg-gradient-to-r from-red-50 to-red-50/50 p-4 text-left transition-all hover:border-red-500 hover:shadow-md dark:border-slate-700 dark:from-red-900/20"
+							class="group relative w-full overflow-hidden rounded-xl border-2 border-red-100 bg-white p-1 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-red-500 hover:shadow-lg dark:border-red-900/50 dark:bg-slate-800"
 							aria-label="Buka form tolak permohonan"
 						>
 							<div
-								class="flex h-12 w-12 items-center justify-center rounded-lg bg-red-600 text-white shadow-md transition-transform group-hover:scale-110"
-								aria-hidden="true"
-							>
-								<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M6 18L18 6M6 6l12 12"
-									/>
-								</svg>
-							</div>
-							<div class="flex-1">
-								<h4 class="font-bold text-slate-900 dark:text-slate-100">Tolak Permohonan</h4>
-								<p class="text-sm text-slate-600 dark:text-slate-400">Tolak dengan alasan</p>
+								class="absolute inset-0 bg-gradient-to-r from-red-50 to-transparent opacity-0 transition-opacity group-hover:opacity-100 dark:from-red-900/20"
+							></div>
+							<div class="relative flex items-center gap-4 p-4">
+								<div
+									class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600 transition-colors group-hover:bg-red-600 group-hover:text-white dark:bg-red-900/50 dark:text-red-400"
+								>
+									<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M6 18L18 6M6 6l12 12"
+										/>
+									</svg>
+								</div>
+								<div>
+									<h4 class="font-bold text-slate-900 dark:text-white">Tolak Permohonan</h4>
+									<p class="text-xs text-slate-500 dark:text-slate-400">
+										Tolak permohonan ini jika tidak memenuhi syarat atau informasi dikecualikan.
+									</p>
+								</div>
+								<div class="ml-auto text-red-500 opacity-0 transition-all group-hover:opacity-100">
+									<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M9 5l7 7-7 7"
+										/>
+									</svg>
+								</div>
 							</div>
 						</button>
 					</div>
@@ -711,7 +767,9 @@
 			<div
 				class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
 			>
-				<div class="border-b border-slate-200 bg-gradient-to-r from-purple-600 to-purple-800 p-4">
+				<div
+					class="border-b border-white/10 bg-gradient-to-r from-ppid-primary to-ppid-primary-light p-4"
+				>
 					<h3 class="flex items-center gap-2 text-lg font-bold text-white">
 						<svg
 							class="h-5 w-5"
@@ -734,7 +792,7 @@
 					<button
 						type="button"
 						onclick={() => (showDispositionModal = true)}
-						class="w-full rounded-lg bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-3 font-semibold text-white shadow-md transition-all hover:from-purple-700 hover:to-purple-800"
+						class="w-full rounded-lg bg-gradient-to-r from-ppid-primary to-ppid-primary-light px-6 py-3 font-semibold text-white shadow-md transition-all hover:from-ppid-primary-hover hover:to-ppid-primary"
 					>
 						Buka Form Disposisi
 					</button>
@@ -1035,7 +1093,7 @@
 			onclick={(e) => e.stopPropagation()}
 		>
 			<div
-				class="flex items-center justify-between border-b border-purple-200 bg-gradient-to-r from-purple-600 to-purple-700 p-6"
+				class="flex items-center justify-between border-b border-white/10 bg-gradient-to-r from-ppid-primary to-ppid-primary-light p-6"
 			>
 				<h3
 					id="disposition-modal-title"
@@ -1146,7 +1204,7 @@
 											checked={isAssigned || selectedSkpd.includes(skpd.id_skpd)}
 											disabled={isAssigned}
 											onchange={() => !isAssigned && toggleSkpd(skpd.id_skpd)}
-											class="h-4 w-4 rounded border-slate-300 text-purple-600 focus:ring-2 focus:ring-purple-500 disabled:cursor-not-allowed disabled:opacity-50"
+											class="h-4 w-4 rounded border-slate-300 text-ppid-primary focus:ring-2 focus:ring-ppid-primary disabled:cursor-not-allowed disabled:opacity-50"
 											aria-describedby={isAssigned ? `skpd-${skpd.id_skpd}-assigned` : undefined}
 										/>
 										<span class="flex-1 text-sm font-medium text-slate-900 dark:text-slate-100">
@@ -1190,7 +1248,7 @@
 							<button
 								type="submit"
 								disabled={selectedSkpd.length === 0}
-								class="flex-1 rounded-lg bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-3 font-semibold text-white shadow-md transition-all hover:from-purple-700 hover:to-purple-800 disabled:cursor-not-allowed disabled:opacity-50"
+								class="flex-1 rounded-lg bg-gradient-to-r from-ppid-primary to-ppid-primary-light px-6 py-3 font-semibold text-white shadow-md transition-all hover:from-ppid-primary-hover hover:to-ppid-primary disabled:cursor-not-allowed disabled:opacity-50"
 							>
 								Buat Disposisi
 							</button>

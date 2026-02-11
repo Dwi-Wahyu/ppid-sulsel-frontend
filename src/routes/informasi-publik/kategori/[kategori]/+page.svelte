@@ -212,7 +212,13 @@
 											</a>
 											{#if item.file}
 												<a
+<<<<<<< HEAD
+													href={item.file.startsWith('http')
+														? item.file
+														: `http://localhost:8000/storage/${item.file}`}
+=======
 													href={item.file.startsWith('http') ? item.file : `/uploads/${item.file}`}
+>>>>>>> a671b4e5aab697cf0824110f57582e30d269fd01
 													aria-label="Download file"
 													download
 													class="text-ppid-primary hover:text-ppid-accent dark:text-blue-400"
