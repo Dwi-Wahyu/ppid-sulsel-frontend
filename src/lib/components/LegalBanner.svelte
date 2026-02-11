@@ -17,7 +17,7 @@
 				data-aos="fade-down"
 			>
 				<div
-					class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl border border-ppid-accent/30 bg-white/5 text-ppid-accent shadow-lg backdrop-blur-sm"
+					class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-ppid-accent/30 bg-white/5 text-ppid-accent shadow-lg backdrop-blur-sm"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"

@@ -1,6 +1,10 @@
 <script>
 	import Footer from '$lib/components/Footer.svelte';
 	import * as m from '$lib/paraglide/messages.js';
+<<<<<<< HEAD
+=======
+	import { api } from '$lib/api';
+>>>>>>> a671b4e5aab697cf0824110f57582e30d269fd01
 
 	// State
 	let type = $state('permohonan'); // 'permohonan' or 'keberatan'
@@ -20,6 +24,7 @@
 		results = [];
 
 		try {
+<<<<<<< HEAD
 			// Simulate API call with mock data
 			await new Promise((resolve) => setTimeout(resolve, 1000));
 
@@ -62,6 +67,37 @@
 			setTimeout(() => {
 				document.getElementById('hasil-pencarian')?.scrollIntoView({ behavior: 'smooth' });
 			}, 100);
+=======
+			// Call API based on type
+			let endpoint = '';
+			if (type === 'permohonan') {
+				endpoint = `/public/permohonan-informasi/search?email=${encodeURIComponent(email)}`;
+			} else {
+				// TODO: Implement endpoint for keberatan if needed, for now simulate or alert
+				// endpoint = `/public/pengajuan-keberatan/search?email=${encodeURIComponent(email)}`;
+				// Assuming currently only permohonan is requested
+				alert('Fitur cek status keberatan belum tersedia saat ini.');
+				loading = false;
+				return;
+			}
+
+			const response = await api.get(endpoint);
+
+			if (response.success) {
+				results = response.data;
+
+				if (results.length === 0) {
+					error = 'Data tidak ditemukan untuk email tersebut.';
+				} else {
+					// Scroll to results
+					setTimeout(() => {
+						document.getElementById('hasil-pencarian')?.scrollIntoView({ behavior: 'smooth' });
+					}, 100);
+				}
+			} else {
+				error = response.message || 'Gagal mengambil data.';
+			}
+>>>>>>> a671b4e5aab697cf0824110f57582e30d269fd01
 		} catch (err) {
 			error = 'Terjadi kesalahan koneksi. Silakan coba lagi.';
 			console.error('Error:', err);
@@ -436,6 +472,29 @@
 										{type === 'permohonan' ? item.keterangan : item.jawaban}
 									</p>
 								</div>
+<<<<<<< HEAD
+=======
+
+								{#if item.file_url}
+									<div class="mt-4">
+										<a
+											href={item.file_url}
+											target="_blank"
+											class="inline-flex items-center gap-2 rounded-lg bg-ppid-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-ppid-primary-dark"
+										>
+											<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+												/>
+											</svg>
+											Unduh Dokumen / Jawaban
+										</a>
+									</div>
+								{/if}
+>>>>>>> a671b4e5aab697cf0824110f57582e30d269fd01
 							</div>
 						</div>
 					</div>

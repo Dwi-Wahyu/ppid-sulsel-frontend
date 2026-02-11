@@ -1,26 +1,38 @@
-<script>
-	import Header from '$lib/components/Header.svelte';
+<script lang="ts">
 	import Footer from '$lib/components/Footer.svelte';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import PageTitle from '$lib/components/PageTitle.svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import { onMount } from 'svelte';
+	import { PUBLIC_API_URL } from '$env/static/public';
 
-	let profil = $state({
-		deskripsi: `
-			<p>Kami dengan ini menyatakan sanggup menyelenggarakan pelayanan informasi publik dengan standar sebagai berikut:</p>
-			<ul>
-				<li>Memberikan pelayanan informasi yang cepat, tepat, dan akurat</li>
-				<li>Melayani permohonan informasi sesuai standar waktu yang ditetapkan</li>
-				<li>Memberikan informasi yang mudah diakses oleh masyarakat</li>
-				<li>Menjaga kerahasiaan informasi yang dikecualikan</li>
-				<li>Meningkatkan kualitas pelayanan secara berkelanjutan</li>
-			</ul>
-		`,
+	interface ProfilData {
+		deskripsi: string;
+		file_banner: string | null;
+	}
+
+	let profil = $state<ProfilData>({
+		deskripsi: '',
 		file_banner: null
 	});
-</script>
 
-<Header />
+	onMount(async () => {
+		try {
+			const response = await fetch(`${PUBLIC_API_URL}/public/profil/maklumat`);
+			const result = await response.json();
+			if (result.success && result.data) {
+				profil.deskripsi = result.data.deskripsi || '';
+				if (result.data.file_banner) {
+					// Check if it's already a full URL or needs storage prefix
+					// Usually files stored via `storeAs` need `storage/` prefix if symlinked
+					profil.file_banner = `${PUBLIC_API_URL}/storage/${result.data.file_banner}`;
+				}
+			}
+		} catch (error) {
+			console.error('Error fetching Maklumat:', error);
+		}
+	});
+</script>
 
 <div
 	class="border-b border-gray-200 bg-white font-['Plus_Jakarta_Sans'] dark:border-slate-700 dark:bg-slate-800"
@@ -104,7 +116,7 @@
 
 			<!-- Contact Info -->
 			<div
-				class="rounded-xl bg-gradient-to-br from-ppid-primary to-ppid-text p-6 text-center text-white md:p-8"
+				class="rounded-xl bg-linear-to-br from-ppid-primary to-ppid-text p-6 text-center text-white md:p-8"
 			>
 				<h3 class="mb-2 text-lg font-bold">Informasi & Pengaduan</h3>
 				<p class="text-sm text-white/90">

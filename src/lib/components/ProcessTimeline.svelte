@@ -50,7 +50,7 @@
 						>
 							<div class="flex flex-row gap-4 md:flex-col md:gap-0">
 								<!-- Icon/Number Badge -->
-								<div class="flex-shrink-0">
+								<div class="shrink-0">
 									<!-- Number Badge - Desktop only -->
 									<div
 										class="absolute -top-4 -left-4 z-10 hidden h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br {s.col} text-xl font-bold text-white shadow-lg md:flex"

@@ -1,199 +1,156 @@
-<script>
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import { env } from '$env/dynamic/public';
 	import * as m from '$lib/paraglide/messages.js';
+	import { fade } from 'svelte/transition';
 
-	// Mock news data - replace with actual API call later
-	let news = $state([
-		{
-			id: 1,
-			judul: 'Contoh Berita 1',
-			img_berita: null,
-			tgl_upload: '2024-02-01',
-			slug: 'contoh-berita-1',
-			skpd: { nm_skpd: 'PPID Utama' }
-		},
-		{
-			id: 2,
-			judul: 'Contoh Berita 2',
-			img_berita: null,
-			tgl_upload: '2024-02-02',
-			slug: 'contoh-berita-2',
-			skpd: { nm_skpd: 'Diskominfo' }
-		},
-		{
-			id: 3,
-			judul: 'Contoh Berita 3',
-			img_berita: null,
-			tgl_upload: '2024-02-03',
-			slug: 'contoh-berita-3',
-			skpd: { nm_skpd: 'Bappeda' }
+	// Types
+	interface NewsItem {
+		id: number;
+		title: string;
+		image: string | null;
+		slug: string;
+		date: string;
+		category: string | null;
+	}
+
+	// State (Svelte 5 Runes)
+	let news = $state<NewsItem[]>([]);
+	let isLoading = $state(true);
+
+	// Fetch Data
+	async function fetchLatestNews() {
+		try {
+			const response = await fetch(`${env.PUBLIC_API_URL}/public/berita/latest`);
+			const result = await response.json();
+
+			console.log('Data diterima:', result);
+
+			/** * PERBAIKAN:
+			 * Contoh output Anda tidak memiliki properti 'success'.
+			 * Langsung cek keberadaan 'result.data'
+			 */
+			if (result && result.data) {
+				news = result.data;
+			}
+		} catch (error) {
+			console.error('Gagal memuat berita:', error);
+		} finally {
+			isLoading = false;
 		}
-	]);
+	}
 
-	/**
-	 * @param {string} dateString
-	 */
-	function formatDate(dateString) {
+	onMount(() => {
+		fetchLatestNews();
+	});
+
+	function formatDate(dateString: string) {
+		if (!dateString) return '-';
 		const date = new Date(dateString);
-		const months = [
-			'Jan',
-			'Feb',
-			'Mar',
-			'Apr',
-			'Mei',
-			'Jun',
-			'Jul',
-			'Agu',
-			'Sep',
-			'Okt',
-			'Nov',
-			'Des'
-		];
-		return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+		return date.toLocaleDateString('id-ID', {
+			day: 'numeric',
+			month: 'short',
+			year: 'numeric'
+		});
 	}
 </script>
 
-<section class="bg-white py-8 font-['Plus_Jakarta_Sans'] transition-all md:py-16 dark:bg-slate-900">
+<section class="bg-white py-16 font-['Plus_Jakarta_Sans'] dark:bg-slate-900">
 	<div class="container mx-auto px-4">
-		<!-- Section Header -->
-		<div class="mx-auto mb-10 max-w-3xl text-center md:mb-[55px]" data-aos="fade-down">
-			<div
-				class="mb-[13px] inline-flex items-center gap-2 rounded-full border border-ppid-accent/30 bg-white px-4 py-1.5 shadow-sm md:px-5 md:py-2 dark:bg-slate-800"
-			>
-				<span class="h-2 w-2 animate-pulse rounded-full bg-ppid-accent"></span>
-				<span
-					class="text-[9px] font-black tracking-widest text-ppid-primary uppercase md:text-[10px] dark:text-gray-200"
-					>{m['common.news']()}</span
+		<div class="mb-12 flex items-end justify-between">
+			<div>
+				<h2
+					class="text-3xl font-black tracking-tight text-slate-800 uppercase md:text-4xl dark:text-white"
 				>
+					Berita Terbaru
+				</h2>
+				<p class="mt-2 font-medium text-slate-500 dark:text-slate-400">
+					Informasi terkini seputar Pemerintah Provinsi Sulawesi Selatan
+				</p>
 			</div>
-			<h2
-				class="mb-4 text-2xl leading-tight font-extrabold tracking-tight text-ppid-primary sm:text-3xl md:mb-[21px] md:text-4xl lg:text-[42px] dark:text-white"
-			>
-				{m['news.title']()}
-			</h2>
-			<p class="text-base text-ppid-text md:text-lg dark:text-gray-300">
-				{m['news.latest_update']()}
-			</p>
-		</div>
-
-		<!-- News Grid -->
-		<div
-			class="scrollbar-hide mx-auto flex max-w-7xl snap-x snap-mandatory gap-6 overflow-x-auto pb-4 md:gap-[34px] lg:grid lg:grid-cols-3 lg:overflow-x-visible lg:pb-0"
-		>
-			{#each news as item, index}
-				<div
-					data-aos="fade-up"
-					data-aos-delay={index * 150}
-					class="group flex min-w-[280px] snap-start flex-col overflow-hidden rounded-[21px] border border-gray-100 bg-white shadow-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_50px_-10px_rgba(26,48,94,0.15)] lg:min-w-0 dark:border-slate-700 dark:bg-slate-800"
-				>
-					<div class="relative aspect-[1.618/1] overflow-hidden">
-						{#if item.img_berita}
-							<img
-								src="/storage/img_berita/{item.img_berita}"
-								class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-								alt={item.judul}
-							/>
-						{:else}
-							<div
-								class="flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 transition-transform duration-700 group-hover:scale-110 dark:from-slate-700 dark:to-slate-800"
-							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-12 w-12 text-gray-300 dark:text-slate-600"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="1.5"
-										d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-									/>
-								</svg>
-							</div>
-						{/if}
-						<div
-							class="absolute inset-0 bg-gradient-to-t from-ppid-primary/60 to-transparent opacity-0 transition-opacity group-hover:opacity-100"
-						></div>
-
-						<div class="absolute top-4 left-4 md:top-[21px] md:left-[21px]">
-							<span
-								class="rounded-lg bg-ppid-accent px-3 py-1.5 text-[9px] font-bold text-white shadow-lg md:px-4 md:py-2 md:text-[10px]"
-							>
-								{item.skpd?.nm_skpd ?? m['common.general']()}
-							</span>
-						</div>
-					</div>
-
-					<div class="flex flex-grow flex-col p-5 sm:p-6 md:p-[34px]">
-						<div
-							class="mb-3 flex items-center gap-2 text-xs font-semibold text-ppid-text md:mb-[13px] dark:text-gray-400"
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="14"
-								height="14"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								><rect width="18" height="18" x="3" y="4" rx="2" ry="2" /><line
-									x1="16"
-									x2="16"
-									y1="2"
-									y2="6"
-								/><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" /></svg
-							>
-							{formatDate(item.tgl_upload)}
-						</div>
-						<a href="/berita/{item.slug}" class="block">
-							<h3
-								class="mb-6 line-clamp-2 text-lg leading-snug font-bold text-ppid-primary transition-colors group-hover:text-ppid-accent md:mb-[21px] md:text-[21px] dark:text-white"
-							>
-								{item.judul}
-							</h3>
-						</a>
-
-						<div class="mt-auto">
-							<a
-								href="/berita/{item.slug}"
-								class="group/btn inline-flex items-center gap-2 text-sm font-bold text-ppid-primary transition-colors hover:text-ppid-accent dark:text-gray-200"
-							>
-								<span>{m['common.read_more']()}</span>
-								<svg
-									class="h-4 w-4 transition-transform group-hover/btn:translate-x-1"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-									stroke-width="3"><path d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg
-								>
-							</a>
-						</div>
-					</div>
-				</div>
-			{/each}
-		</div>
-
-		<!-- View All Button -->
-		<div class="mt-12 text-center" data-aos="fade-up">
 			<a
 				href="/berita"
-				class="inline-flex items-center gap-2 rounded-full bg-ppid-primary px-8 py-3 font-bold text-white shadow-lg transition-all hover:-translate-y-1 hover:bg-ppid-accent hover:text-ppid-primary hover:shadow-xl"
+				class="hidden text-sm font-black tracking-widest text-blue-700 uppercase hover:underline md:block dark:text-blue-400"
 			>
-				<span>{m['common.view_all']()}</span>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class="h-5 w-5"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					><path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M17 8l4 4m0 0l-4 4m4-4H3"
-					/></svg
-				>
+				Lihat Semua Berita →
+			</a>
+		</div>
+
+		<div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+			{#if isLoading}
+				{#each Array(3) as _}
+					<div class="h-96 animate-pulse rounded-4xl bg-slate-100 dark:bg-slate-800"></div>
+				{/each}
+			{:else if news.length > 0}
+				{#each news as item (item.id)}
+					<article
+						in:fade
+						class="group flex flex-col overflow-hidden rounded-4xl border border-slate-100 bg-white shadow-xs transition-all hover:border-blue-100 hover:shadow-2xl dark:border-slate-800 dark:bg-slate-800"
+					>
+						<div class="relative aspect-video overflow-hidden">
+							<img
+								src={item.image
+									? `${env.PUBLIC_API_URL.replace('/api', '')}/storage/berita/${item.image}`
+									: '/img/placeholder-news.jpg'}
+								alt={item.title}
+								class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+							/>
+							{#if item.category}
+								<div class="absolute top-4 left-4">
+									<span
+										class="rounded-xl bg-blue-700/90 px-4 py-1.5 text-[10px] font-black tracking-widest text-white uppercase shadow-lg backdrop-blur-sm"
+									>
+										{item.category}
+									</span>
+								</div>
+							{/if}
+						</div>
+
+						<div class="flex flex-1 flex-col p-8">
+							<time class="mb-3 text-xs font-black tracking-widest text-slate-400 uppercase">
+								{formatDate(item.date)}
+							</time>
+							<h3
+								class="mb-6 line-clamp-2 text-xl font-black tracking-tight text-slate-800 transition-colors group-hover:text-blue-700 dark:text-white dark:group-hover:text-blue-400"
+							>
+								<a href="/berita/{item.slug}">{item.title}</a>
+							</h3>
+
+							<div class="mt-auto">
+								<a
+									href="/berita/{item.slug}"
+									class="group/link inline-flex items-center gap-2 text-xs font-black tracking-widest text-blue-700 uppercase dark:text-blue-400"
+								>
+									<span>{m['news.read_more']()}</span>
+									<svg
+										class="h-4 w-4 transition-transform group-hover/link:translate-x-1"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+										stroke-width="3"
+									>
+										<path d="M17 8l4 4m0 0l-4 4m4-4H3" />
+									</svg>
+								</a>
+							</div>
+						</div>
+					</article>
+				{/each}
+			{:else}
+				<div class="col-span-full py-20 text-center">
+					<p class="font-medium text-slate-400 italic">
+						Belum ada berita terbaru untuk ditampilkan.
+					</p>
+				</div>
+			{/if}
+		</div>
+
+		<div class="mt-12 text-center md:hidden">
+			<a
+				href="/berita"
+				class="inline-block rounded-2xl bg-blue-700 px-10 py-4 text-xs font-black tracking-widest text-white uppercase shadow-xl shadow-blue-700/30"
+			>
+				Lihat Semua Berita
 			</a>
 		</div>
 	</div>

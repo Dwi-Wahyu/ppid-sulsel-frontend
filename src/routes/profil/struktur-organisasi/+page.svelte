@@ -1,14 +1,40 @@
-<script>
-	import Header from '$lib/components/Header.svelte';
+<script lang="ts">
 	import Footer from '$lib/components/Footer.svelte';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import PageTitle from '$lib/components/PageTitle.svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import { onMount } from 'svelte';
+	import { PUBLIC_API_URL } from '$env/static/public';
 
-	let pdfPath = $state(null); // Will be populated with actual PDF path from API
+	interface ProfilData {
+		struktur_organisasi_path: string | null;
+	}
+
+	let profil = $state<ProfilData>({
+		struktur_organisasi_path: null
+	});
+	let isLoading = $state(true);
+
+	onMount(async () => {
+		try {
+			const response = await fetch(`${PUBLIC_API_URL}/public/profil/struktur-organisasi`);
+			const result = await response.json();
+			if (result.success && result.data) {
+				const path = result.data.struktur_organisasi_path;
+				if (path) {
+					// Remove 'public/' prefix if it exists in the stored path context, usually storage links are 'storage/...'
+					// The backend usually stores 'struktur_organisasi/filename.pdf' in public disk.
+					// The access URL is 'storage/struktur_organisasi/filename.pdf'.
+					profil.struktur_organisasi_path = `${PUBLIC_API_URL}/storage/${path}`;
+				}
+			}
+		} catch (error) {
+			console.error('Error fetching Struktur Organisasi:', error);
+		} finally {
+			isLoading = false;
+		}
+	});
 </script>
-
-<Header />
 
 <div
 	class="border-b border-gray-200 bg-white font-['Plus_Jakarta_Sans'] dark:border-slate-700 dark:bg-slate-800"
@@ -57,8 +83,8 @@
 				>
 					<h2 class="font-bold text-gray-900 dark:text-white">Bagan Struktur Organisasi PPID</h2>
 					<a
-						href={pdfPath || '#'}
-						download={pdfPath ? true : undefined}
+						href={profil.struktur_organisasi_path || '#'}
+						download={profil.struktur_organisasi_path ? true : undefined}
 						class="flex items-center gap-2 text-sm font-medium text-ppid-primary transition-colors hover:text-ppid-accent dark:text-white"
 					>
 						<svg
@@ -85,9 +111,9 @@
 					<div
 						class="h-[600px] overflow-hidden rounded-lg border border-gray-200 md:h-[800px] dark:border-slate-700"
 					>
-						{#if pdfPath}
+						{#if profil.struktur_organisasi_path}
 							<iframe
-								src={pdfPath}
+								src={profil.struktur_organisasi_path}
 								width="100%"
 								height="100%"
 								class="h-full w-full border-0"
@@ -95,7 +121,7 @@
 							>
 								<p>
 									Browser Anda tidak mendukung pratinjau PDF.
-									<a href={pdfPath}>Download PDF</a> untuk melihatnya.
+									<a href={profil.struktur_organisasi_path}>Download PDF</a> untuk melihatnya.
 								</p>
 							</iframe>
 						{:else}

@@ -1,23 +1,44 @@
-<script>
-	import Header from '$lib/components/Header.svelte';
+<script lang="ts">
 	import Footer from '$lib/components/Footer.svelte';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import PageTitle from '$lib/components/PageTitle.svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import { onMount } from 'svelte';
+	import { PUBLIC_API_URL } from '$env/static/public';
 
-	let profil = $state({
-		deskripsi: `
-			<p>Provinsi Sulawesi Selatan merupakan salah satu provinsi di Indonesia yang terletak di bagian selatan Pulau Sulawesi. Dengan ibukota Makassar, Sulawesi Selatan memiliki sejarah panjang sebagai pusat perdagangan dan kebudayaan di kawasan timur Indonesia.</p>
-			<p>Secara geografis, Sulawesi Selatan berbatasan dengan Sulawesi Barat di utara, Teluk Bone dan Sulawesi Tenggara di timur, Selat Makassar di barat, dan Laut Flores di selatan.</p>
-			<h3>Potensi dan Kekayaan Alam</h3>
-			<p>Sulawesi Selatan memiliki kekayaan alam yang melimpah, mulai dari sektor pertanian, perkebunan, perikanan, hingga pariwisata. Beragam suku dan budaya turut memperkaya khazanah budaya Nusantara.</p>
-		`,
+	interface ProfilData {
+		deskripsi: string;
+		foto_gubernur: string | null;
+		foto_wakil: string | null;
+	}
+
+	let profil = $state<ProfilData>({
+		deskripsi: '',
 		foto_gubernur: null,
 		foto_wakil: null
 	});
-</script>
+	let isLoading = $state(true);
 
-<Header />
+	onMount(async () => {
+		try {
+			const response = await fetch(`${PUBLIC_API_URL}/public/profil/pemerintah`);
+			const result = await response.json();
+			if (result.success && result.data) {
+				profil.deskripsi = result.data.deskripsi;
+				if (result.data.foto_gubernur) {
+					profil.foto_gubernur = `${PUBLIC_API_URL}/storage/${result.data.foto_gubernur}`;
+				}
+				if (result.data.foto_wakil) {
+					profil.foto_wakil = `${PUBLIC_API_URL}/storage/${result.data.foto_wakil}`;
+				}
+			}
+		} catch (error) {
+			console.error('Error fetching Government profile:', error);
+		} finally {
+			isLoading = false;
+		}
+	});
+</script>
 
 <div
 	class="border-b border-gray-200 bg-white font-['Plus_Jakarta_Sans'] dark:border-slate-700 dark:bg-slate-800"
@@ -152,7 +173,7 @@
 					<div class="grid gap-4 sm:grid-cols-2">
 						{#each [{ label: 'Ibukota', value: 'Makassar' }, { label: 'Gubernur', value: 'Andi Sudirman Sulaiman' }, { label: 'Wakil Gubernur', value: 'Fatmawati Rusdi' }, { label: 'Jumlah Kecamatan', value: '304 Kecamatan' }, { label: 'Jumlah Kelurahan/Desa', value: '3.054 Kel/Desa' }] as item}
 							<div class="flex items-center gap-3 rounded-lg bg-gray-50 p-4 dark:bg-slate-900">
-								<div class="h-2 w-2 flex-shrink-0 rounded-full bg-ppid-primary"></div>
+								<div class="h-2 w-2 shrink-0 rounded-full bg-ppid-primary"></div>
 								<div>
 									<p class="text-xs text-gray-600 dark:text-gray-300">{item.label}</p>
 									<p class="text-sm font-bold text-gray-900 dark:text-white">{item.value}</p>
@@ -197,7 +218,7 @@
 							{#each ['Meningkatkan kualitas dan aksesibilitas pelayanan dasar', 'Mengembangkan ekonomi kerakyatan berbasis potensi lokal', 'Membangun infrastruktur yang merata dan berkualitas', 'Memperkuat tata kelola pemerintahan yang baik', 'Melestarikan nilai-nilai budaya dan kearifan lokal'] as item, index}
 								<div class="flex items-start gap-3">
 									<div
-										class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg bg-ppid-primary text-xs font-bold text-white"
+										class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-ppid-primary text-xs font-bold text-white"
 									>
 										{index + 1}
 									</div>
@@ -222,7 +243,7 @@
 					<div class="space-y-4 p-5">
 						<!-- Gubernur -->
 						<div class="rounded-lg border border-ppid-primary/10 bg-ppid-primary/5 p-4">
-							<div class="mb-3 aspect-[3/4] overflow-hidden rounded-lg">
+							<div class="mb-3 aspect-3/4 overflow-hidden rounded-lg">
 								{#if profil.foto_gubernur}
 									<img
 										src={profil.foto_gubernur}
@@ -231,7 +252,7 @@
 									/>
 								{:else}
 									<div
-										class="flex h-full w-full items-center justify-center bg-gradient-to-br from-ppid-primary to-ppid-text text-white"
+										class="flex h-full w-full items-center justify-center bg-linear-to-br from-ppid-primary to-ppid-text text-white"
 									>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
@@ -258,7 +279,7 @@
 
 						<!-- Wakil Gubernur -->
 						<div class="rounded-lg border border-ppid-accent/20 bg-ppid-accent/5 p-4">
-							<div class="mb-3 aspect-[3/4] overflow-hidden rounded-lg">
+							<div class="mb-3 aspect-3/4 overflow-hidden rounded-lg">
 								{#if profil.foto_wakil}
 									<img
 										src={profil.foto_wakil}
@@ -267,7 +288,7 @@
 									/>
 								{:else}
 									<div
-										class="flex h-full w-full items-center justify-center bg-gradient-to-br from-ppid-accent to-[#B08D26] text-white"
+										class="flex h-full w-full items-center justify-center bg-linear-to-br from-ppid-accent to-[#B08D26] text-white"
 									>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
@@ -293,7 +314,7 @@
 				</div>
 
 				<!-- Potensi -->
-				<div class="rounded-xl bg-gradient-to-br from-ppid-primary to-ppid-text p-6 text-white">
+				<div class="rounded-xl bg-linear-to-br from-ppid-primary to-ppid-text p-6 text-white">
 					<h4 class="mb-3 font-bold">Potensi Daerah</h4>
 					<div class="space-y-2 text-sm text-white/90">
 						<div>• Pertanian & Perkebunan</div>

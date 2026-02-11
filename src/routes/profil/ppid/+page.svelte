@@ -1,28 +1,34 @@
-<script>
-	import Header from '$lib/components/Header.svelte';
+<script lang="ts">
 	import Footer from '$lib/components/Footer.svelte';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import PageTitle from '$lib/components/PageTitle.svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import { onMount } from 'svelte';
+	import { PUBLIC_API_URL } from '$env/static/public';
 
-	// Mock data - replace with actual API data
-	let profil = $state({
-		deskripsi: `
-			<h2>Tentang PPID Provinsi Sulawesi Selatan</h2>
-			<p>Pejabat Pengelola Informasi dan Dokumentasi (PPID) Provinsi Sulawesi Selatan dibentuk berdasarkan amanat Undang-Undang Nomor 14 Tahun 2008 tentang Keterbukaan Informasi Publik.</p>
-			<p>PPID memiliki tugas dan tanggung jawab dalam pengelolaan dan pelayanan informasi publik di lingkungan Pemerintah Provinsi Sulawesi Selatan.</p>
-			<h3>Fungsi PPID</h3>
-			<ul>
-				<li>Penghimpunan informasi publik dari seluruh unit kerja</li>
-				<li>Penyediaan dan pelayanan informasi publik</li>
-				<li>Pendokumentasian informasi publik</li>
-				<li>Pengujian konsekuensi informasi yang dikecualikan</li>
-			</ul>
-		`
+	interface ProfilData {
+		deskripsi: string;
+	}
+
+	let profil = $state<ProfilData>({
+		deskripsi: ''
+	});
+	let isLoading = $state(true);
+
+	onMount(async () => {
+		try {
+			const response = await fetch(`${PUBLIC_API_URL}/public/profil/ppid`);
+			const result = await response.json();
+			if (result.success) {
+				profil.deskripsi = result.data.deskripsi;
+			}
+		} catch (error) {
+			console.error('Error fetching PPID profile:', error);
+		} finally {
+			isLoading = false;
+		}
 	});
 </script>
-
-<Header />
 
 <!-- Breadcrumb + Title Section -->
 <div
@@ -67,7 +73,7 @@
 					<div class="space-y-4">
 						<div class="flex items-start gap-3">
 							<div
-								class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-ppid-primary/10"
+								class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-ppid-primary/10"
 							>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -101,7 +107,7 @@
 						</div>
 						<div class="flex items-start gap-3">
 							<div
-								class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-ppid-text/10"
+								class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-ppid-text/10"
 							>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -129,7 +135,7 @@
 						</div>
 						<div class="flex items-start gap-3">
 							<div
-								class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-ppid-accent/10"
+								class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-ppid-accent/10"
 							>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -164,19 +170,19 @@
 					<h3 class="mb-4 text-sm font-bold tracking-wide uppercase">Landasan Hukum</h3>
 					<div class="space-y-3 text-sm">
 						<div class="flex items-start gap-2">
-							<div class="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-ppid-accent"></div>
+							<div class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ppid-accent"></div>
 							<p class="text-white/90">UU No. 14 Tahun 2008 tentang Keterbukaan Informasi Publik</p>
 						</div>
 						<div class="flex items-start gap-2">
-							<div class="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-ppid-accent"></div>
+							<div class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ppid-accent"></div>
 							<p class="text-white/90">PP No. 61 Tahun 2010 tentang Pelaksanaan UU KIP</p>
 						</div>
 						<div class="flex items-start gap-2">
-							<div class="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-ppid-accent"></div>
+							<div class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ppid-accent"></div>
 							<p class="text-white/90">Peraturan Komisi Informasi No. 1 Tahun 2010</p>
 						</div>
 						<div class="flex items-start gap-2">
-							<div class="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-ppid-accent"></div>
+							<div class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ppid-accent"></div>
 							<p class="text-white/90">Peraturan Gubernur Sulawesi Selatan</p>
 						</div>
 					</div>

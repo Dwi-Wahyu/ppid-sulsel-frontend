@@ -1,28 +1,34 @@
-<script>
-	import Header from '$lib/components/Header.svelte';
+<script lang="ts">
 	import Footer from '$lib/components/Footer.svelte';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import PageTitle from '$lib/components/PageTitle.svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import { onMount } from 'svelte';
+	import { PUBLIC_API_URL } from '$env/static/public';
 
-	let profil = $state({
-		deskripsi: `
-			<h2>Visi</h2>
-			<p><strong>Mewujudkan PPID yang Profesional, Transparan, dan Akuntabel dalam Pelayanan Informasi Publik</strong></p>
-			
-			<h2>Misi</h2>
-			<ol>
-				<li>Meningkatkan kualitas pengelolaan dan pelayanan informasi publik</li>
-				<li>Membangun sistem informasi dan dokumentasi yang terintegrasi</li>
-				<li>Meningkatkan kapasitas SDM dalam pengelolaan informasi publik</li>
-				<li>Memperkuat koordinasi dengan PPID Pembantu di lingkungan Pemprov Sulsel</li>
-				<li>Mendorong partisipasi masyarakat dalam pengawasan keterbukaan informasi</li>
-			</ol>
-		`
+	interface ProfilData {
+		deskripsi: string;
+	}
+
+	let profil = $state<ProfilData>({
+		deskripsi: ''
+	});
+	let isLoading = $state(true);
+
+	onMount(async () => {
+		try {
+			const response = await fetch(`${PUBLIC_API_URL}/public/profil/visi-misi`);
+			const result = await response.json();
+			if (result.success && result.data) {
+				profil.deskripsi = result.data.deskripsi;
+			}
+		} catch (error) {
+			console.error('Error fetching Visi Misi profile:', error);
+		} finally {
+			isLoading = false;
+		}
 	});
 </script>
-
-<Header />
 
 <div
 	class="border-b border-gray-200 bg-white font-['Plus_Jakarta_Sans'] dark:border-slate-700 dark:bg-slate-800"
