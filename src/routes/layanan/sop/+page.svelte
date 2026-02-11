@@ -3,6 +3,7 @@
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import { onMount } from 'svelte';
 	import { env } from '$env/dynamic/public';
+	import * as m from '$lib/paraglide/messages.js';
 
 	// Types
 	interface SopItem {
@@ -77,7 +78,7 @@
 			await fetch(`${env.PUBLIC_API_URL}/public/sop/download?id=${id}`);
 
 			// Open file in new tab
-			window.open(fileUrl, '_blank');
+			window.open(filename, '_blank');
 
 			// Refresh data to update download count locally
 			fetchSop(currentPage, searchTerm);
@@ -92,20 +93,22 @@
 		<Breadcrumb
 			items={[
 				{ label: 'breadcrumb.home', href: '/' },
-				{ label: 'layanan.services' },
-				{ label: 'layanan.sop_title' }
+				{ label: 'common.services' },
+				{ label: 'sop_page.title' }
 			]}
 		/>
 
 		<div class="mt-4 flex items-end justify-between">
 			<div>
-				<h1 class="mb-2 text-3xl font-bold text-blue-700 md:text-4xl dark:text-white">
-					Standard Operating Procedure (SOP)
+				<h1 class="mb-2 text-3xl font-bold text-ppid-primary md:text-4xl dark:text-white">
+					{m['sop_page.title']()}
 				</h1>
-				<p class="text-gray-600 dark:text-gray-300">Panduan prosedur layanan informasi publik</p>
+				<p class="text-gray-600 dark:text-gray-300">{m['sop_page.subtitle']()}</p>
 			</div>
 			<div class="hidden md:block" aria-hidden="true">
-				<div class="h-1.5 w-24 rounded-full bg-linear-to-r from-blue-700 to-cyan-500"></div>
+				<div
+					class="h-1.5 w-24 rounded-full bg-gradient-to-r from-ppid-primary to-ppid-accent"
+				></div>
 			</div>
 		</div>
 	</div>
@@ -115,9 +118,11 @@
 	<div class="container mx-auto px-4">
 		<div class="mx-auto max-w-7xl">
 			<section class="mb-8 max-w-2xl" aria-label="Pencarian SOP">
-				<form onsubmit={handleSearch} class="flex gap-2">
-					<div class="relative flex-1">
-						<span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
+				<form onsubmit={handleSearch} class="flex gap-3">
+					<div class="group relative flex-1">
+						<span
+							class="absolute inset-y-0 left-3 flex items-center text-gray-400 transition-colors group-focus-within:text-ppid-primary"
+						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								width="20"
@@ -134,16 +139,16 @@
 						<input
 							type="search"
 							bind:value={searchTerm}
-							placeholder="Cari SOP..."
+							placeholder={m['sop_page.search_placeholder']()}
 							aria-label="Cari judul SOP"
-							class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pr-4 pl-10 outline-hidden transition-all focus:border-blue-700 focus:ring-2 focus:ring-blue-700/20 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+							class="w-full rounded-xl border border-gray-200 bg-white py-3 pr-4 pl-10 text-gray-900 shadow-sm transition-all outline-none placeholder:text-gray-400 focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
 						/>
 					</div>
 					<button
 						type="submit"
-						class="rounded-lg bg-blue-700 px-6 py-2.5 font-medium text-white transition-colors hover:bg-blue-800 focus:ring-4 focus:ring-blue-700/30"
+						class="rounded-xl bg-ppid-primary px-8 py-3 font-semibold text-white shadow-lg shadow-ppid-primary/20 transition-all hover:-translate-y-0.5 hover:bg-ppid-primary-hover hover:shadow-ppid-primary/30 focus:ring-4 focus:ring-ppid-primary/30 active:translate-y-0"
 					>
-						{isLoading ? 'Loading...' : 'Cari'}
+						{isLoading ? m['status.searching']() : m['common.search']()}
 					</button>
 				</form>
 			</section>
@@ -156,8 +161,12 @@
 						<thead class="bg-blue-700 text-white">
 							<tr>
 								<th scope="col" class="w-16 px-6 py-4 text-center text-sm font-semibold">No</th>
-								<th scope="col" class="px-6 py-4 text-sm font-semibold">Judul SOP</th>
-								<th scope="col" class="w-48 px-6 py-4 text-center text-sm font-semibold">Aksi</th>
+								<th scope="col" class="px-6 py-4 text-sm font-semibold"
+									>{m['sop_page.title_column']()}</th
+								>
+								<th scope="col" class="w-48 px-6 py-4 text-center text-sm font-semibold"
+									>{m['sop_page.action_column']()}</th
+								>
 							</tr>
 						</thead>
 						<tbody class="divide-y divide-gray-200 dark:divide-slate-700">
@@ -217,7 +226,7 @@
 										colspan="3"
 										class="bg-gray-50 px-6 py-12 text-center text-gray-500 italic dark:bg-slate-700/50 dark:text-gray-400"
 									>
-										Tidak ada data SOP ditemukan
+										{m['sop_page.no_data']()}
 									</td>
 								</tr>
 							{/if}
@@ -227,28 +236,31 @@
 
 				{#if sopResponse && sopResponse.last_page > 1}
 					<nav
-						class="flex items-center justify-center border-t border-gray-200 bg-gray-50 px-6 py-4 dark:border-slate-700 dark:bg-slate-900"
+						class="flex items-center justify-between border-t border-gray-100 bg-gray-50/50 px-6 py-4 dark:border-slate-700 dark:bg-slate-800"
 						aria-label="Pagination"
 					>
+						<span class="text-sm text-gray-500 dark:text-gray-400">
+							{m['common.page']()}
+							<span class="font-medium text-gray-900 dark:text-white">{currentPage}</span>
+							{m['common.from']()}
+							<span class="font-medium text-gray-900 dark:text-white">{sopResponse.last_page}</span>
+						</span>
+
 						<div class="flex items-center gap-2">
 							<button
 								onclick={() => handlePageChange(currentPage - 1)}
 								disabled={currentPage === 1 || isLoading}
-								class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-300"
+								class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-xs transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:bg-slate-700 dark:text-gray-300 dark:hover:bg-slate-600"
 							>
-								Previous
+								{m['common.prev']()}
 							</button>
-
-							<span class="px-4 py-2 text-sm text-gray-700 dark:text-gray-300">
-								Halaman {currentPage} dari {sopResponse.last_page}
-							</span>
 
 							<button
 								onclick={() => handlePageChange(currentPage + 1)}
 								disabled={currentPage === sopResponse.last_page || isLoading}
-								class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-300"
+								class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-xs transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:bg-slate-700 dark:text-gray-300 dark:hover:bg-slate-600"
 							>
-								Next
+								{m['common.next']()}
 							</button>
 						</div>
 					</nav>

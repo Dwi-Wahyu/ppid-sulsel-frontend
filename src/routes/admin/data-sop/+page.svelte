@@ -3,6 +3,7 @@
 	import { api } from '$lib/api'; // Menggunakan helper proxy API
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
+	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 
 	interface SOP {
 		id: number;
@@ -34,6 +35,11 @@
 	let showDeleteConfirm = $state(false);
 	let selectedId = $state<number | null>(null);
 	let isDeleting = $state(false);
+
+	// Notification State
+	let showNotification = $state(false);
+	let notificationType = $state<'success' | 'error'>('success');
+	let notificationMessage = $state('');
 
 	onMount(async () => {
 		await fetchData();
@@ -105,9 +111,15 @@
 			const res = await api.delete(`/admin/sop/${selectedId}`);
 			if (res.success) {
 				await fetchData(pagination.current_page);
+				notificationType = 'success';
+				notificationMessage = res.message || 'SOP berhasil dihapus';
+				showNotification = true;
 			}
-		} catch (error) {
+		} catch (error: any) {
 			console.error('Gagal menghapus SOP:', error);
+			notificationType = 'error';
+			notificationMessage = error.message || 'Terjadi kesalahan saat menghapus data';
+			showNotification = true;
 		} finally {
 			isDeleting = false;
 			selectedId = null;
@@ -121,6 +133,7 @@
 </svelte:head>
 
 <div class="space-y-6 p-6">
+	<!-- Header Section -->
 	<header class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 		<div>
 			<h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">
@@ -139,7 +152,7 @@
 					bind:value={search}
 					oninput={handleSearchInput}
 					placeholder="Cari judul SOP..."
-					class="w-full rounded-xl border border-slate-200 bg-white py-2.5 pr-4 pl-10 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 md:w-64 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+					class="w-full rounded-xl border border-slate-200 bg-white py-2.5 pr-4 pl-10 text-sm shadow-sm transition-all focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary/20 md:w-64 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-ppid-primary"
 				/>
 				<div class="pointer-events-none absolute top-3 left-3 text-slate-400">
 					<svg
@@ -160,8 +173,8 @@
 			</div>
 
 			<a
-				href="/admin/sop/create"
-				class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:bg-indigo-700"
+				href="/admin/data-sop/create"
+				class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-ppid-primary to-ppid-primary-light px-4 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:from-ppid-primary-light hover:to-ppid-primary hover:shadow-lg"
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -178,13 +191,14 @@
 		</div>
 	</header>
 
+	<!-- Table Section -->
 	<div
-		class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs dark:border-slate-700 dark:bg-slate-800"
+		class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
 	>
 		<div class="overflow-x-auto">
 			<table class="w-full text-left text-sm" aria-busy={loading}>
 				<thead
-					class="border-b border-slate-200 bg-slate-50 font-bold text-slate-600 dark:border-slate-700 dark:bg-slate-700/50 dark:text-slate-400"
+					class="border-b border-slate-200 bg-slate-50/50 font-bold text-slate-700 dark:border-slate-700 dark:bg-slate-700/50 dark:text-slate-300"
 				>
 					<tr>
 						<th scope="col" class="px-6 py-4">Judul Dokumen</th>
@@ -219,25 +233,32 @@
 						</tr>
 					{:else}
 						{#each items as item (item.id)}
-							<tr class="transition-colors hover:bg-slate-50/50 dark:hover:bg-slate-700/30">
-								<td class="px-6 py-4 font-semibold text-slate-900 dark:text-slate-100"
-									>{item.judul}</td
-								>
-								<td class="px-6 py-4 text-xs font-black text-slate-400 uppercase"
-									>{getFileExtension(item.file)}</td
-								>
+							<tr class="group transition-colors hover:bg-slate-50 dark:hover:bg-slate-700/30">
+								<td class="px-6 py-4">
+									<div class="font-semibold text-slate-900 dark:text-slate-100">
+										{item.judul}
+									</div>
+								</td>
+								<td class="px-6 py-4">
+									<span
+										class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-600 uppercase dark:bg-slate-700 dark:text-slate-300"
+									>
+										{getFileExtension(item.file)}
+									</span>
+								</td>
 								<td class="px-6 py-4 text-center">
 									<span
-										class="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold dark:bg-slate-700"
-										>{item.jumlah_download}</span
+										class="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-bold text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300"
 									>
+										{item.jumlah_download}
+									</span>
 								</td>
 								<td class="px-6 py-4 text-right">
-									<div class="flex justify-end gap-1">
+									<div class="flex justify-end gap-1 opacity-100 transition-opacity">
 										<a
 											href={`${PUBLIC_API_URL.replace('/api', '')}/storage/sop/${item.file}`}
 											target="_blank"
-											class="rounded-lg p-2 text-slate-400 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20"
+											class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
 											title="Lihat Dokumen"
 										>
 											<svg
@@ -262,8 +283,8 @@
 											</svg>
 										</a>
 										<a
-											href="/admin/sop/{item.id}/edit"
-											class="rounded-lg p-2 text-slate-400 hover:bg-amber-50 hover:text-amber-600 dark:hover:bg-amber-900/20"
+											href="/admin/data-sop/{item.id}/edit"
+											class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-amber-50 hover:text-amber-600 dark:hover:bg-amber-900/20 dark:hover:text-amber-400"
 											title="Edit"
 										>
 											<svg
@@ -284,7 +305,7 @@
 										<button
 											type="button"
 											onclick={() => triggerDelete(item.id)}
-											class="rounded-lg p-2 text-slate-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
+											class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-900/20 dark:hover:text-rose-400"
 											title="Hapus"
 										>
 											<svg
@@ -312,6 +333,7 @@
 		</div>
 	</div>
 
+	<!-- Pagination -->
 	{#if !loading && items.length > 0}
 		<nav
 			class="flex flex-col items-center justify-between gap-4 py-2 md:flex-row"
@@ -327,14 +349,14 @@
 				<button
 					onclick={() => changePage(pagination.prev_page_url)}
 					disabled={!pagination.prev_page_url}
-					class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+					class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 transition-all hover:bg-slate-50 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
 				>
 					Sebelumnya
 				</button>
 				<button
 					onclick={() => changePage(pagination.next_page_url)}
 					disabled={!pagination.next_page_url}
-					class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+					class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 transition-all hover:bg-slate-50 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
 				>
 					Berikutnya
 				</button>
@@ -350,4 +372,11 @@
 	confirmText="Ya, Hapus SOP"
 	theme="danger"
 	onConfirm={handleDelete}
+/>
+
+<NotificationDialog
+	bind:show={showNotification}
+	theme={notificationType}
+	title={notificationType === 'success' ? 'Berhasil!' : 'Gagal!'}
+	description={notificationMessage}
 />

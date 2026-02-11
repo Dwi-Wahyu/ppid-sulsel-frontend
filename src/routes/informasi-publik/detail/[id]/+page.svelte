@@ -31,15 +31,15 @@
 
 	const BACKEND_URL = env.PUBLIC_BACKEND_URL || 'http://localhost:8000';
 
+	// 		if (file.startsWith('http')) {
+	// 			return file;
+	// 		}
+	// 		return `${BACKEND_URL}/storage/${file}`;
 	function getFileUrl(file: string): string {
 		if (file.startsWith('http')) {
 			return file;
 		}
-<<<<<<< HEAD
 		return `${BACKEND_URL}/storage/${file}`;
-=======
-		return `${BACKEND_URL}/uploads/${file}`;
->>>>>>> a671b4e5aab697cf0824110f57582e30d269fd01
 	}
 
 	function getDownloadUrl(id: number): string {
@@ -51,6 +51,7 @@
 	<title>{data.informasi.judul} - PPID Sulawesi Selatan</title>
 </svelte:head>
 
+<!-- Breadcrumb + Title Section -->
 <!-- Breadcrumb + Title Section -->
 <div
 	class="border-b border-gray-200 bg-white font-['Plus_Jakarta_Sans'] dark:border-slate-700 dark:bg-slate-800"
@@ -90,7 +91,7 @@
 				<path d="m9 18 6-6-6-6" />
 			</svg>
 			<a href="/informasi-publik" class="transition-colors hover:text-ppid-primary dark:text-white">
-				Informasi Publik
+				{m['public_info.title']()}
 			</a>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -106,7 +107,9 @@
 			>
 				<path d="m9 18 6-6-6-6" />
 			</svg>
-			<span class="font-medium text-ppid-primary dark:text-white">Detail</span>
+			<span class="font-medium text-ppid-primary dark:text-white"
+				>{m['public_info.detail.breadcrumb']()}</span
+			>
 		</div>
 
 		<!-- Title -->
@@ -117,7 +120,7 @@
 				>
 					{data.informasi.judul}
 				</h1>
-				<p class="text-gray-600 dark:text-gray-300">Detail informasi dan dokumen publik</p>
+				<p class="text-gray-600 dark:text-gray-300">{m['public_info.detail.subtitle']()}</p>
 			</div>
 			<div class="hidden md:block">
 				<div class="h-1 w-20 rounded-full bg-gradient-to-r from-ppid-primary to-transparent"></div>
@@ -160,7 +163,7 @@
 						<span
 							class="mb-4 inline-block rounded-full bg-ppid-accent px-3 py-1 text-xs font-bold tracking-wider text-white uppercase"
 						>
-							{data.informasi.kategori?.nm_kat_info || 'Informasi Publik'}
+							{data.informasi.kategori?.nm_kat_info || m['public_info.detail.fallback_category']()}
 						</span>
 						<h2 class="mb-4 text-2xl font-bold">{data.informasi.judul}</h2>
 						<div class="flex flex-wrap items-center gap-6 text-sm text-white/80">
@@ -201,7 +204,8 @@
 									<polyline points="7 10 12 15 17 10" />
 									<line x1="12" x2="12" y1="15" y2="3" />
 								</svg>
-								{data.informasi.jumlah_download || 0} Unduhan
+								{data.informasi.jumlah_download || 0}
+								{m['public_info.detail.downloads']()}
 							</div>
 						</div>
 					</div>
@@ -215,7 +219,7 @@
 								<label
 									class="mb-1 block text-xs font-bold tracking-widest text-gray-400 uppercase dark:text-gray-500"
 								>
-									SKPD / Instansi
+									{m['public_info.detail.skpd_label']()}
 								</label>
 								<p class="font-medium text-gray-900 italic dark:text-white">
 									{data.informasi.skpd?.nm_skpd || '-'}
@@ -225,12 +229,12 @@
 								<label
 									class="mb-1 block text-xs font-bold tracking-widest text-gray-400 uppercase dark:text-gray-500"
 								>
-									Keterangan
+									{m['public_info.detail.desc_label']()}
 								</label>
 								<div
 									class="prose prose-sm max-w-none leading-relaxed text-gray-700 dark:text-gray-300 dark:prose-invert"
 								>
-									{@html data.informasi.ket || 'Tidak ada keterangan tambahan.'}
+									{@html data.informasi.ket || m['public_info.detail.no_desc']()}
 								</div>
 							</div>
 						</div>
@@ -240,7 +244,7 @@
 							<label
 								class="mb-4 block text-xs font-bold tracking-widest text-gray-400 uppercase dark:text-gray-500"
 							>
-								Informasi Dokumen
+								{m['public_info.detail.doc_info']()}
 							</label>
 							<ul class="space-y-4 text-sm">
 								<li class="flex items-start gap-3">
@@ -267,7 +271,9 @@
 										</svg>
 									</div>
 									<div>
-										<span class="block text-xs text-gray-500 dark:text-gray-400">Nama Berkas</span>
+										<span class="block text-xs text-gray-500 dark:text-gray-400"
+											>{m['public_info.detail.file_name']()}</span
+										>
 										<span class="font-medium break-all text-gray-900 dark:text-white">
 											{data.informasi.file.split('/').pop()}
 										</span>
@@ -294,13 +300,14 @@
 									</div>
 									<div>
 										<span class="block text-xs text-gray-500 dark:text-gray-400"
-											>Status Verifikasi</span
+											>{m['public_info.detail.verify_status']()}</span
 										>
 										<span
 											class="inline-flex items-center gap-1.5 text-[10px] font-bold text-green-600 uppercase"
 										>
 											<span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
-											Terverifikasi ({data.informasi.tgl_verify || data.informasi.tgl_upload})
+											{m['public_info.detail.verified']()} ({data.informasi.tgl_verify ||
+												data.informasi.tgl_upload})
 										</span>
 									</div>
 								</li>
@@ -333,7 +340,7 @@
 									<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
 									<circle cx="12" cy="12" r="3" />
 								</svg>
-								Lihat Berkas
+								{m['public_info.detail.view_file']()}
 							</a>
 							<a
 								href={getDownloadUrl(data.informasi.id_informasi)}
@@ -354,13 +361,13 @@
 									<polyline points="7 10 12 15 17 10" />
 									<line x1="12" x2="12" y1="15" y2="3" />
 								</svg>
-								Download Berkas
+								{m['public_info.detail.download_file']()}
 							</a>
 						{:else}
 							<div
 								class="w-full rounded-xl border border-red-100 bg-red-50 p-4 text-center font-bold text-red-600"
 							>
-								Berkas tidak tersedia
+								{m['public_info.detail.no_file']()}
 							</div>
 						{/if}
 					</div>
@@ -388,7 +395,7 @@
 						<line x1="19" y1="12" x2="5" y2="12" />
 						<polyline points="12 19 5 12 12 5" />
 					</svg>
-					Kembali ke halaman sebelumnya
+					{m['public_info.detail.back']()}
 				</button>
 			</div>
 		</div>

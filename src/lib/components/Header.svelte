@@ -284,15 +284,55 @@
 							transition:slide
 							class="z-50 w-full bg-white py-2 text-[#1A305E] lg:absolute lg:w-64 lg:rounded-b-lg lg:border-t-4 lg:border-[#D4AF37] dark:bg-slate-800 dark:text-gray-200"
 						>
-							{#each ['ppid', 'sambutan', 'struktur-organisasi', 'visi-misi', 'tupoksi', 'maklumat', 'pemerintah-sulsel'] as path}
-								<li>
-									<a
-										href="/profil/{path}"
-										class="block border-l-4 border-transparent px-10 py-3 hover:border-[#D4AF37] hover:bg-[#1A305E]/5 lg:px-6"
-										>{path.replace(/-/g, ' ').toUpperCase()}</a
-									>
-								</li>
-							{/each}
+							<li>
+								<a
+									href="/profil/ppid"
+									class="block border-l-4 border-transparent px-10 py-3 hover:border-[#D4AF37] hover:bg-[#1A305E]/5 lg:px-6"
+									>{m['header.profile_ppid']()}</a
+								>
+							</li>
+							<li>
+								<a
+									href="/profil/sambutan"
+									class="block border-l-4 border-transparent px-10 py-3 hover:border-[#D4AF37] hover:bg-[#1A305E]/5 lg:px-6"
+									>{m['header.profile_sambutan']()}</a
+								>
+							</li>
+							<li>
+								<a
+									href="/profil/struktur-organisasi"
+									class="block border-l-4 border-transparent px-10 py-3 hover:border-[#D4AF37] hover:bg-[#1A305E]/5 lg:px-6"
+									>{m['header.profile_struktur']()}</a
+								>
+							</li>
+							<li>
+								<a
+									href="/profil/visi-misi"
+									class="block border-l-4 border-transparent px-10 py-3 hover:border-[#D4AF37] hover:bg-[#1A305E]/5 lg:px-6"
+									>{m['header.profile_visi']()}</a
+								>
+							</li>
+							<li>
+								<a
+									href="/profil/tupoksi"
+									class="block border-l-4 border-transparent px-10 py-3 hover:border-[#D4AF37] hover:bg-[#1A305E]/5 lg:px-6"
+									>{m['header.profile_tupoksi']()}</a
+								>
+							</li>
+							<li>
+								<a
+									href="/profil/maklumat"
+									class="block border-l-4 border-transparent px-10 py-3 hover:border-[#D4AF37] hover:bg-[#1A305E]/5 lg:px-6"
+									>{m['header.profile_maklumat']()}</a
+								>
+							</li>
+							<li>
+								<a
+									href="/profil/pemerintah-sulsel"
+									class="block border-l-4 border-transparent px-10 py-3 hover:border-[#D4AF37] hover:bg-[#1A305E]/5 lg:px-6"
+									>{m['header.profile_gov']()}</a
+								>
+							</li>
 						</ul>
 					{/if}
 				</li>
@@ -332,7 +372,7 @@
 										href="/informasi-publik/tahun/{item.waktu}"
 										class="block border-l-4 border-transparent px-10 py-3 hover:border-[#D4AF37] hover:bg-[#1A305E]/5 lg:px-6"
 									>
-										Informasi Publik Tahun {item.waktu}
+										{m['header.public_info_year']({ year: item.waktu })}
 									</a>
 								</li>
 							{/each}
@@ -340,7 +380,7 @@
 								<a
 									href="/informasi-publik"
 									class="block border-l-4 border-transparent px-10 py-3 hover:border-[#D4AF37] hover:bg-[#1A305E]/5 lg:px-6"
-									>Daftar Informasi Publik</a
+									>{m['header.public_info_list']()}</a
 								>
 							</li>
 						</ul>
@@ -376,7 +416,11 @@
 										href="/informasi-publik/kategori/{kat.slug}"
 										class="block border-l-4 border-transparent px-10 py-3 hover:border-[#D4AF37] hover:bg-[#1A305E]/5 lg:px-6"
 									>
-										{kat.nm_kat_info}
+										{(() => {
+											const key = `public_info_types.${kat.slug.replace(/-/g, '_')}`;
+											// @ts-ignore
+											return m[key] ? m[key]() : kat.nm_kat_info;
+										})()}
 									</a>
 								</li>
 							{/each}
@@ -385,7 +429,7 @@
 									href="/informasi-publik/pengadaan-barang-jasa"
 									class="block border-l-4 border-transparent px-10 py-3 hover:border-[#D4AF37] hover:bg-[#1A305E]/5 lg:px-6"
 								>
-									Pengadaan Barang & Jasa
+									{m['header.procurement']()}
 								</a>
 							</li>
 						</ul>
@@ -421,15 +465,41 @@
 							transition:slide
 							class="z-50 w-full bg-white py-2 text-[#1A305E] lg:absolute lg:w-64 lg:rounded-b-lg lg:border-t-4 lg:border-[#D4AF37] dark:bg-slate-800 dark:text-gray-200"
 						>
-							{#each ['permohonan-informasi', 'pengajuan-keberatan', 'sop', 'cek-status', 'kontak'] as s}
-								<li>
-									<a
-										href="/layanan/{s}"
-										class="block border-l-4 border-transparent px-10 py-3 hover:border-[#D4AF37] hover:bg-[#1A305E]/5 lg:px-6"
-										>{s.replace(/-/g, ' ').toUpperCase()}</a
-									>
-								</li>
-							{/each}
+							<li>
+								<a
+									href="/layanan/permohonan-informasi"
+									class="block border-l-4 border-transparent px-10 py-3 hover:border-[#D4AF37] hover:bg-[#1A305E]/5 lg:px-6"
+									>{m['header.service_request']()}</a
+								>
+							</li>
+							<li>
+								<a
+									href="/layanan/pengajuan-keberatan"
+									class="block border-l-4 border-transparent px-10 py-3 hover:border-[#D4AF37] hover:bg-[#1A305E]/5 lg:px-6"
+									>{m['header.service_objection']()}</a
+								>
+							</li>
+							<li>
+								<a
+									href="/layanan/sop"
+									class="block border-l-4 border-transparent px-10 py-3 hover:border-[#D4AF37] hover:bg-[#1A305E]/5 lg:px-6"
+									>{m['header.service_sop']()}</a
+								>
+							</li>
+							<li>
+								<a
+									href="/layanan/cek-status"
+									class="block border-l-4 border-transparent px-10 py-3 hover:border-[#D4AF37] hover:bg-[#1A305E]/5 lg:px-6"
+									>{m['header.service_status']()}</a
+								>
+							</li>
+							<li>
+								<a
+									href="/layanan/kontak"
+									class="block border-l-4 border-transparent px-10 py-3 hover:border-[#D4AF37] hover:bg-[#1A305E]/5 lg:px-6"
+									>{m['header.service_contact']()}</a
+								>
+							</li>
 						</ul>
 					{/if}
 				</li>
@@ -461,14 +531,14 @@
 								<a
 									href="/survey/isi-survey"
 									class="block border-l-4 border-transparent px-10 py-3 hover:border-[#D4AF37] hover:bg-[#1A305E]/5 lg:px-6"
-									>Isi Survey</a
+									>{m['header.survey_fill']()}</a
 								>
 							</li>
 							<li>
 								<a
 									href="/survey/hasil-survey"
 									class="block border-l-4 border-transparent px-10 py-3 hover:border-[#D4AF37] hover:bg-[#1A305E]/5 lg:px-6"
-									>Hasil Survey</a
+									>{m['header.survey_result']()}</a
 								>
 							</li>
 						</ul>

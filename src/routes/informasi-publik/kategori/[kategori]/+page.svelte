@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import * as m from '$lib/paraglide/messages.js';
 
 	// Mengambil props dari load function
 	let { data } = $props();
@@ -34,6 +35,25 @@
 		await goto(`?${params.toString()}`, { keepFocus: true, noScroll: true });
 	}
 
+	function getCategoryTitle(slug: string, originalName: string) {
+		switch (slug) {
+			case 'berkala':
+				return m['public_info_types.berkala']();
+			case 'serta-merta':
+				return m['public_info_types.serta_merta']();
+			case 'setiap-saat':
+				return m['public_info_types.setiap_saat']();
+			case 'dikecualikan':
+				return m['public_info_types.dikecualikan']();
+			case 'daftar-informasi-dikecualikan':
+				return m['public_info_types.daftar_informasi_dikecualikan']();
+			case 'daftar-informasi-publik':
+				return m['public_info_types.daftar_informasi_publik']();
+			default:
+				return originalName;
+		}
+	}
+
 	function handlePageChange(url: string | null) {
 		if (!url) return;
 		const target = new URL(url);
@@ -50,8 +70,8 @@
 		<nav class="mb-4 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
 			<a
 				href="/"
-				aria-label="Kembali ke beranda"
-				title="Kembali ke beranda"
+				aria-label={m['breadcrumb.home']()}
+				title={m['breadcrumb.home']()}
 				class="transition-colors hover:text-ppid-primary dark:text-white"
 			>
 				<svg
@@ -73,7 +93,7 @@
 			</a>
 			<span class="text-gray-400">/</span>
 			<a href="/informasi-publik" class="transition-colors hover:text-ppid-primary dark:text-white"
-				>Informasi Publik</a
+				>{m['public_info.title']()}</a
 			>
 			<span class="text-gray-400">/</span>
 			<span class="font-medium text-ppid-primary dark:text-white">{kategori.name}</span>
@@ -82,10 +102,15 @@
 		<div class="flex items-end justify-between">
 			<div>
 				<h1 class="mb-2 text-3xl font-bold text-ppid-primary md:text-4xl dark:text-white">
-					Informasi {kategori.name}
+					{#if !['daftar-informasi-dikecualikan', 'daftar-informasi-publik'].includes(page.params.kategori)}
+						{m['public_info.category_title'] ? m['public_info.category_title']() : ''}
+					{/if}
+					{getCategoryTitle(page.params.kategori, kategori.name)}
 				</h1>
 				<p class="text-gray-600 dark:text-gray-300">
-					Daftar informasi kategori {kategori.name} Pemerintah Provinsi Sulawesi Selatan
+					{m['public_info.category_desc']({
+						category: getCategoryTitle(page.params.kategori, kategori.name)
+					})}
 				</p>
 			</div>
 			<div class="hidden md:block">
@@ -123,7 +148,7 @@
 					<input
 						type="text"
 						bind:value={searchQuery}
-						placeholder="Cari judul informasi..."
+						placeholder={m['public_info.search_placeholder_title']()}
 						class="w-full rounded-lg border border-gray-300 py-2 pr-4 pl-10 focus:ring-2 focus:ring-ppid-primary focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-white"
 					/>
 				</div>
@@ -133,7 +158,7 @@
 					onchange={applyFilters}
 					class="rounded-lg border border-gray-300 bg-white px-4 py-2 focus:ring-2 focus:ring-ppid-primary dark:border-slate-600 dark:bg-slate-800 dark:text-white"
 				>
-					<option value="">Pilih Tahun</option>
+					<option value="">{m['public_info.select_year']()}</option>
 					{#each availableYears as year}
 						<option value={year.waktu}>{year.waktu}</option>
 					{/each}
@@ -144,14 +169,14 @@
 						type="submit"
 						class="hover:bg-opacity-90 rounded-lg bg-ppid-accent px-6 py-2 font-semibold text-white transition-colors"
 					>
-						Cari
+						{m['public_info.search_btn'] ? m['public_info.search_btn']() : 'Cari'}
 					</button>
 					{#if page.url.searchParams.get('search') || page.url.searchParams.get('year')}
 						<a
 							href={page.url.pathname}
 							class="flex items-center justify-center rounded-lg bg-gray-200 px-6 py-2 font-medium text-gray-700 hover:bg-gray-300 dark:bg-slate-700 dark:text-gray-200"
 						>
-							Clear
+							{m['common.clear'] ? m['common.clear']() : 'Clear'}
 						</a>
 					{/if}
 				</div>
@@ -164,11 +189,13 @@
 					<table class="w-full border-collapse text-left">
 						<thead class="bg-ppid-primary text-white">
 							<tr>
-								<th class="px-4 py-3 text-sm font-semibold">No</th>
-								<th class="px-4 py-3 text-sm font-semibold">Judul Informasi</th>
-								<th class="px-4 py-3 text-sm font-semibold">Tahun</th>
-								<th class="px-4 py-3 text-sm font-semibold">OPD Pengelola</th>
-								<th class="px-4 py-3 text-center text-sm font-semibold">Aksi</th>
+								<th class="px-4 py-3 text-sm font-semibold">{m['public_info.table.no']()}</th>
+								<th class="px-4 py-3 text-sm font-semibold">{m['public_info.table.title']()}</th>
+								<th class="px-4 py-3 text-sm font-semibold">{m['public_info.table.year']()}</th>
+								<th class="px-4 py-3 text-sm font-semibold">{m['public_info.table.opd']()}</th>
+								<th class="px-4 py-3 text-center text-sm font-semibold"
+									>{m['public_info.table.action']()}</th
+								>
 							</tr>
 						</thead>
 						<tbody class="divide-y divide-gray-100 dark:divide-slate-700">
@@ -191,7 +218,7 @@
 											<a
 												href="/informasi-publik/detail/{item.id_informasi}"
 												class="text-ppid-primary hover:text-ppid-accent dark:text-blue-400"
-												title="Lihat Detail"
+												title={m['public_info.view_detail']()}
 											>
 												<svg
 													xmlns="http://www.w3.org/2000/svg"
@@ -213,7 +240,7 @@
 											{#if item.file}
 												<a
 													href={item.file.startsWith('http') ? item.file : `/uploads/${item.file}`}
-													aria-label="Download file"
+													aria-label={m['public_info.download']()}
 													download
 													class="text-ppid-primary hover:text-ppid-accent dark:text-blue-400"
 												>
@@ -239,7 +266,7 @@
 							{:else}
 								<tr>
 									<td colspan="5" class="py-20 text-center text-gray-500 italic"
-										>Data tidak ditemukan</td
+										>{m['public_info.no_data_short']()}</td
 									>
 								</tr>
 							{/each}

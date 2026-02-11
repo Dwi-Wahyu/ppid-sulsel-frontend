@@ -101,16 +101,12 @@
 
 	// Helper: URL Storage
 	const getFileUrl = (fileName: string) => {
-<<<<<<< HEAD
 		return `${PUBLIC_API_URL.replace('/api', '')}/storage/${fileName}`;
-=======
-		return `${PUBLIC_API_URL.replace('/api', '')}/uploads/${fileName}`;
->>>>>>> a671b4e5aab697cf0824110f57582e30d269fd01
 	};
 </script>
 
 <svelte:head>
-	<title>Pengadaan Barang & Jasa - PPID Provinsi Sulawesi Selatan</title>
+	<title>{m['pengadaan.title']()} - PPID Provinsi Sulawesi Selatan</title>
 </svelte:head>
 
 <div
@@ -142,7 +138,7 @@
 				stroke-width="2"><path d="m9 18 6-6-6-6" /></svg
 			>
 			<a href="/informasi-publik" class="transition-colors hover:text-ppid-primary dark:text-white"
-				>Informasi Publik</a
+				>{m['public_info.title']()}</a
 			>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -152,7 +148,7 @@
 				stroke="currentColor"
 				stroke-width="2"><path d="m9 18 6-6-6-6" /></svg
 			>
-			<span class="font-medium text-ppid-primary dark:text-white">Pengadaan Barang & Jasa</span>
+			<span class="font-medium text-ppid-primary dark:text-white">{m['pengadaan.title']()}</span>
 		</nav>
 
 		<div class="flex flex-col justify-between gap-4 md:flex-row md:items-end">
@@ -160,10 +156,10 @@
 				<h1
 					class="mb-2 text-3xl font-black tracking-tight text-ppid-primary uppercase md:text-5xl dark:text-white"
 				>
-					Pengadaan Barang & Jasa
+					{m['pengadaan.title']()}
 				</h1>
 				<p class="font-medium text-gray-500 dark:text-gray-400">
-					Daftar informasi terkait proses pengadaan barang dan jasa pemerintah.
+					{m['pengadaan.desc']()}
 				</p>
 			</div>
 			<div class="hidden md:block">
@@ -190,7 +186,7 @@
 						<input
 							type="text"
 							bind:value={searchQuery}
-							placeholder="Cari nama dokumen pengadaan..."
+							placeholder={m['pengadaan.search_placeholder']()}
 							class="w-full rounded-xl border border-gray-300 bg-white py-3 pr-4 pl-10 text-sm focus:ring-2 focus:ring-ppid-primary focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white"
 						/>
 					</div>
@@ -198,7 +194,7 @@
 						type="submit"
 						class="rounded-xl bg-ppid-accent px-8 py-3 text-sm font-bold text-white shadow-lg shadow-ppid-accent/20 transition-all hover:bg-[#B08D26] active:scale-95"
 					>
-						CARI
+						{m['public_info.search_btn']()}
 					</button>
 				</form>
 
@@ -208,7 +204,7 @@
 						onchange={() => fetchData(1)}
 						class="rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-ppid-primary focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white"
 					>
-						<option value="">Semua Tahun</option>
+						<option value="">{m['pengadaan.all_years']()}</option>
 						{#each availableYears as year}
 							<option value={year.waktu}>{year.waktu}</option>
 						{/each}
@@ -219,7 +215,7 @@
 							onclick={clearFilters}
 							class="rounded-xl bg-gray-200 px-6 py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-gray-300 dark:bg-slate-700 dark:text-gray-200"
 						>
-							RESET
+							{m['common.reset']()}
 						</button>
 					{/if}
 				</div>
@@ -233,7 +229,7 @@
 						<thead>
 							<tr class="bg-ppid-primary text-xs font-black tracking-widest text-white uppercase">
 								<th class="px-6 py-5">NO</th>
-								<th class="px-6 py-5">NAMA DOKUMEN / JABATAN</th>
+								<th class="px-6 py-5">{m['pengadaan.table.doc_name']()}</th>
 								<th class="px-6 py-5 text-center">AKSI</th>
 							</tr>
 						</thead>
@@ -272,10 +268,10 @@
 											<div
 												class="mt-1 flex items-center gap-3 text-[10px] font-black tracking-tighter text-gray-400 uppercase"
 											>
-												<span>Dilihat: {item.jumlah_download}x</span>
+												<span>{m['pengadaan.meta.viewed']()}: {item.jumlah_download}x</span>
 												<span class="h-1 w-1 rounded-full bg-gray-300"></span>
 												<span
-													>Update: {item.updated_at
+													>{m['pengadaan.meta.update']()}: {item.updated_at
 														? new Date(item.updated_at).toLocaleDateString('id-ID')
 														: '-'}</span
 												>
@@ -311,7 +307,7 @@
 										colspan="3"
 										class="px-6 py-20 text-center text-gray-500 italic dark:text-gray-400"
 									>
-										Data pengadaan tidak ditemukan.
+										{m['pengadaan.no_data']()}
 									</td>
 								</tr>
 							{/if}
@@ -324,10 +320,11 @@
 						class="flex flex-col items-center justify-between gap-4 border-t border-gray-100 bg-gray-50/50 px-8 py-6 md:flex-row dark:border-slate-700 dark:bg-slate-900/50"
 					>
 						<div class="text-xs font-black tracking-widest text-gray-400 uppercase">
-							Menampilkan <span class="text-gray-900 dark:text-white"
-								>{pagination.from} - {pagination.to}</span
-							>
-							dari <span class="text-gray-900 dark:text-white">{pagination.total}</span> Data
+							{m['common.showing']()}
+							<span class="text-gray-900 dark:text-white">{pagination.from} - {pagination.to}</span>
+							{m['common.from']()}
+							<span class="text-gray-900 dark:text-white">{pagination.total}</span>
+							{m['common.data']()}
 						</div>
 						<div class="flex items-center gap-2">
 							<button
@@ -335,14 +332,14 @@
 								disabled={!pagination.prev_page_url}
 								class="rounded-xl border-2 border-gray-200 bg-white px-6 py-2 text-xs font-black tracking-widest text-gray-600 transition-all hover:border-ppid-primary hover:text-ppid-primary disabled:opacity-30 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-300"
 							>
-								PREV
+								{m['common.prev']()}
 							</button>
 							<button
 								onclick={() => changePage(pagination.next_page_url)}
 								disabled={!pagination.next_page_url}
 								class="rounded-xl border-2 border-gray-200 bg-white px-6 py-2 text-xs font-black tracking-widest text-gray-600 transition-all hover:border-ppid-primary hover:text-ppid-primary disabled:opacity-30 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-300"
 							>
-								NEXT
+								{m['common.next']()}
 							</button>
 						</div>
 					</div>

@@ -62,13 +62,13 @@
 
 		// Validate NIK
 		if (formData.nik.length !== 16) {
-			alert('NIK harus 16 digit angka!');
+			alert(m['form.alert.nik_length']());
 			return;
 		}
 
 		// Validate file upload
 		if (!formData.foto_ktp) {
-			alert('Foto KTP wajib diupload!');
+			alert(m['form.alert.ktp_required']());
 			return;
 		}
 
@@ -113,14 +113,14 @@
 			items={[
 				{ label: 'breadcrumb.home', href: '/' },
 				{ label: 'layanan.services' },
-				{ label: 'layanan.keberatan_title' }
+				{ label: 'layanan_pages.keberatan_title' }
 			]}
 		/>
 
 		<div class="mt-4 flex items-end justify-between">
 			<PageTitle
-				title="Pengajuan Keberatan"
-				subtitle="Ajukan keberatan atas permohonan informasi"
+				title={m['layanan_pages.keberatan_title']()}
+				subtitle={m['layanan_pages.keberatan_subtitle']()}
 			/>
 			<div class="hidden md:block">
 				<div
@@ -160,9 +160,9 @@
 						</svg>
 					</div>
 					<h2 class="mb-2 text-2xl font-bold text-ppid-primary dark:text-white">
-						Form Pengajuan Keberatan
+						{m['layanan_pages.keberatan_form_title']()}
 					</h2>
-					<p class="text-gray-600 dark:text-gray-300">Lengkapi formulir di bawah ini</p>
+					<p class="text-gray-600 dark:text-gray-300">{m['layanan_pages.form_desc']()}</p>
 				</div>
 
 				<form onsubmit={handleSubmit} class="space-y-8" id="keberatanForm">
@@ -194,10 +194,10 @@
 										<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
 										<circle cx="12" cy="7" r="4"></circle>
 									</svg>
-									Data Pribadi
+									{m['layanan_pages.personal_data']()}
 								</div>
 								<p class="mt-1 text-xs font-normal text-gray-500 dark:text-gray-400">
-									Informasi identitas pengaju
+									{m['layanan_pages.personal_data_desc_applicant']()}
 								</p>
 							</div>
 						</h3>
@@ -206,12 +206,12 @@
 						<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									Nama Lengkap <span class="text-red-500">*</span>
+									{m['form.fullname']()} <span class="text-red-500">*</span>
 								</label>
 								<input
 									type="text"
 									bind:value={formData.nama}
-									placeholder="Masukkan nama sesuai KTP"
+									placeholder={m['form.fullname_placeholder']()}
 									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 									required
 								/>
@@ -219,25 +219,25 @@
 
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									No. KTP (NIK) <span class="text-red-500">*</span>
+									{m['form.nik']()} <span class="text-red-500">*</span>
 								</label>
 								<input
 									type="text"
 									bind:value={formData.nik}
 									oninput={validateNik}
-									placeholder="16 digit NIK"
+									placeholder={m['form.nik_placeholder']()}
 									maxlength="16"
 									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 									required
 								/>
-								<p class="mt-1 text-xs text-gray-500">NIK harus 16 digit angka</p>
+								<p class="mt-1 text-xs text-gray-500">{m['form.nik_error']()}</p>
 							</div>
 						</div>
 
 						<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									Email <span class="text-red-500">*</span>
+									{m['contact.email']()} <span class="text-red-500">*</span>
 								</label>
 								<input
 									type="email"
@@ -250,7 +250,7 @@
 
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									No. HP / WhatsApp <span class="text-red-500">*</span>
+									{m['contact.phone']()} <span class="text-red-500">*</span>
 								</label>
 								<input
 									type="text"
@@ -265,13 +265,13 @@
 						<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									Pekerjaan <span class="text-red-500">*</span>
+									{m['form.job']()} <span class="text-red-500">*</span>
 								</label>
 								<SearchableSelect
 									options={masterPekerjaan}
 									bind:value={formData.pekerjaan_id}
 									name="pekerjaan_id"
-									placeholder="-- Pilih Pekerjaan --"
+									placeholder={m['form.job_placeholder']()}
 									idKey="id"
 									labelKey="nama_pekerjaan"
 									required={true}
@@ -280,13 +280,13 @@
 
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									Asal / Domisili <span class="text-red-500">*</span>
+									{m['form.domicile']()} <span class="text-red-500">*</span>
 								</label>
 								<SearchableSelect
 									options={masterDomisili}
 									bind:value={formData.domisili_id}
 									name="domisili_id"
-									placeholder="-- Pilih Kabupaten/Kota --"
+									placeholder={m['form.domicile_placeholder']()}
 									idKey="id"
 									labelKey="nama_daerah"
 									required={true}
@@ -296,12 +296,12 @@
 
 						<div class="space-y-2">
 							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-								Alamat Lengkap <span class="text-red-500">*</span>
+								{m['contact.address']()} <span class="text-red-500">*</span>
 							</label>
 							<input
 								type="text"
 								bind:value={formData.alamat}
-								placeholder="Jl. Contoh No. 123, Kelurahan/Desa"
+								placeholder={m['form.address_placeholder']()}
 								class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 								required
 							/>
@@ -309,7 +309,7 @@
 
 						<div class="space-y-2">
 							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-								Upload Foto KTP <span class="text-red-500">*</span>
+								{m['form.upload_ktp']()} <span class="text-red-500">*</span>
 							</label>
 							<input
 								type="file"
@@ -319,13 +319,13 @@
 								required
 							/>
 							<p class="mt-1 text-xs text-gray-500">
-								Format: JPG, JPEG, PNG | Maksimal ukuran: 5MB
+								{m['form.file_format_hint']()}
 							</p>
 						</div>
 
 						<div class="space-y-2">
 							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-								Upload Dokumen Pendukung
+								{m['form.upload_supporting_doc']()}
 							</label>
 							<input
 								type="file"
@@ -334,7 +334,7 @@
 								class="block w-full cursor-pointer rounded-lg border border-gray-300 bg-white text-sm text-gray-700 file:mr-4 file:border-0 file:bg-gradient-to-r file:from-ppid-primary/90 file:to-ppid-primary file:px-6 file:py-3 file:text-sm file:font-semibold file:text-white hover:file:from-ppid-primary hover:file:to-ppid-primary/90 focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800 dark:text-gray-300"
 							/>
 							<p class="mt-1 text-xs leading-relaxed text-gray-500">
-								Bukti penolakan atau dokumen pendukung lainnya
+								{m['form.supporting_doc_hint']()}
 							</p>
 						</div>
 
@@ -353,11 +353,11 @@
 										for="showInstansi"
 										class="ml-3 block cursor-pointer text-sm font-semibold text-gray-800 dark:text-gray-200"
 									>
-										Mengajukan atas nama Instansi / Badan Hukum?
+										{m['form.agency_question']()}
 									</label>
 								</div>
 								<p class="ml-7 text-xs leading-relaxed text-gray-600 dark:text-gray-300">
-									Centang jika Anda mewakili instansi pemerintah, organisasi, atau badan hukum.
+									{m['form.agency_hint']()}
 								</p>
 							</div>
 						</div>
@@ -365,12 +365,12 @@
 						{#if isInstansi}
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									Nomor Pengesahan (Badan Hukum) <span class="text-red-500">*</span>
+									{m['form.agency_number']()} <span class="text-red-500">*</span>
 								</label>
 								<input
 									type="text"
 									bind:value={formData.nmr_pengesahan}
-									placeholder="Masukkan nomor pengesahan badan hukum"
+									placeholder={m['form.agency_number_placeholder']()}
 									required={isInstansi}
 									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 								/>
@@ -407,38 +407,38 @@
 											d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
 										/>
 									</svg>
-									Detail Keberatan
+									{m['layanan_pages.keberatan_detail']()}
 								</div>
 								<p class="mt-1 text-xs font-normal text-gray-500 dark:text-gray-400">
-									Informasi mengenai keberatan Anda
+									{m['layanan_pages.keberatan_detail_desc']()}
 								</p>
 							</div>
 						</h3>
 
 						<div class="space-y-2">
 							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-								Nomor Permohonan <span class="text-red-500">*</span>
+								{m['form.request_number']()} <span class="text-red-500">*</span>
 							</label>
 							<input
 								type="text"
 								bind:value={formData.id_permohonan}
-								placeholder="Masukkan nomor permohonan yang diajukan keberatan"
+								placeholder={m['form.request_number_placeholder']()}
 								class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 								required
 							/>
 							<p class="mt-1 text-xs text-gray-500">
-								Nomor permohonan informasi yang akan diajukan keberatan
+								{m['form.request_number_hint']()}
 							</p>
 						</div>
 
 						<div class="space-y-2">
 							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-								Alasan Keberatan <span class="text-red-500">*</span>
+								{m['form.objection_reason']()} <span class="text-red-500">*</span>
 							</label>
 							<textarea
 								bind:value={formData.alasan_keberatan}
 								rows="5"
-								placeholder="Jelaskan alasan Anda mengajukan keberatan..."
+								placeholder={m['form.objection_reason_placeholder']()}
 								class="w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 								required
 							></textarea>
@@ -446,17 +446,17 @@
 
 						<div class="space-y-2">
 							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-								Kasus Posisi <span class="text-red-500">*</span>
+								{m['form.case_position']()} <span class="text-red-500">*</span>
 							</label>
 							<textarea
 								bind:value={formData.kasus_posisi}
 								rows="5"
-								placeholder="Jelaskan kronologi atau kasus posisi secara detail..."
+								placeholder={m['form.case_position_placeholder']()}
 								class="w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 								required
 							></textarea>
 							<p class="mt-1 text-xs text-gray-500">
-								Jelaskan kronologi kejadian atau latar belakang keberatan
+								{m['form.case_position_hint']()}
 							</p>
 						</div>
 					</div>
@@ -469,7 +469,7 @@
 								onclick={resetForm}
 								class="flex items-center justify-center gap-2 rounded-lg bg-gray-100 px-6 py-3 font-semibold text-gray-700 transition-all hover:bg-gray-200"
 							>
-								Reset Form
+								{m['form.reset']()}
 							</button>
 							<button
 								type="submit"
@@ -489,7 +489,7 @@
 									<line x1="22" x2="11" y1="2" y2="13" />
 									<polygon points="22 2 15 22 11 13 2 9 22 2" />
 								</svg>
-								Kirim Keberatan
+								{m['form.submit_objection']()}
 							</button>
 						</div>
 					</div>

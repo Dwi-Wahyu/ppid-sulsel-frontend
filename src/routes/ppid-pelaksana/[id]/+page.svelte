@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { PUBLIC_API_URL, PUBLIC_BACKEND_URL } from '$env/static/public';
+	import * as m from '$lib/paraglide/messages.js';
 	import { onMount } from 'svelte';
 
 	let { data } = $props();
@@ -22,7 +23,7 @@
 </script>
 
 <svelte:head>
-	<title>{data.skpd.nm_skpd} - PPID Pelaksana</title>
+	<title>{data.skpd.nm_skpd} {m['ppid_pel.detail.title_suffix']()}</title>
 </svelte:head>
 
 <div class="relative min-h-screen overflow-x-hidden bg-gray-50 pb-20 dark:bg-slate-900">
@@ -54,19 +55,20 @@
 			<nav
 				class="mb-6 inline-flex items-center space-x-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-300 backdrop-blur-sm"
 			>
-				<a href="/" class="transition-colors hover:text-ppid-accent">Beranda</a>
+				<a href="/" class="transition-colors hover:text-ppid-accent">{m['breadcrumb.home']()}</a>
 				<span class="text-gray-500">/</span>
-				<a href="/ppid-pelaksana" class="transition-colors hover:text-ppid-accent">PPID Pelaksana</a
+				<a href="/ppid-pelaksana" class="transition-colors hover:text-ppid-accent"
+					>{m['breadcrumb.ppid_pelaksana']()}</a
 				>
 				<span class="text-gray-500">/</span>
-				<span class="font-medium text-ppid-accent">Detail</span>
+				<span class="font-medium text-ppid-accent">{m['public_info.detail.breadcrumb']()}</span>
 			</nav>
 
 			<h1 class="mb-3 text-3xl font-bold tracking-tight text-white md:text-4xl lg:text-5xl">
-				Profil <span class="text-ppid-accent">SKPD</span>
+				{m['menu.profile_dropdown']()} <span class="text-ppid-accent">{m['ppid_pel.skpd']()}</span>
 			</h1>
 			<p class="mx-auto max-w-2xl text-base leading-relaxed text-gray-200 md:text-lg">
-				Informasi detail mengenai Pejabat Pengelola Informasi dan Dokumentasi Pelaksana
+				{m['ppid_pel.detail.desc']()}
 			</p>
 		</div>
 	</div>
@@ -104,7 +106,7 @@
 							class="mb-4 inline-flex items-center gap-2 rounded-full border border-ppid-accent/30 bg-linear-to-r from-ppid-accent/15 to-ppid-accent/5 px-3 py-1.5 text-xs font-bold text-[#C4941F]"
 						>
 							<span class="h-2 w-2 rounded-full bg-ppid-accent"></span>
-							PPID PELAKSANA PROVINSI SULSEL
+							{m['ppid_pel.detail.badge']()}
 						</div>
 						<h2
 							class="mb-5 text-2xl leading-tight font-bold text-ppid-primary md:text-3xl lg:text-4xl dark:text-white"
@@ -156,7 +158,7 @@
 											d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"
 										/>
 									</svg>
-									<span class="text-base font-medium">Kunjungi Website</span>
+									<span class="text-base font-medium">{m['ppid_pel.visit_website']()}</span>
 								</a>
 							{/if}
 						</div>
@@ -196,7 +198,7 @@
 								</svg>
 							</div>
 							<h3 class="text-2xl font-bold text-ppid-primary md:text-3xl dark:text-white">
-								Pimpinan SKPD
+								{m['ppid_pel.leadership_title']()}
 							</h3>
 						</div>
 
@@ -209,7 +211,7 @@
 										class="absolute top-0 right-0 h-20 w-20 rounded-bl-[3rem] bg-linear-to-br from-ppid-primary/3 to-ppid-accent/3 transition-transform group-hover:scale-110"
 									></div>
 									<p class="mb-3 text-sm font-bold tracking-wider text-ppid-accent uppercase">
-										Kepala Dinas
+										{m['ppid_pel.head_of_agency']()}
 									</p>
 									<h4
 										class="text-xl leading-relaxed font-bold text-ppid-primary md:text-2xl dark:text-white"
@@ -227,7 +229,7 @@
 										class="absolute top-0 right-0 h-20 w-20 rounded-bl-[3rem] bg-linear-to-br from-ppid-primary/3 to-ppid-accent/3 transition-transform group-hover:scale-110"
 									></div>
 									<p class="mb-3 text-sm font-bold tracking-wider text-ppid-accent uppercase">
-										Sekretaris
+										{m['ppid_pel.secretary']()}
 									</p>
 									<h4
 										class="text-xl leading-relaxed font-bold text-ppid-primary md:text-2xl dark:text-white"
@@ -270,7 +272,7 @@
 								</svg>
 							</div>
 							<h3 class="text-2xl font-bold text-ppid-primary md:text-3xl dark:text-white">
-								Visi & Misi
+								{m['profile.vision_mission_title']()}
 							</h3>
 						</div>
 
@@ -311,7 +313,7 @@
 									</svg>
 								</div>
 								<h3 class="text-2xl font-bold text-ppid-primary md:text-3xl dark:text-white">
-									Tugas Pokok & Fungsi
+									{m['profile.tupoksi_title']()}
 								</h3>
 							</div>
 
@@ -345,7 +347,7 @@
 												points="7 10 12 15 17 10"
 											/><line x1="12" x2="12" y1="15" y2="3" /></svg
 										>
-										Buka File Penuh
+										{m['ppid_pel.open_full_file']()}
 									</a>
 								</div>
 							{:else}
@@ -385,7 +387,7 @@
 									</svg>
 								</div>
 								<h3 class="text-2xl font-bold text-ppid-primary md:text-3xl dark:text-white">
-									Tujuan
+									{m['ppid_pel.goal']()}
 								</h3>
 							</div>
 							<div class="prose prose-lg max-w-none prose-slate dark:prose-invert">
@@ -431,7 +433,7 @@
 									/>
 								</svg>
 							</span>
-							Kontak Kami
+							{m['contact.title']()}
 						</h3>
 
 						<div class="relative z-10 space-y-6">
@@ -439,7 +441,7 @@
 							{#if data.skpd.no_tlp}
 								<div>
 									<p class="mb-1.5 text-sm font-bold tracking-wider text-white/70 uppercase">
-										Telepon
+										{m['contact.phone']()}
 									</p>
 									<a
 										href="tel:{data.skpd.no_tlp}"
@@ -454,7 +456,7 @@
 							{#if data.skpd.email}
 								<div>
 									<p class="mb-1.5 text-sm font-bold tracking-wider text-white/70 uppercase">
-										Email
+										{m['contact.email']()}
 									</p>
 									<a
 										href="mailto:{data.skpd.email}"
@@ -469,7 +471,7 @@
 							{#if data.skpd.alamat}
 								<div>
 									<p class="mb-1.5 text-sm font-bold tracking-wider text-white/70 uppercase">
-										Alamat
+										{m['contact.address']()}
 									</p>
 									<p class="text-base leading-relaxed text-white/95">{data.skpd.alamat}</p>
 								</div>
@@ -484,7 +486,7 @@
 							href="/ppid-pelaksana"
 							class="block w-full transform rounded-xl bg-ppid-accent py-4 text-center font-bold text-ppid-primary shadow-lg transition-all duration-300 hover:-translate-y-1 hover:bg-[#bfa035]"
 						>
-							Kembali ke Daftar
+							{m['ppid_pel.back_to_list']()}
 						</a>
 					</div>
 				</div>

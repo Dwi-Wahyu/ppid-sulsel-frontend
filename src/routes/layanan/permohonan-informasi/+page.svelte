@@ -6,6 +6,7 @@
 	import SuccessModal from '$lib/components/SuccessModal.svelte';
 	import { onMount } from 'svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
+	import * as m from '$lib/paraglide/messages.js';
 
 	// Interfaces
 	interface Domisili {
@@ -247,12 +248,15 @@
 			items={[
 				{ label: 'breadcrumb.home', href: '/' },
 				{ label: 'layanan.services' },
-				{ label: 'layanan.permohonan_title' }
+				{ label: 'layanan_pages.permohonan_title' }
 			]}
 		/>
 
 		<div class="mt-4 flex items-end justify-between">
-			<PageTitle title="Permohonan Informasi" subtitle="Ajukan permohonan informasi publik" />
+			<PageTitle
+				title={m['layanan_pages.permohonan_title']()}
+				subtitle={m['layanan_pages.permohonan_subtitle']()}
+			/>
 			<div class="hidden md:block">
 				<div
 					class="h-1.5 w-24 rounded-full bg-gradient-to-r from-ppid-primary to-ppid-accent"
@@ -293,9 +297,9 @@
 						</svg>
 					</div>
 					<h2 class="mb-2 text-2xl font-bold text-ppid-primary dark:text-white">
-						Form Permohonan Informasi
+						{m['layanan_pages.form_title']()}
 					</h2>
-					<p class="text-gray-600 dark:text-gray-300">Lengkapi formulir di bawah ini</p>
+					<p class="text-gray-600 dark:text-gray-300">{m['layanan_pages.form_desc']()}</p>
 				</div>
 
 				<form onsubmit={handleSubmit} class="space-y-8" id="permohonanForm">
@@ -336,10 +340,10 @@
 										<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
 										<circle cx="12" cy="7" r="4"></circle>
 									</svg>
-									Data Pribadi
+									{m['layanan_pages.personal_data']()}
 								</div>
 								<p class="mt-1 text-xs font-normal text-gray-500 dark:text-gray-400">
-									Informasi identitas pemohon
+									{m['layanan_pages.personal_data_desc']()}
 								</p>
 							</div>
 						</h3>
@@ -348,12 +352,12 @@
 						<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									Nama Lengkap <span class="text-red-500">*</span>
+									{m['form.fullname']()} <span class="text-red-500">*</span>
 								</label>
 								<input
 									type="text"
 									bind:value={formData.nama}
-									placeholder="Masukkan nama sesuai KTP"
+									placeholder={m['form.fullname_placeholder']()}
 									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 									required
 								/>
@@ -361,18 +365,18 @@
 
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									No. KTP (NIK) <span class="text-red-500">*</span>
+									{m['form.nik']()} <span class="text-red-500">*</span>
 								</label>
 								<input
 									type="text"
 									bind:value={formData.nik}
 									oninput={validateNik}
-									placeholder="16 digit NIK"
+									placeholder={m['form.nik_placeholder']()}
 									maxlength="16"
 									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 									required
 								/>
-								<p class="mt-1 text-xs text-gray-500">NIK harus 16 digit angka</p>
+								<p class="mt-1 text-xs text-gray-500">{m['form.nik_error']()}</p>
 							</div>
 						</div>
 
@@ -380,7 +384,7 @@
 						<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									Email <span class="text-red-500">*</span>
+									{m['contact.email']()} <span class="text-red-500">*</span>
 								</label>
 								<input
 									type="email"
@@ -393,7 +397,7 @@
 
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									No. HP / WhatsApp <span class="text-red-500">*</span>
+									{m['contact.phone']()} <span class="text-red-500">*</span>
 								</label>
 								<input
 									type="text"
@@ -409,13 +413,13 @@
 						<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									Pekerjaan <span class="text-red-500">*</span>
+									{m['form.job']()} <span class="text-red-500">*</span>
 								</label>
 								<SearchableSelect
 									options={masterPekerjaan}
 									bind:value={formData.pekerjaan_id}
 									name="pekerjaan_id"
-									placeholder="-- Pilih Pekerjaan --"
+									placeholder={m['form.job_placeholder']()}
 									idKey="id"
 									labelKey="nama_pekerjaan"
 									required={true}
@@ -424,30 +428,30 @@
 
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									Asal / Domisili <span class="text-red-500">*</span>
+									{m['form.domicile']()} <span class="text-red-500">*</span>
 								</label>
 								<SearchableSelect
 									options={masterDomisili}
 									bind:value={formData.domisili_id}
 									name="domisili_id"
-									placeholder="-- Pilih Kabupaten/Kota --"
+									placeholder={m['form.domicile_placeholder']()}
 									idKey="id"
 									labelKey="nama_daerah"
 									required={true}
 								/>
-								<p class="mt-1 text-xs text-gray-500">Pilih kabupaten/kota asal Anda</p>
+								<p class="mt-1 text-xs text-gray-500">{m['form.domicile_hint']()}</p>
 							</div>
 						</div>
 
 						<!-- Row 4: Alamat -->
 						<div class="space-y-2">
 							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-								Alamat Lengkap <span class="text-red-500">*</span>
+								{m['contact.address']()} <span class="text-red-500">*</span>
 							</label>
 							<input
 								type="text"
 								bind:value={formData.alamat}
-								placeholder="Jl. Contoh No. 123, Kelurahan/Desa"
+								placeholder={m['form.address_placeholder']()}
 								class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 								required
 							/>
@@ -456,7 +460,7 @@
 						<!-- Row 5: Upload KTP -->
 						<div class="space-y-2">
 							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-								Upload Foto KTP <span class="text-red-500">*</span>
+								{m['form.upload_ktp']()} <span class="text-red-500">*</span>
 							</label>
 							<input
 								type="file"
@@ -467,14 +471,14 @@
 							/>
 							<p class="mt-1 text-xs text-gray-500">
 								<i class="fas fa-info-circle mr-1"></i>
-								Format: JPG, JPEG, PNG | Maksimal ukuran: 5MB
+								{m['form.file_format_hint']()}
 							</p>
 						</div>
 
 						<!-- Row 6: Upload Dokumen Pendukung -->
 						<div class="space-y-2">
 							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-								Upload Dokumen Pendukung
+								{m['form.upload_supporting_doc']()}
 							</label>
 							<input
 								type="file"
@@ -483,10 +487,10 @@
 								class="block w-full cursor-pointer rounded-lg border border-gray-300 bg-white text-sm text-gray-700 file:mr-4 file:border-0 file:bg-gradient-to-r file:from-ppid-primary/90 file:to-ppid-primary file:px-6 file:py-3 file:text-sm file:font-semibold file:text-white hover:file:from-ppid-primary hover:file:to-ppid-primary/90 focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800 dark:text-gray-300"
 							/>
 							<p class="mt-1 text-xs leading-relaxed text-gray-500">
-								Surat kuasa, surat tugas, atau dokumen lain yang mendukung permohonan Anda
+								{m['form.supporting_doc_hint']()}
 							</p>
 							<p class="mt-0.5 text-xs text-gray-400">
-								Format: PDF, DOC, DOCX, JPG, PNG | Maksimal: 10MB
+								{m['form.file_format_hint_2']()}
 							</p>
 						</div>
 
@@ -506,11 +510,11 @@
 										for="showInstansi"
 										class="ml-3 block cursor-pointer text-sm font-semibold text-gray-800 dark:text-gray-200"
 									>
-										Mengajukan atas nama Instansi / Badan Hukum?
+										{m['form.agency_question']()}
 									</label>
 								</div>
 								<p class="ml-7 text-xs leading-relaxed text-gray-600 dark:text-gray-300">
-									Centang jika Anda mewakili instansi pemerintah, organisasi, atau badan hukum.
+									{m['form.agency_hint']()}
 								</p>
 							</div>
 						</div>
@@ -519,17 +523,17 @@
 						{#if isInstansi}
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									Nomor Pengesahan (Badan Hukum) <span class="text-red-500">*</span>
+									{m['form.agency_number']()} <span class="text-red-500">*</span>
 								</label>
 								<input
 									type="text"
 									bind:value={formData.nmr_pengesahan}
-									placeholder="Masukkan nomor pengesahan badan hukum"
+									placeholder={m['form.agency_number_placeholder']()}
 									required={isInstansi}
 									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 								/>
 								<p class="mt-1 text-xs text-gray-500">
-									Wajib diisi untuk pemohon dari instansi/badan hukum
+									{m['form.agency_number_required']()}
 								</p>
 							</div>
 						{/if}
@@ -564,10 +568,10 @@
 										<line x1="12" y1="16" x2="12" y2="12"></line>
 										<line x1="12" y1="8" x2="12.01" y2="8"></line>
 									</svg>
-									Detail Informasi
+									{m['layanan_pages.detail_info']()}
 								</div>
 								<p class="mt-1 text-xs font-normal text-gray-500 dark:text-gray-400">
-									Rincian informasi yang dibutuhkan
+									{m['layanan_pages.detail_info_desc']()}
 								</p>
 							</div>
 						</h3>
@@ -575,12 +579,12 @@
 						<!-- Row 1: Tujuan -->
 						<div class="space-y-2">
 							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-								Tujuan Penggunaan Informasi <span class="text-red-500">*</span>
+								{m['form.purpose']()} <span class="text-red-500">*</span>
 							</label>
 							<input
 								type="text"
 								bind:value={formData.tujuan}
-								placeholder="Contoh: Penelitian, Keperluan Pribadi, dll"
+								placeholder={m['form.purpose_placeholder']()}
 								class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 								required
 							/>
@@ -589,17 +593,17 @@
 						<!-- Row 2: Rincian -->
 						<div class="space-y-2">
 							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-								Rincian Informasi Yang Dibutuhkan <span class="text-red-500">*</span>
+								{m['form.details']()} <span class="text-red-500">*</span>
 							</label>
 							<textarea
 								bind:value={formData.rincian}
 								rows="5"
-								placeholder="Deskripsikan secara detail informasi yang Anda butuhkan..."
+								placeholder={m['form.details_placeholder']()}
 								class="w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 								required
 							></textarea>
 							<p class="mt-1 text-xs text-gray-500">
-								Jelaskan informasi yang dibutuhkan sejelas mungkin
+								{m['form.details_hint']()}
 							</p>
 						</div>
 
@@ -607,14 +611,14 @@
 						<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									Format Informasi <span class="text-red-500">*</span>
+									{m['form.format']()} <span class="text-red-500">*</span>
 								</label>
 								<select
 									bind:value={formData.id_bentuk_informasi}
 									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 									required
 								>
-									<option value="">-- Pilih Format Informasi --</option>
+									<option value="">{m['form.format_placeholder']()}</option>
 									{#each bentukInformasis as bentuk}
 										<option value={bentuk.id}>{bentuk.judul}</option>
 									{/each}
@@ -623,7 +627,7 @@
 
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									Contoh Informasi (Link)
+									{m['form.example_link']()}
 								</label>
 								<input
 									type="text"
@@ -632,7 +636,7 @@
 									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 								/>
 								<p class="mt-1 text-xs text-gray-500">
-									Sertakan link jika ada contoh informasi yang dimaksud
+									{m['form.example_link_hint']()}
 								</p>
 							</div>
 						</div>
@@ -648,7 +652,7 @@
 								disabled={isSubmitting}
 							>
 								<i class="fas fa-redo"></i>
-								Reset Form
+								{m['form.reset']()}
 							</button>
 							<button
 								type="submit"
@@ -676,7 +680,7 @@
 											d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
 										></path>
 									</svg>
-									Mengirim...
+									{m['form.submitting']()}
 								{:else}
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
@@ -692,7 +696,7 @@
 										<line x1="22" x2="11" y1="2" y2="13" />
 										<polygon points="22 2 15 22 11 13 2 9 22 2" />
 									</svg>
-									Kirim Permohonan
+									{m['form.submit']()}
 								{/if}
 							</button>
 						</div>

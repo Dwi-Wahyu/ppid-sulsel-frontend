@@ -83,16 +83,16 @@
 			>
 				<path d="m9 18 6-6-6-6" />
 			</svg>
-			<span class="font-medium text-ppid-primary dark:text-white">Daftar Informasi Publik</span>
+			<span class="font-medium text-ppid-primary dark:text-white">{m['public_info.title']()}</span>
 		</nav>
 
 		<div class="flex items-end justify-between">
 			<div>
 				<h1 class="mb-2 text-3xl font-bold text-ppid-primary md:text-4xl dark:text-white">
-					Daftar Informasi Publik
+					{m['public_info.title']()}
 				</h1>
 				<p class="text-gray-600 dark:text-gray-300">
-					Daftar lengkap informasi publik Pemerintah Provinsi Sulawesi Selatan
+					{m['public_info.desc']()}
 				</p>
 			</div>
 			<div class="hidden md:block">
@@ -124,7 +124,7 @@
 					<input
 						type="text"
 						bind:value={searchQuery}
-						placeholder="Cari berdasarkan judul atau isi informasi..."
+						placeholder={m['public_info.search_placeholder_general']()}
 						class="w-full rounded-lg border border-gray-300 py-2.5 pr-4 pl-10 focus:ring-2 focus:ring-ppid-primary focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-white"
 					/>
 				</div>
@@ -133,14 +133,14 @@
 						type="submit"
 						class="hover:bg-opacity-90 rounded-lg bg-ppid-accent px-6 py-2 font-semibold text-white transition-colors"
 					>
-						Cari
+						{m['public_info.search_btn'] ? m['public_info.search_btn']() : 'Cari'}
 					</button>
 					{#if filters.search}
 						<a
 							href={page.url.pathname}
 							class="flex items-center justify-center rounded-lg bg-gray-200 px-6 py-2 font-medium text-gray-700 transition-colors hover:bg-gray-300 dark:bg-slate-700 dark:text-gray-200"
 						>
-							Clear
+							{m['public_info.clear_btn']()}
 						</a>
 					{/if}
 				</div>
@@ -153,12 +153,24 @@
 					<table class="w-full border-collapse text-left">
 						<thead class="bg-ppid-primary text-white">
 							<tr>
-								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase">No</th>
-								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase">Informasi</th>
-								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase">Ringkasan</th>
-								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase">Pejabat</th>
-								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase">Bentuk</th>
-								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase">Aksi</th>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
+									>{m['public_info.table.no']()}</th
+								>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
+									>{m['public_info.table.info']()}</th
+								>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
+									>{m['public_info.table.summary']()}</th
+								>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
+									>{m['public_info.table.official']()}</th
+								>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
+									>{m['public_info.table.format']()}</th
+								>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
+									>{m['public_info.table.action']()}</th
+								>
 							</tr>
 						</thead>
 						<tbody class="divide-y divide-gray-100 dark:divide-slate-700">
@@ -179,14 +191,14 @@
 											target="_blank"
 											class="font-medium text-ppid-primary hover:underline dark:text-blue-400"
 										>
-											Lihat
+											{m['public_info.view']()}
 										</a>
 									</td>
 								</tr>
 							{:else}
 								<tr>
 									<td colspan="6" class="py-20 text-center text-gray-500">
-										Data tidak ditemukan untuk pencarian ini.
+										{m['public_info.no_data']()}
 									</td>
 								</tr>
 							{/each}

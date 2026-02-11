@@ -1,7 +1,6 @@
-<script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { api } from '$lib/api';
 	import FilePond from '$lib/components/FilePond.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
@@ -33,15 +32,10 @@
 			formData.append('judul', judul);
 			formData.append('file', file);
 
-			const response = await fetch(`${PUBLIC_API_URL}/admin/data-sop`, {
-				method: 'POST',
-				credentials: 'include',
-				body: formData
-			});
+			// Menggunakan api.post untuk mengirim FormData
+			const result = await api.post('/admin/sop', formData);
 
-			const result = await response.json();
-
-			if (response.ok) {
+			if (result.success) {
 				notificationType = 'success';
 				notificationMessage = 'SOP berhasil ditambahkan';
 				showNotification = true;
@@ -50,13 +44,12 @@
 					goto('/admin/data-sop');
 				}, 1500);
 			} else {
-				notificationType = 'error';
-				notificationMessage = result.message || 'Gagal menyimpan SOP';
-				showNotification = true;
+				throw new Error(result.message || 'Gagal menyimpan SOP');
 			}
-		} catch (error) {
+		} catch (error: any) {
+			console.error('Error saving SOP:', error);
 			notificationType = 'error';
-			notificationMessage = 'Terjadi kesalahan saat menyimpan data';
+			notificationMessage = error.message || 'Terjadi kesalahan saat menyimpan data';
 			showNotification = true;
 		} finally {
 			isSaving = false;
@@ -73,7 +66,7 @@
 	<div class="mb-6 flex items-center gap-4">
 		<a
 			href="/admin/data-sop"
-			class="rounded-xl border border-slate-200 bg-white p-2 text-slate-400 transition-all hover:text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:hover:text-slate-300"
+			class="rounded-xl border border-slate-200 bg-white p-2.5 text-slate-400 shadow-sm transition-all hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:hover:text-slate-300"
 			aria-label="Kembali ke daftar SOP"
 		>
 			<svg
@@ -124,7 +117,7 @@
 					bind:value={judul}
 					required
 					aria-required="true"
-					class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-slate-900 placeholder-slate-400 transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:placeholder-slate-500"
+					class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 shadow-sm transition-all focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary/20 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-ppid-primary"
 					placeholder="Contoh: SOP Pelayanan Informasi Publik"
 				/>
 			</div>
@@ -156,7 +149,7 @@
 		<div class="flex items-center justify-end gap-3">
 			<a
 				href="/admin/data-sop"
-				class="rounded-xl border border-slate-200 px-6 py-2.5 text-sm font-semibold text-slate-600 transition-all hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+				class="rounded-xl border border-slate-200 bg-white px-6 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
 			>
 				Batal
 			</a>
@@ -164,7 +157,7 @@
 				type="submit"
 				disabled={isSaving}
 				aria-busy={isSaving}
-				class="rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+				class="rounded-xl bg-gradient-to-r from-ppid-primary to-ppid-primary-light px-8 py-2.5 text-sm font-semibold text-white shadow-md transition-all hover:from-ppid-primary-light hover:to-ppid-primary hover:shadow-lg focus:ring-2 focus:ring-ppid-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 			>
 				{isSaving ? 'Menyimpan...' : 'Simpan SOP'}
 			</button>

@@ -40,7 +40,7 @@
 				results = response.data;
 
 				if (results.length === 0) {
-					error = 'Data tidak ditemukan untuk email tersebut.';
+					error = m['common.no_data_email']();
 				} else {
 					// Scroll to results
 					setTimeout(() => {
@@ -51,7 +51,7 @@
 				error = response.message || 'Gagal mengambil data.';
 			}
 		} catch (err) {
-			error = 'Terjadi kesalahan koneksi. Silakan coba lagi.';
+			error = m['form.alert.server_error']();
 			console.error('Error:', err);
 		} finally {
 			loading = false;
@@ -98,7 +98,7 @@
 			class="mb-6 text-4xl leading-tight font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl"
 		>
 			<span class="bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">
-				Cek Status
+				{m['layanan_pages.check_status_title']()}
 			</span>
 		</h1>
 
@@ -106,7 +106,7 @@
 		<p
 			class="mb-12 text-lg leading-relaxed font-medium text-blue-100 sm:text-xl md:mb-16 md:text-2xl"
 		>
-			Lacak perkembangan permohonan informasi dan pengajuan keberatan Anda secara real-time
+			{m['layanan_pages.check_status_subtitle']()}
 		</p>
 	</div>
 
@@ -139,10 +139,10 @@
 					<h2
 						class="mb-4 text-2xl font-bold text-ppid-primary sm:text-3xl md:text-4xl dark:text-white"
 					>
-						Pilih Jenis Layanan
+						{m['layanan_pages.choose_service']()}
 					</h2>
 					<p class="text-slate-600 dark:text-slate-400">
-						Pilih jenis layanan yang ingin Anda cek statusnya
+						{m['layanan_pages.choose_service_desc']()}
 					</p>
 				</div>
 
@@ -193,8 +193,8 @@
 									</svg>
 								</div>
 								<div class="text-left">
-									<div class="mb-1 text-lg font-bold">Permohonan Informasi</div>
-									<div class="text-sm opacity-90">Cek status permohonan informasi publik</div>
+									<div class="mb-1 text-lg font-bold">{m['layanan_pages.permohonan_title']()}</div>
+									<div class="text-sm opacity-90">{m['layanan_pages.check_permohonan_desc']()}</div>
 								</div>
 							</div>
 							{#if type === 'permohonan'}
@@ -254,8 +254,8 @@
 									</svg>
 								</div>
 								<div class="text-left">
-									<div class="mb-1 text-lg font-bold">Pengajuan Keberatan</div>
-									<div class="text-sm opacity-90">Cek status pengajuan keberatan</div>
+									<div class="mb-1 text-lg font-bold">{m['layanan_pages.keberatan_title']()}</div>
+									<div class="text-sm opacity-90">{m['layanan_pages.check_keberatan_desc']()}</div>
 								</div>
 							</div>
 							{#if type === 'keberatan'}
@@ -277,7 +277,7 @@
 				<form onsubmit={searchStatus} class="mx-auto max-w-2xl">
 					<div class="mb-8">
 						<label class="mb-3 block text-lg font-semibold text-ppid-primary dark:text-white">
-							Email {type === 'permohonan' ? 'Pemohon' : 'Pengaju'}
+							{m['form.applicant_email']()}
 						</label>
 						<div class="group relative">
 							<input
@@ -285,7 +285,7 @@
 								bind:value={email}
 								required
 								class="w-full rounded-2xl border-2 border-slate-300 bg-white px-6 py-5 text-xl text-slate-900 transition-all duration-300 focus:border-ppid-primary focus:ring-4 focus:ring-ppid-accent/30 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-								placeholder="contoh: nama@email.com"
+								placeholder={m['form.email_example_placeholder']()}
 							/>
 						</div>
 					</div>
@@ -328,9 +328,9 @@
 									d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
 								></path>
 							</svg>
-							<span>Mencari...</span>
+							<span>{m['form.searching']()}</span>
 						{:else}
-							<span>Cek Status Saya</span>
+							<span>{m['form.check_my_status']()}</span>
 						{/if}
 					</button>
 				</form>
@@ -348,10 +348,13 @@
 					class="inline-flex flex-col items-center gap-4 rounded-2xl border-2 border-ppid-primary/10 bg-white px-8 py-5 shadow-lg sm:flex-row dark:bg-slate-800"
 				>
 					<h2 class="text-2xl font-bold text-ppid-primary sm:text-3xl dark:text-white">
-						{type === 'permohonan' ? 'Riwayat Permohonan Informasi' : 'Riwayat Pengajuan Keberatan'}
+						{type === 'permohonan'
+							? m['layanan_pages.history_permohonan']()
+							: m['layanan_pages.history_keberatan']()}
 					</h2>
 					<span class="rounded-full bg-ppid-accent px-4 py-1 text-sm font-bold text-white">
-						{results.length} Data
+						{results.length}
+						{m['common.data']()}
 					</span>
 				</div>
 			</div>
@@ -367,11 +370,11 @@
 								<div>
 									<h3 class="mb-2 text-2xl font-bold text-white">
 										{type === 'permohonan'
-											? `Permohonan #${item.id_permohonan}`
-											: `Keberatan #${item.id_pengajuan}`}
+											? `${m['common.request']()} #${item.id_permohonan}`
+											: `${m['common.objection']()} #${item.id_pengajuan}`}
 									</h3>
 									<p class="text-blue-100">
-										Tanggal: {formatDate(
+										{m['common.date']()}: {formatDate(
 											type === 'permohonan' ? item.tgl_permohonan : item.tgl_pengajuan
 										)}
 									</p>
@@ -394,7 +397,9 @@
 							<div class="space-y-4">
 								<div>
 									<label class="mb-1 block text-sm font-semibold text-gray-600 dark:text-gray-400">
-										{type === 'permohonan' ? 'Rincian Informasi' : 'Alasan Keberatan'}
+										{type === 'permohonan'
+											? m['layanan_pages.detail_info']()
+											: m['form.objection_reason']()}
 									</label>
 									<p class="text-lg text-gray-800 dark:text-white">
 										{type === 'permohonan' ? item.rincian : item.alasan_keberatan}
@@ -406,7 +411,7 @@
 										<label
 											class="mb-1 block text-sm font-semibold text-gray-600 dark:text-gray-400"
 										>
-											Tanggal Selesai
+											{m['form.completion_date']()}
 										</label>
 										<p class="text-lg text-gray-800 dark:text-white">
 											{formatDate(item.tgl_selesai)}
@@ -416,7 +421,7 @@
 
 								<div>
 									<label class="mb-1 block text-sm font-semibold text-gray-600 dark:text-gray-400">
-										{type === 'permohonan' ? 'Keterangan' : 'Jawaban'}
+										{type === 'permohonan' ? m['form.remarks']() : m['form.answer']()}
 									</label>
 									<p
 										class="rounded-lg bg-blue-50 p-4 text-gray-700 dark:bg-slate-700 dark:text-gray-300"
@@ -440,7 +445,7 @@
 													d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
 												/>
 											</svg>
-											Unduh Dokumen / Jawaban
+											{m['form.download_response']()}
 										</a>
 									</div>
 								{/if}
