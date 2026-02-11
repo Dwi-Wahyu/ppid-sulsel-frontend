@@ -35,7 +35,7 @@
 		if (file.startsWith('http')) {
 			return file;
 		}
-		return `${BACKEND_URL}/storage/${file}`;
+		return `${BACKEND_URL}/uploads/${file}`;
 	}
 
 	function getDownloadUrl(id: number): string {

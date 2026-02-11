@@ -216,7 +216,7 @@
 					<div class="mt-4">
 						<dt class="mb-2 text-sm font-semibold text-slate-600 dark:text-slate-400">Foto KTP</dt>
 						<a
-							href="http://localhost:8000/storage/{data.permohonan.foto_ktp}"
+							href="/uploads/{data.permohonan.foto_ktp}"
 							target="_blank"
 							rel="noopener noreferrer"
 							class="inline-flex items-center gap-2 text-sm text-[#1A305E] hover:text-[#B8860B] dark:text-blue-400 dark:hover:text-blue-300"
@@ -445,7 +445,7 @@
 												{disposisi.skpd?.nm_skpd || 'SKPD'}
 											</h3>
 											<p class="text-xs text-slate-600 dark:text-slate-400">
-												Didisposisi oleh {disposisi.disposisi_by_user?.name || 'Admin'} •
+												Didisposisi oleh {disposisi.disposisiBy?.name || 'Admin'} •
 												{formatDate(disposisi.created_at)}
 											</p>
 										</div>
@@ -462,7 +462,7 @@
 								<!-- Card Body -->
 								<div class="p-4">
 									<!-- Pesan Disposisi -->
-									{#if disposisi.pesan}
+									{#if disposisi.catatan_disposisi}
 										<div class="mb-4">
 											<p
 												class="text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400"
@@ -472,7 +472,7 @@
 											<p
 												class="mt-1 rounded-lg bg-white p-3 text-sm text-slate-700 italic shadow-sm dark:bg-slate-800 dark:text-slate-300"
 											>
-												"{disposisi.pesan}"
+												"{disposisi.catatan_disposisi}"
 											</p>
 										</div>
 									{/if}
@@ -516,7 +516,7 @@
 																{responIndex + 1}
 															</div>
 															<p class="font-bold text-purple-900 dark:text-purple-100">
-																{respon.responded_by?.name || 'OPD'}
+																{respon.respondedBy?.name || 'OPD'}
 															</p>
 														</div>
 														<time
@@ -535,7 +535,7 @@
 														{#if respon.file}
 															<div class="mt-3">
 																<a
-																	href="http://localhost:8000/storage/{respon.file}"
+																	href="/uploads/{respon.file}"
 																	target="_blank"
 																	rel="noopener noreferrer"
 																	class="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-purple-700 hover:shadow-lg"

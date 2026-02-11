@@ -101,7 +101,7 @@
 
 	// Helper: URL Storage
 	const getFileUrl = (fileName: string) => {
-		return `${PUBLIC_API_URL.replace('/api', '')}/storage/${fileName}`;
+		return `${PUBLIC_API_URL.replace('/api', '')}/uploads/${fileName}`;
 	};
 </script>
 

@@ -12,7 +12,7 @@ export interface PermohonanRespon {
 	respon_by: number;
 	created_at: string;
 	updated_at: string;
-	responded_by?: {
+	respondedBy?: {
 		id: number;
 		name: string;
 	};
@@ -23,13 +23,14 @@ export interface PermohonanDisposisi {
 	id_permohonan: number;
 	id_skpd: string;
 	status: string;
+	catatan_disposisi?: string;
 	pesan?: string;
 	disposisi_by?: number;
 	created_at: string;
 	updated_at: string;
 	skpd?: Skpd;
 	respon?: PermohonanRespon[];
-	disposisi_by_user?: {
+	disposisiBy?: {
 		id: number;
 		name: string;
 	};
@@ -48,6 +49,7 @@ export interface PermohonanInformasi {
 	id_alasan_pengajuan?: number;
 	id_bentuk_informasi?: number;
 	pekerjaan?: string;
+	kategori?: string;
 	tujuan: string;
 	rincian_informasi: string;
 	cara_memperoleh: string;

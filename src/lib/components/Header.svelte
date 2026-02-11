@@ -205,7 +205,9 @@
 				{/if}
 			</div>
 
-			<Sosmed />
+			<div class="hidden lg:block">
+				<Sosmed />
+			</div>
 
 			<button
 				onclick={() => (mobileMenu = !mobileMenu)}
@@ -459,6 +461,11 @@
 					{/if}
 				</li>
 			</ul>
+
+			<!-- Mobile Social Media -->
+			<div class="mt-6 flex justify-center border-t border-white/10 pt-6 lg:hidden">
+				<Sosmed />
+			</div>
 		</div>
 	</nav>
 

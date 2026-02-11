@@ -77,7 +77,7 @@
 			await fetch(`${env.PUBLIC_API_URL}/public/sop/download?id=${id}`);
 
 			// Open file in new tab
-			const fileUrl = `${env.PUBLIC_API_URL}/storage/sop/${filename}`;
+			const fileUrl = `${env.PUBLIC_API_URL}/uploads/sop/${filename}`;
 			window.open(fileUrl, '_blank');
 
 			// Refresh data to update download count locally

@@ -212,9 +212,7 @@
 											</a>
 											{#if item.file}
 												<a
-													href={item.file.startsWith('http')
-														? item.file
-														: `http://localhost:8000/storage/${item.file}`}
+													href={item.file.startsWith('http') ? item.file : `/uploads/${item.file}`}
 													aria-label="Download file"
 													download
 													class="text-ppid-primary hover:text-ppid-accent dark:text-blue-400"
