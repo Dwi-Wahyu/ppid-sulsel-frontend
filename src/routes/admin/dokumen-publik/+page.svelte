@@ -359,7 +359,7 @@
 					<select
 						onchange={handleSkpdFilter}
 						value={data.filters.id_skpd}
-						class="w-full min-w-[200px] rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 focus:border-ppid-accent focus:ring-1 focus:ring-ppid-accent focus:outline-none md:flex-1 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300"
+						class="w-full min-w-50 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600 focus:border-ppid-accent focus:ring-1 focus:ring-ppid-accent focus:outline-none md:flex-1 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300"
 					>
 						<option value="">Filter Berdasarkan SKPD...</option>
 						{#each data.skpdList as skpd}
@@ -372,6 +372,7 @@
 				<button
 					onclick={() => (showFilters = !showFilters)}
 					type="button"
+					title="Tampilkan Filter Lanjutan"
 					class="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
 				>
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

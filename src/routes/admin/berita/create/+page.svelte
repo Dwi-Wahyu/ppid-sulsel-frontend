@@ -6,6 +6,7 @@
 	import FilePond from '$lib/components/FilePond.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
+	import SearchableSelect from '$lib/components/SearchableSelect.svelte';
 
 	interface SKPD {
 		id_skpd: string;
@@ -166,17 +167,13 @@
 							class="block text-[10px] font-black tracking-widest text-slate-500 uppercase"
 							>SKPD Pengirim</label
 						>
-						<select
-							id="id_skpd"
+						<SearchableSelect
+							options={skpdList}
 							bind:value={id_skpd}
-							required
-							class="w-full rounded-2xl border-2 {errors.id_skpd
-								? 'border-red-400'
-								: 'border-slate-100'} px-5 py-4 text-sm font-bold outline-none focus:border-ppid-primary dark:bg-slate-900 dark:text-white"
-						>
-							<option value="">-- Pilih Unit Kerja --</option>
-							{#each skpdList as skpd}<option value={skpd.id_skpd}>{skpd.nm_skpd}</option>{/each}
-						</select>
+							idKey="id_skpd"
+							labelKey="nm_skpd"
+							placeholder={isLoading ? 'Memuat SKPD...' : 'Cari SKPD...'}
+						/>
 					</div>
 
 					<div class="space-y-2">
@@ -199,7 +196,7 @@
 
 				<div class="space-y-2">
 					<h1 class="block text-[10px] font-black tracking-widest text-slate-500 uppercase">
-						Gambar Utama (Max 2MB)
+						Thumbnail (Max 20MB)
 					</h1>
 					<div
 						class="rounded-3xl border-2 {errors.img_berita
@@ -257,6 +254,7 @@
 	onConfirm={handleSubmit}
 	isLoading={isSaving}
 />
+
 <NotificationDialog
 	bind:show={notification.show}
 	theme={notification.type}
