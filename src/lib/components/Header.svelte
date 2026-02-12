@@ -96,7 +96,7 @@
 	<div
 		class="container mx-auto flex items-center justify-between px-4 transition-all duration-300 {isScrolled
 			? 'py-4 opacity-100 lg:h-0 lg:overflow-hidden lg:py-0 lg:opacity-0'
-			: 'py-4 opacity-100 md:py-8'}"
+			: 'py-12 opacity-100 md:py-8'}"
 	>
 		<a href="/" class="group flex items-center gap-3">
 			{#if theme.darkMode}
