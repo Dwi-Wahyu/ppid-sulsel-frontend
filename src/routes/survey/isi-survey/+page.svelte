@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Footer from '$lib/components/Footer.svelte';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import PageTitle from '$lib/components/PageTitle.svelte';
 	import SuccessModal from '$lib/components/SuccessModal.svelte';
@@ -543,5 +542,3 @@
 	title="Survey Terkirim!"
 	message="Terima kasih telah mengisi survey kepuasan masyarakat. Masukan Anda sangat berarti bagi kami."
 />
-
-<Footer />

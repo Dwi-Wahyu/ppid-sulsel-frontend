@@ -1,5 +1,4 @@
 <script>
-	import Footer from '$lib/components/Footer.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 
 	// Form state
@@ -388,5 +387,3 @@
 		</div>
 	</div>
 </div>
-
-<Footer />

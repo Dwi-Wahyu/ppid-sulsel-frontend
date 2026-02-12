@@ -90,13 +90,13 @@
 
 <header
 	class="fixed top-0 left-0 z-50 w-full font-['Plus_Jakarta_Sans'] transition-all duration-300 {isScrolled
-		? ''
+		? 'bg-white shadow-md dark:bg-slate-900'
 		: 'bg-white shadow-md dark:bg-slate-900'}"
 >
 	<div
 		class="container mx-auto flex items-center justify-between px-4 transition-all duration-300 {isScrolled
-			? 'h-0 overflow-hidden py-0 opacity-0'
-			: 'py-4 opacity-100 md:py-6'}"
+			? 'py-4 opacity-100 lg:h-0 lg:overflow-hidden lg:py-0 lg:opacity-0'
+			: 'py-4 opacity-100 md:py-8'}"
 	>
 		<a href="/" class="group flex items-center gap-3">
 			{#if theme.darkMode}
@@ -121,7 +121,9 @@
 
 		<div class="flex items-center gap-3 md:gap-4">
 			<!-- Search Trigger Button -->
-			<a href="/login" class="text-sm font-medium text-gray-700 dark:text-white"> Login </a>
+			<a href="/login" class="hidden text-sm font-medium text-gray-700 lg:block dark:text-white">
+				Login
+			</a>
 
 			<button
 				onclick={() => (searchModalOpen = true)}
@@ -146,7 +148,7 @@
 
 			<button
 				onclick={toggleDarkMode}
-				class="rounded-full p-2 text-gray-700 hover:bg-white/10 dark:text-white"
+				class="hidden rounded-full p-2 text-gray-700 hover:bg-white/10 lg:block dark:text-white"
 				aria-label="Toggle dark mode"
 			>
 				{#if !theme.darkMode}
@@ -235,9 +237,9 @@
 	</div>
 
 	<nav
-		class="relative bg-ppid-primary transition-all duration-300 {mobileMenu
-			? 'block'
-			: 'hidden lg:block'} {isScrolled ? 'shadow-xl' : 'shadow-md'}"
+		class="relative overflow-hidden bg-ppid-primary transition-all duration-500 ease-in-out {mobileMenu
+			? 'max-h-[1000px] opacity-100'
+			: 'max-h-0 opacity-0 lg:max-h-none lg:opacity-100'} {isScrolled ? 'shadow-xl' : 'shadow-md'}"
 	>
 		<div class="absolute top-0 left-0 h-px w-full bg-white/20"></div>
 		<div class="container mx-auto py-4">
@@ -426,6 +428,11 @@
 							</li>
 						</ul>
 					{/if}
+				</li>
+
+				<!-- Login Button (Mobile Only) -->
+				<li class="border-b border-white/10 lg:hidden">
+					<a href="/login" class="block px-6 py-4 hover:text-[#D4AF37]">Login</a>
 				</li>
 
 				<li class="border-b border-white/10 lg:border-none">

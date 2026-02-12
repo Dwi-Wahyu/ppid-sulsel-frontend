@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/state'; // Menggunakan state di Svelte 5
 	import { PUBLIC_API_URL } from '$env/static/public';
-	import Footer from '$lib/components/Footer.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 
 	// --- Type Definitions ---
@@ -298,5 +297,3 @@
 		{/if}
 	</div>
 </div>
-
-<Footer />

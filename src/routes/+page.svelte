@@ -8,7 +8,6 @@
 	import Leadership from '$lib/components/Leadership.svelte';
 	import LegalBanner from '$lib/components/LegalBanner.svelte';
 	import FAQ from '$lib/components/FAQ.svelte';
-	import Footer from '$lib/components/Footer.svelte';
 </script>
 
 <Hero />
@@ -26,5 +25,3 @@
 <LegalBanner />
 
 <FAQ />
-
-<Footer />

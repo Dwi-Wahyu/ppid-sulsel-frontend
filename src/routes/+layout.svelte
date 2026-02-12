@@ -8,6 +8,7 @@
 	import AccessibilityMenu from '$lib/components/AccessibilityMenu.svelte';
 
 	import Header from '$lib/components/Header.svelte';
+	import Footer from '$lib/components/Footer.svelte';
 	import ScrollButtons from '$lib/components/ScrollButtons.svelte';
 
 	let { children } = $props();
@@ -31,6 +32,7 @@
 
 	let showAccessibilityMenu = $derived(isPublicPage);
 	let showHeader = $derived(isPublicPage);
+	let showFooter = $derived(isPublicPage);
 
 	// Add padding top for non-home pages when header is visible
 	let mainClass = $derived(showHeader && page.url.pathname !== '/' ? 'pt-32 lg:pt-48' : '');
@@ -49,6 +51,10 @@
 <main class={mainClass}>
 	{@render children()}
 </main>
+
+{#if showFooter}
+	<Footer />
+{/if}
 
 <div style="display:none">
 	{#each locales as locale}

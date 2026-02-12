@@ -1,5 +1,4 @@
 <script>
-	import Footer from '$lib/components/Footer.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { api } from '$lib/api';
 
@@ -457,8 +456,6 @@
 		</div>
 	</section>
 {/if}
-
-<Footer />
 
 <style>
 	[x-cloak] {

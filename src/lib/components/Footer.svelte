@@ -43,7 +43,7 @@
 	// Definisi navigasi sesuai dengan struktur Blade sebelumnya
 	const navSections = [
 		{
-			title: 'header.profile',
+			title: m['header.profile'](),
 			links: [
 				{ label: m['footer.about_us'](), href: '/profil/ppid' },
 				{ label: m['footer.vision_mission'](), href: '/profil/visi-misi' },
@@ -52,7 +52,7 @@
 			]
 		},
 		{
-			title: 'header.services',
+			title: m['header.services'](),
 			links: [
 				{ label: m['footer.info_request'](), href: '/layanan/permohonan-informasi' },
 				{ label: m['footer.objection'](), href: '/layanan/pengajuan-keberatan' },
@@ -61,7 +61,7 @@
 			]
 		},
 		{
-			title: 'header.public_info',
+			title: m['header.public_info'](),
 			links: [
 				{ label: m['footer.latest_news'](), href: '/berita' },
 				{ label: m['footer.public_info_list'](), href: '/daftar-informasi-publik' },
@@ -94,11 +94,13 @@
 	});
 </script>
 
-<footer class="relative overflow-hidden bg-ppid-primary font-['Plus_Jakarta_Sans'] text-white">
+<footer
+	class="relative overflow-hidden bg-ppid-primary font-['Plus_Jakarta_Sans'] text-white dark:bg-gray-950"
+>
 	<div class="pointer-events-none absolute inset-0">
 		<img src="/images/kantor.jpeg" class="h-full w-full object-cover" alt="Sulsel Background" />
 		<div
-			class="absolute inset-0 bg-linear-to-t from-ppid-primary via-ppid-primary/95 to-ppid-primary/90"
+			class="absolute inset-0 bg-linear-to-t from-ppid-primary via-ppid-primary/95 to-ppid-primary/90 dark:from-gray-950 dark:via-gray-950/95 dark:to-gray-950/90"
 		></div>
 	</div>
 

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Footer from '$lib/components/Footer.svelte';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import { onMount } from 'svelte';
 	import { env } from '$env/dynamic/public';
@@ -268,5 +267,3 @@
 		</div>
 	</div>
 </main>
-
-<Footer />

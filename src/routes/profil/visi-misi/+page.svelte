@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Footer from '$lib/components/Footer.svelte';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import PageTitle from '$lib/components/PageTitle.svelte';
 	import * as m from '$lib/paraglide/messages.js';
@@ -63,5 +62,3 @@
 		</div>
 	</div>
 </main>
-
-<Footer />
