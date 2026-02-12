@@ -1,9 +1,19 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { env } from '$env/dynamic/public';
 	import { api } from '$lib/api';
 	import Sosmed from './Sosmed.svelte';
+	import { browser } from '$app/environment';
+
+	import { onMount, onDestroy } from 'svelte';
+	import FooterDialog from './FooterDialog.svelte';
+
+	function handleEscape(e: KeyboardEvent) {
+		if (e.key === 'Escape') {
+			showPrivacyModal = false;
+			showTermsModal = false;
+		}
+	}
 
 	interface FooterData {
 		footer_logo: string | null;
@@ -35,32 +45,36 @@
 		{
 			title: 'header.profile',
 			links: [
-				{ label: 'footer.about_us', href: '/profil/ppid' },
-				{ label: 'footer.vision_mission', href: '/profil/visi-misi' },
-				{ label: 'footer.org_structure', href: '/profil/struktur-organisasi' },
-				{ label: 'footer.tasks', href: '/profil/tupoksi' }
+				{ label: m['footer.about_us'](), href: '/profil/ppid' },
+				{ label: m['footer.vision_mission'](), href: '/profil/visi-misi' },
+				{ label: m['footer.org_structure'](), href: '/profil/struktur-organisasi' },
+				{ label: m['footer.tasks'](), href: '/profil/tupoksi' }
 			]
 		},
 		{
 			title: 'header.services',
 			links: [
-				{ label: 'footer.info_request', href: '/layanan/permohonan-informasi' },
-				{ label: 'footer.objection', href: '/layanan/pengajuan-keberatan' },
-				{ label: 'footer.check_status', href: '/layanan/cek-status' },
-				{ label: 'footer.service_survey', href: '/layanan/isi-survey' }
+				{ label: m['footer.info_request'](), href: '/layanan/permohonan-informasi' },
+				{ label: m['footer.objection'](), href: '/layanan/pengajuan-keberatan' },
+				{ label: m['footer.check_status'](), href: '/layanan/cek-status' },
+				{ label: m['footer.service_survey'](), href: '/layanan/isi-survey' }
 			]
 		},
 		{
 			title: 'header.public_info',
 			links: [
-				{ label: 'footer.latest_news', href: '/berita' },
-				{ label: 'footer.public_info_list', href: '/daftar-informasi-publik' },
-				{ label: 'footer.contact', href: '/layanan/kontak' }
+				{ label: m['footer.latest_news'](), href: '/berita' },
+				{ label: m['footer.public_info_list'](), href: '/daftar-informasi-publik' },
+				{ label: m['footer.contact'](), href: '/layanan/kontak' }
 			]
 		}
 	];
 
 	onMount(async () => {
+		if (browser) {
+			window.addEventListener('keydown', handleEscape);
+		}
+
 		try {
 			const response = await api.get('/public/footer-setting');
 			if (response && response.data) {
@@ -70,6 +84,12 @@
 			console.error('Gagal mengambil data footer:', error);
 		} finally {
 			isLoading = false;
+		}
+	});
+
+	onDestroy(() => {
+		if (browser) {
+			window.removeEventListener('keydown', handleEscape);
 		}
 	});
 </script>
@@ -184,7 +204,7 @@
 					<h4
 						class="relative mb-6 inline-block text-base font-bold text-white uppercase sm:block md:text-lg"
 					>
-						{m[section.title]()}
+						{section.title}
 						<span
 							class="absolute -bottom-2 left-1/2 h-1 w-8 -translate-x-1/2 rounded-full bg-ppid-accent sm:left-0 sm:translate-x-0"
 						></span>
@@ -199,7 +219,7 @@
 									<span
 										class="hidden h-1.5 w-1.5 rounded-full bg-ppid-accent opacity-0 transition-opacity group-hover:opacity-100 sm:block"
 									></span>
-									{m[link.label]()}
+									{link.label}
 								</a>
 							</li>
 						{/each}
@@ -270,75 +290,32 @@
 		</div>
 	</div>
 
-	{#if showPrivacyModal}
-		<div
-			class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-			onclick={() => (showPrivacyModal = false)}
-		>
-			<div
-				class="max-h-[80vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl dark:bg-slate-800"
-				onclick={(e) => e.stopPropagation()}
-			>
-				<div class="mb-4 flex items-center justify-between">
-					<h3 class="text-2xl font-bold text-ppid-primary dark:text-white">
-						{m['footer.privacy']()}
-					</h3>
-					<button
-						onclick={() => (showPrivacyModal = false)}
-						class="text-gray-500 hover:text-ppid-primary"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="24"
-							height="24"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg
-						>
-					</button>
-				</div>
-				<div class="prose max-w-none text-ppid-text dark:text-gray-300">
-					{@html footerData?.privacy_policy || '<p>Memuat kebijakan privasi...</p>'}
-				</div>
-			</div>
-		</div>
-	{/if}
+	<button type="button" class="text-sm hover:underline" onclick={() => (showPrivacyModal = true)}>
+		Kebijakan Privasi
+	</button>
 
-	{#if showTermsModal}
-		<div
-			class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-			onclick={() => (showTermsModal = false)}
-		>
-			<div
-				class="max-h-[80vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl dark:bg-slate-800"
-				onclick={(e) => e.stopPropagation()}
-			>
-				<div class="mb-4 flex items-center justify-between">
-					<h3 class="text-2xl font-bold text-ppid-primary dark:text-white">
-						{m['footer.terms']()}
-					</h3>
-					<button
-						onclick={() => (showTermsModal = false)}
-						class="text-gray-500 hover:text-ppid-primary"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="24"
-							height="24"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg
-						>
-					</button>
-				</div>
-				<div class="prose max-w-none text-ppid-text dark:text-gray-300">
-					{@html footerData?.terms_conditions || '<p>Memuat syarat dan ketentuan...</p>'}
-				</div>
-			</div>
+	<button type="button" class="text-sm hover:underline" onclick={() => (showTermsModal = true)}>
+		Syarat & Ketentuan
+	</button>
+
+	<FooterDialog
+		open={showPrivacyModal}
+		title="Kebijakan Privasi"
+		on:close={() => (showPrivacyModal = false)}
+	>
+		<div class="prose max-w-none text-ppid-text dark:text-gray-300">
+			{@html footerData?.privacy_policy || '<p>Memuat kebijakan privasi...</p>'}
 		</div>
-	{/if}
+	</FooterDialog>
+
+	<FooterDialog
+		open={showTermsModal}
+		title="Syarat & Ketentuan"
+		on:close={() => (showTermsModal = false)}
+	>
+		<p>Isi syarat dan ketentuan di sini...</p>
+		<div class="prose max-w-none text-ppid-text dark:text-gray-300">
+			{@html footerData?.terms_conditions || '<p>Memuat syarat dan ketentuan...</p>'}
+		</div>
+	</FooterDialog>
 </footer>

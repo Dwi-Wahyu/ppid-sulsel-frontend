@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import { env } from '$env/dynamic/public';
 	import * as m from '$lib/paraglide/messages.js';
+	import { goto } from '$app/navigation';
 
 	// Types
 	interface SopItem {
@@ -75,10 +76,10 @@
 	async function handleDownload(id: number, filename: string) {
 		try {
 			// Trigger download counter in Laravel
-			await fetch(`${env.PUBLIC_API_URL}/public/sop/download?id=${id}`);
+			await fetch(`${env.PUBLIC_API_URL}/public/sop/download/${id}`);
 
 			// Open file in new tab
-			window.open(filename, '_blank');
+			window.open(`${env.PUBLIC_BACKEND_URL}/uploads/sop/${filename}`, '_blank');
 
 			// Refresh data to update download count locally
 			fetchSop(currentPage, searchTerm);
@@ -106,9 +107,7 @@
 				<p class="text-gray-600 dark:text-gray-300">{m['sop_page.subtitle']()}</p>
 			</div>
 			<div class="hidden md:block" aria-hidden="true">
-				<div
-					class="h-1.5 w-24 rounded-full bg-gradient-to-r from-ppid-primary to-ppid-accent"
-				></div>
+				<div class="h-1.5 w-24 rounded-full bg-linear-to-r from-ppid-primary to-ppid-accent"></div>
 			</div>
 		</div>
 	</div>

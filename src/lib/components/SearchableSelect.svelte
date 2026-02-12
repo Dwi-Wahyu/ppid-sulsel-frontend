@@ -1,6 +1,16 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 
+	interface Props {
+		options?: any[];
+		value?: string | number;
+		placeholder?: string;
+		name?: string;
+		required?: boolean;
+		idKey?: string;
+		labelKey?: string;
+	}
+
 	let {
 		options = [],
 		value = $bindable(''),
@@ -9,23 +19,25 @@
 		required = false,
 		idKey = 'id',
 		labelKey = 'label'
-	} = $props();
+	}: Props = $props();
 
 	let isOpen = $state(false);
 	let searchTerm = $state('');
 	let highlightedIndex = $state(0);
-	let buttonRef = $state(null);
-	let dropdownRef = $state(null);
+
+	// Perbaikan tipe data untuk bind:this
+	let buttonRef = $state<HTMLButtonElement | null>(null);
+	let dropdownRef = $state<HTMLDivElement | null>(null);
 
 	const dispatch = createEventDispatcher();
 
-	// Filter options based on search term
-	let filteredOptions = $derived(() => {
-		if (!searchTerm) return options;
-		return options.filter((opt) => opt[labelKey].toLowerCase().includes(searchTerm.toLowerCase()));
-	});
+	// Svelte 5: $derived tidak butuh fungsi pembungkus () => jika ingin langsung diakses
+	let filteredOptions = $derived(
+		searchTerm
+			? options.filter((opt) => opt[labelKey].toLowerCase().includes(searchTerm.toLowerCase()))
+			: options
+	);
 
-	// Get selected option label
 	let selectedLabel = $derived(() => {
 		const selected = options.find((opt) => opt[idKey] === value);
 		return selected ? selected[labelKey] : placeholder;
@@ -45,15 +57,14 @@
 		dispatch('change', { value: option[idKey], option });
 	}
 
-	function handleKeydown(e) {
+	// Perbaikan tipe data event KeyboardEvent
+	function handleKeydown(e: KeyboardEvent) {
 		if (!isOpen) return;
-
-		const filtered = filteredOptions();
 
 		switch (e.key) {
 			case 'ArrowDown':
 				e.preventDefault();
-				highlightedIndex = Math.min(highlightedIndex + 1, filtered.length - 1);
+				highlightedIndex = Math.min(highlightedIndex + 1, filteredOptions.length - 1);
 				break;
 			case 'ArrowUp':
 				e.preventDefault();
@@ -61,8 +72,8 @@
 				break;
 			case 'Enter':
 				e.preventDefault();
-				if (filtered[highlightedIndex]) {
-					selectOption(filtered[highlightedIndex]);
+				if (filteredOptions[highlightedIndex]) {
+					selectOption(filteredOptions[highlightedIndex]);
 				}
 				break;
 			case 'Escape':
@@ -72,13 +83,9 @@
 		}
 	}
 
-	function handleClickOutside(e: any) {
-		if (
-			buttonRef &&
-			dropdownRef &&
-			!buttonRef.contains(e.target) &&
-			!dropdownRef.contains(e.target)
-		) {
+	function handleClickOutside(e: MouseEvent) {
+		const target = e.target as Node;
+		if (buttonRef && dropdownRef && !buttonRef.contains(target) && !dropdownRef.contains(target)) {
 			isOpen = false;
 		}
 	}
@@ -93,13 +100,15 @@
 	});
 </script>
 
-<div class="relative" onkeydown={handleKeydown}>
+<div class="relative" onkeydown={handleKeydown} role="none">
 	<input type="hidden" {name} {value} {required} />
 
 	<button
 		type="button"
 		bind:this={buttonRef}
 		onclick={toggleDropdown}
+		aria-haspopup="listbox"
+		aria-expanded={isOpen}
 		class="flex w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-4 py-3 text-left text-gray-700 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800 dark:text-gray-300"
 	>
 		<span class:text-gray-400={!value}>{selectedLabel()}</span>
@@ -125,14 +134,15 @@
 					bind:value={searchTerm}
 					placeholder="Cari..."
 					class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-					autofocus
 				/>
 			</div>
 
-			<div class="max-h-64 overflow-y-auto">
-				{#each filteredOptions() as option, index (option[idKey])}
+			<div class="max-h-64 overflow-y-auto" role="listbox">
+				{#each filteredOptions as option, index (option[idKey])}
 					<button
 						type="button"
+						role="option"
+						aria-selected={value === option[idKey]}
 						onclick={() => selectOption(option)}
 						class="w-full px-4 py-2.5 text-left transition-colors hover:bg-ppid-primary/10 dark:hover:bg-ppid-primary/20 {index ===
 						highlightedIndex

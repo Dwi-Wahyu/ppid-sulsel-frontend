@@ -1,18 +1,18 @@
-<script>
+<script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 
 	let {
 		isOpen = $bindable(false),
-		title = m.form?.success_title() || 'Berhasil!',
-		message = m.form?.success_desc() || 'Permohonan Anda telah berhasil dikirim',
-		subtitle = m.form?.process_desc() || 'Kami akan memproses permohonan Anda'
+		title = m['form.success_title']() || 'Berhasil!',
+		message = m['form.success_desc']() || 'Permohonan Anda telah berhasil dikirim',
+		subtitle = m['form.process_desc']() || 'Kami akan memproses permohonan Anda'
 	} = $props();
 
 	function close() {
 		isOpen = false;
 	}
 
-	function handleBackdropClick(e) {
+	function handleBackdropClick(e: MouseEvent) {
 		if (e.target === e.currentTarget) {
 			close();
 		}
@@ -40,7 +40,7 @@
 
 			<!-- Modal Content -->
 			<div
-				class="relative inline-block transform overflow-hidden rounded-[2rem] bg-white text-left align-bottom shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:align-middle dark:bg-slate-800"
+				class="relative inline-block transform overflow-hidden rounded-4xl bg-white text-left align-bottom shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:align-middle dark:bg-slate-800"
 			>
 				<div class="relative z-10 flex flex-col items-center px-8 pt-10 pb-8 text-center">
 					<!-- Icon Wrapper with Blob Background -->
@@ -102,13 +102,13 @@
 							onclick={close}
 							class="flex-1 rounded-2xl bg-slate-200 px-5 py-3.5 text-sm font-bold tracking-wide text-slate-700 transition-all hover:bg-slate-300 active:scale-95 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
 						>
-							{m.form?.close() || 'Tutup'}
+							{m['form.close']() || 'Tutup'}
 						</button>
 						<button
 							onclick={close}
-							class="flex-1 transform rounded-2xl bg-gradient-to-r from-ppid-primary to-blue-600 px-5 py-3.5 text-sm font-bold tracking-wide text-white shadow-xl shadow-blue-500/30 transition-all hover:scale-105 hover:to-blue-500 active:scale-95"
+							class="flex-1 transform rounded-2xl bg-linear-to-r from-ppid-primary to-blue-600 px-5 py-3.5 text-sm font-bold tracking-wide text-white shadow-xl shadow-blue-500/30 transition-all hover:scale-105 hover:to-blue-500 active:scale-95"
 						>
-							{m.form?.great() || 'Oke'}
+							{m['form.great']() || 'Oke'}
 						</button>
 					</div>
 				</div>

@@ -2,7 +2,8 @@
 	import { onMount } from 'svelte';
 	import { env } from '$env/dynamic/public';
 	import type { Notification, NotificationResponse } from '$lib/types/notification';
-	import { fade, slide } from 'svelte/transition';
+	import { fade } from 'svelte/transition';
+	import { api } from '$lib/api';
 
 	// State menggunakan Svelte 5 Runes
 	let notifications = $state<Notification[]>([]);
@@ -14,8 +15,8 @@
 	async function fetchNotifications(page = 1) {
 		isLoading = true;
 		try {
-			const res = await fetch(`${env.PUBLIC_API_URL}/admin/notifications?page=${page}`);
-			const result: NotificationResponse = await res.json();
+			const result: NotificationResponse = await api.get('/admin/notifications', { page });
+
 			notifications = result.data.data;
 			totalPages = result.data.last_page;
 			currentPage = result.data.current_page;
@@ -28,19 +29,28 @@
 
 	// Actions
 	async function markAllAsRead() {
-		await fetch(`${env.PUBLIC_API_URL}/admin/notifications/mark-all-read`, { method: 'POST' });
+		await api.post('/admin/notifications/mark-all-read', {});
 		fetchNotifications(currentPage);
 	}
 
 	async function deleteAll() {
 		if (!confirm('Hapus semua notifikasi?')) return;
-		await fetch(`${env.PUBLIC_API_URL}/admin/notifications/delete-all`, { method: 'DELETE' });
+		await api.delete('/admin/notifications/delete-all');
 		notifications = [];
 	}
 
 	async function deleteOne(id: string) {
+		// Optimistic update: hapus dari UI dulu
+		const originalNotifications = [...notifications];
 		notifications = notifications.filter((n) => n.id_notification !== id);
-		await fetch(`${env.PUBLIC_API_URL}/admin/notifications/${id}`, { method: 'DELETE' });
+
+		try {
+			await api.delete(`/admin/notifications/${id}`);
+		} catch (e) {
+			// Kembalikan data jika gagal
+			notifications = originalNotifications;
+			alert('Gagal menghapus notifikasi');
+		}
 	}
 
 	onMount(() => fetchNotifications());
@@ -48,7 +58,11 @@
 
 <div class="mx-auto max-w-4xl space-y-6 pb-10 font-sans">
 	<nav class="flex items-center gap-2 text-sm" aria-label="Breadcrumb">
-		<a href="/admin/dashboard" class="text-slate-500 transition-colors hover:text-blue-600">
+		<a
+			title="Kembali ke dashboard"
+			href="/admin/dashboard"
+			class="text-slate-500 transition-colors hover:text-blue-600"
+		>
 			<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				<path
 					stroke-linecap="round"

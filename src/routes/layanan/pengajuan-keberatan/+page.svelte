@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import Footer from '$lib/components/Footer.svelte';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import PageTitle from '$lib/components/PageTitle.svelte';
@@ -6,105 +6,60 @@
 	import SuccessModal from '$lib/components/SuccessModal.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 
-	// State
-	let isInstansi = $state(false);
-	let showSuccessModal = $state(false);
-	let formData = $state({
-		nama: '',
-		nik: '',
-		email: '',
-		no_hp: '',
-		pekerjaan_id: '',
-		domisili_id: '',
-		alamat: '',
-		foto_ktp: null,
-		dokumen_pendukung: null,
-		nmr_pengesahan: '',
-		id_permohonan: '',
-		alasan_keberatan: '',
-		kasus_posisi: ''
+	// Superforms
+	import { superForm } from 'sveltekit-superforms/client';
+	import type { PageData } from './$types';
+	import { untrack } from 'svelte';
+
+	// Props dari server
+	let { data }: { data: PageData } = $props();
+
+	// Ambil daftar provinsi unik dari data domisili
+	const provinsiOptions = [...new Set(data.domisiliOptions.map((item: any) => item.provinsi))].map(
+		(prov) => ({ value: prov, label: prov })
+	);
+
+	// Inisialisasi Superform
+	const { form, errors, enhance, delayed, message } = superForm(data.form, {
+		taintedMessage: null,
+		scrollToError: 'smooth',
+		onResult: ({ result }) => {
+			if (result.type === 'success') {
+				showSuccessModal = true;
+			}
+		}
 	});
 
-	// Mock data - replace with actual API calls
-	const masterPekerjaan = [
-		{ id: '1', nama_pekerjaan: 'PNS' },
-		{ id: '2', nama_pekerjaan: 'Swasta' },
-		{ id: '3', nama_pekerjaan: 'Wiraswasta' },
-		{ id: '4', nama_pekerjaan: 'Mahasiswa' },
-		{ id: '5', nama_pekerjaan: 'Pelajar' }
-	];
+	// Gunakan $derived untuk memfilter kota berdasarkan provinsi yang dipilih di form
+	// Kita hubungkan dengan $form.state_pemohon (sesuai input hidden yang Anda miliki)
+	let filteredDomisili = $derived(
+		$form.state_pemohon
+			? data.domisiliOptions.filter((item: any) => item.provinsi === $form.state_pemohon)
+			: []
+	);
 
-	const masterDomisili = [
-		{ id: '1', nama_daerah: 'Makassar' },
-		{ id: '2', nama_daerah: 'Gowa' },
-		{ id: '3', nama_daerah: 'Maros' },
-		{ id: '4', nama_daerah: 'Takalar' },
-		{ id: '5', nama_daerah: 'Pangkep' }
-	];
+	$effect(() => {
+		// Kita ingin effect ini HANYA bereaksi saat provinsi (state_pemohon) berubah
+		const selectedProvince = $form.state_pemohon;
 
-	// File upload handlers
-	function handleFileUpload(e, fieldName) {
-		const file = e.target?.files?.[0];
-		if (file) {
-			formData[fieldName] = file;
-		}
-	}
+		// Gunakan untrack untuk operasi pengecekan dan perubahan kota
+		untrack(() => {
+			if (selectedProvince) {
+				// Cek apakah kota yang sekarang dipilih masih ada di dalam daftar kota provinsi baru
+				const isValid = filteredDomisili.some((opt: any) => opt.value === $form.city_pemohon);
 
-	// NIK validation
-	function validateNik(e) {
-		const value = e.target.value.replace(/\D/g, '');
-		formData.nik = value.substring(0, 16);
-	}
+				// Jika tidak valid (atau kota belum dipilih), reset ke kosong
+				if (!isValid && $form.city_pemohon !== '') {
+					$form.city_pemohon = '';
+				}
+			}
+		});
+	});
 
-	// Form submission
-	async function handleSubmit(e) {
-		e.preventDefault();
-
-		// Validate NIK
-		if (formData.nik.length !== 16) {
-			alert(m['form.alert.nik_length']());
-			return;
-		}
-
-		// Validate file upload
-		if (!formData.foto_ktp) {
-			alert(m['form.alert.ktp_required']());
-			return;
-		}
-
-		// In real app, send to API
-		console.log('Keberatan submitted:', formData);
-
-		// Show success modal
-		showSuccessModal = true;
-
-		// Reset form after short delay
-		setTimeout(() => {
-			resetForm();
-		}, 2000);
-	}
-
-	function resetForm() {
-		formData = {
-			nama: '',
-			nik: '',
-			email: '',
-			no_hp: '',
-			pekerjaan_id: '',
-			domisili_id: '',
-			alamat: '',
-			foto_ktp: null,
-			dokumen_pendukung: null,
-			nmr_pengesahan: '',
-			id_permohonan: '',
-			alasan_keberatan: '',
-			kasus_posisi: ''
-		};
-		isInstansi = false;
-	}
+	let isInstansi = $state<boolean>(false);
+	let showSuccessModal = $state<boolean>(false);
 </script>
 
-<!-- Breadcrumb + Title Section -->
 <div
 	class="border-b border-gray-200 bg-white font-['Plus_Jakarta_Sans'] dark:border-slate-700 dark:bg-slate-800"
 >
@@ -116,226 +71,171 @@
 				{ label: 'layanan_pages.keberatan_title' }
 			]}
 		/>
-
 		<div class="mt-4 flex items-end justify-between">
 			<PageTitle
 				title={m['layanan_pages.keberatan_title']()}
 				subtitle={m['layanan_pages.keberatan_subtitle']()}
 			/>
-			<div class="hidden md:block">
-				<div
-					class="h-1.5 w-24 rounded-full bg-gradient-to-r from-ppid-primary to-ppid-accent"
-				></div>
-			</div>
 		</div>
 	</div>
 </div>
 
-<!-- Main Content -->
 <main class="bg-gray-50 py-12 font-['Plus_Jakarta_Sans'] md:py-16 dark:bg-slate-900">
 	<div class="container mx-auto px-4">
 		<div class="mx-auto max-w-5xl">
-			<!-- Form Container -->
 			<div
 				class="relative rounded-2xl border border-gray-200 bg-white p-8 shadow-sm md:p-10 dark:border-slate-700 dark:bg-slate-800"
 			>
-				<div class="mb-10 text-center">
-					<div
-						class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-ppid-primary/5 text-ppid-primary dark:text-white"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="32"
-							height="32"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<path
-								d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-							/>
-						</svg>
+				{#if $message}
+					<div class="mb-6 rounded-lg bg-red-100 p-4 text-red-700">
+						{$message}
 					</div>
-					<h2 class="mb-2 text-2xl font-bold text-ppid-primary dark:text-white">
-						{m['layanan_pages.keberatan_form_title']()}
-					</h2>
-					<p class="text-gray-600 dark:text-gray-300">{m['layanan_pages.form_desc']()}</p>
-				</div>
+				{/if}
 
-				<form onsubmit={handleSubmit} class="space-y-8" id="keberatanForm">
-					<!-- Section 1: Data Pribadi -->
+				<form method="POST" use:enhance class="space-y-8" id="keberatanForm">
+					<input type="text" name="website" class="hidden" bind:value={$form.website} />
+					<input type="hidden" name="state_pemohon" bind:value={$form.state_pemohon} />
+
 					<div
-						class="space-y-6 rounded-2xl border border-gray-100 bg-gradient-to-br from-white to-gray-50/50 p-6 dark:border-slate-700 dark:from-slate-800 dark:to-slate-800/50"
+						class="space-y-6 rounded-2xl border border-gray-100 bg-linear-to-br from-white to-gray-50/50 p-6 dark:border-slate-700 dark:from-slate-800 dark:to-slate-800/50"
 					>
 						<h3
 							class="flex items-center gap-3 border-b-2 border-ppid-primary/20 pb-4 text-xl font-bold text-ppid-primary dark:text-white"
 						>
 							<div
-								class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-ppid-primary to-ppid-accent text-base font-bold text-white shadow-lg"
+								class="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-ppid-primary to-ppid-accent text-base font-bold text-white shadow-lg"
 							>
 								1
 							</div>
 							<div class="flex-1">
-								<div class="flex items-center gap-2">
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										width="20"
-										height="20"
-										viewBox="0 0 24 24"
-										fill="none"
-										stroke="currentColor"
-										stroke-width="2"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-									>
-										<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-										<circle cx="12" cy="7" r="4"></circle>
-									</svg>
-									{m['layanan_pages.personal_data']()}
-								</div>
-								<p class="mt-1 text-xs font-normal text-gray-500 dark:text-gray-400">
-									{m['layanan_pages.personal_data_desc_applicant']()}
-								</p>
+								{m['layanan_pages.personal_data']()}
 							</div>
 						</h3>
 
-						<!-- Same fields as Permohonan Informasi -->
 						<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 							<div class="space-y-2">
-								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+								<h1 class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
 									{m['form.fullname']()} <span class="text-red-500">*</span>
-								</label>
+								</h1>
 								<input
 									type="text"
-									bind:value={formData.nama}
+									name="nama_pemohon"
+									bind:value={$form.nama_pemohon}
 									placeholder={m['form.fullname_placeholder']()}
-									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-									required
+									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+									aria-invalid={$errors.nama_pemohon ? 'true' : undefined}
 								/>
+								{#if $errors.nama_pemohon}<span class="text-xs text-red-500"
+										>{$errors.nama_pemohon}</span
+									>{/if}
 							</div>
 
 							<div class="space-y-2">
-								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									{m['form.nik']()} <span class="text-red-500">*</span>
-								</label>
+								<h1 class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+									{m['contact.phone']()} <span class="text-red-500">*</span>
+								</h1>
 								<input
 									type="text"
-									bind:value={formData.nik}
-									oninput={validateNik}
-									placeholder={m['form.nik_placeholder']()}
-									maxlength="16"
-									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-									required
+									name="no_telp_pemohon"
+									bind:value={$form.no_telp_pemohon}
+									placeholder="08xxxxxxxxxx"
+									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 								/>
-								<p class="mt-1 text-xs text-gray-500">{m['form.nik_error']()}</p>
+								{#if $errors.no_telp_pemohon}<span class="text-xs text-red-500"
+										>{$errors.no_telp_pemohon}</span
+									>{/if}
 							</div>
 						</div>
 
 						<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 							<div class="space-y-2">
-								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+								<h1 class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
 									{m['contact.email']()} <span class="text-red-500">*</span>
-								</label>
+								</h1>
 								<input
 									type="email"
-									bind:value={formData.email}
+									name="email_pemohon"
+									bind:value={$form.email_pemohon}
 									placeholder="contoh@email.com"
-									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-									required
+									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 								/>
+								{#if $errors.email_pemohon}<span class="text-xs text-red-500"
+										>{$errors.email_pemohon}</span
+									>{/if}
 							</div>
 
 							<div class="space-y-2">
-								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									{m['contact.phone']()} <span class="text-red-500">*</span>
-								</label>
-								<input
-									type="text"
-									bind:value={formData.no_hp}
-									placeholder="08xxxxxxxxxx"
-									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-									required
+								<h1 class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+									{m['form.job']()} <span class="text-red-500">*</span>
+								</h1>
+								<SearchableSelect
+									options={data.pekerjaanOptions}
+									bind:value={$form.pekerjaan_pemohon}
+									name="pekerjaan_pemohon"
+									placeholder={m['form.job_placeholder']()}
+									idKey="value"
+									labelKey="label"
 								/>
+								{#if $errors.pekerjaan_pemohon}<span class="text-xs text-red-500"
+										>{$errors.pekerjaan_pemohon}</span
+									>{/if}
 							</div>
 						</div>
 
 						<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 							<div class="space-y-2">
-								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									{m['form.job']()} <span class="text-red-500">*</span>
-								</label>
+								<h1 class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+									Provinsi <span class="text-red-500">*</span>
+								</h1>
 								<SearchableSelect
-									options={masterPekerjaan}
-									bind:value={formData.pekerjaan_id}
-									name="pekerjaan_id"
-									placeholder={m['form.job_placeholder']()}
-									idKey="id"
-									labelKey="nama_pekerjaan"
-									required={true}
+									options={provinsiOptions}
+									bind:value={$form.state_pemohon}
+									name="state_pemohon"
+									placeholder="Pilih Provinsi..."
+									idKey="value"
+									labelKey="label"
 								/>
+								{#if $errors.state_pemohon}<span class="text-xs text-red-500"
+										>{$errors.state_pemohon}</span
+									>{/if}
 							</div>
 
 							<div class="space-y-2">
-								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									{m['form.domicile']()} <span class="text-red-500">*</span>
-								</label>
+								<h1 class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+									{m['form.domicile']()} (Kab/Kota) <span class="text-red-500">*</span>
+								</h1>
 								<SearchableSelect
-									options={masterDomisili}
-									bind:value={formData.domisili_id}
-									name="domisili_id"
-									placeholder={m['form.domicile_placeholder']()}
-									idKey="id"
-									labelKey="nama_daerah"
-									required={true}
+									options={filteredDomisili}
+									bind:value={$form.city_pemohon}
+									name="city_pemohon"
+									placeholder={$form.state_pemohon
+										? m['form.domicile_placeholder']()
+										: 'Pilih provinsi terlebih dahulu'}
+									idKey="value"
+									labelKey="label"
 								/>
+								{#if $errors.city_pemohon}<span class="text-xs text-red-500"
+										>{$errors.city_pemohon}</span
+									>{/if}
 							</div>
 						</div>
 
-						<div class="space-y-2">
-							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-								{m['contact.address']()} <span class="text-red-500">*</span>
-							</label>
-							<input
-								type="text"
-								bind:value={formData.alamat}
-								placeholder={m['form.address_placeholder']()}
-								class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-								required
-							/>
-						</div>
-
-						<div class="space-y-2">
-							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-								{m['form.upload_ktp']()} <span class="text-red-500">*</span>
-							</label>
-							<input
-								type="file"
-								onchange={(e) => handleFileUpload(e, 'foto_ktp')}
-								accept="image/jpeg,image/jpg,image/png"
-								class="block w-full cursor-pointer rounded-lg border border-gray-300 bg-white text-sm text-gray-700 file:mr-4 file:border-0 file:bg-ppid-primary file:px-6 file:py-3 file:text-sm file:font-semibold file:text-white hover:file:bg-ppid-primary/90 focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800 dark:text-gray-300"
-								required
-							/>
-							<p class="mt-1 text-xs text-gray-500">
-								{m['form.file_format_hint']()}
-							</p>
-						</div>
-
-						<div class="space-y-2">
-							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-								{m['form.upload_supporting_doc']()}
-							</label>
-							<input
-								type="file"
-								onchange={(e) => handleFileUpload(e, 'dokumen_pendukung')}
-								accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-								class="block w-full cursor-pointer rounded-lg border border-gray-300 bg-white text-sm text-gray-700 file:mr-4 file:border-0 file:bg-gradient-to-r file:from-ppid-primary/90 file:to-ppid-primary file:px-6 file:py-3 file:text-sm file:font-semibold file:text-white hover:file:from-ppid-primary hover:file:to-ppid-primary/90 focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800 dark:text-gray-300"
-							/>
-							<p class="mt-1 text-xs leading-relaxed text-gray-500">
-								{m['form.supporting_doc_hint']()}
-							</p>
+						<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+							<div class="space-y-2">
+								<h1 class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+									{m['contact.address']()} <span class="text-red-500">*</span>
+								</h1>
+								<input
+									type="text"
+									name="alamat_pemohon"
+									bind:value={$form.alamat_pemohon}
+									placeholder={m['form.address_placeholder']()}
+									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+								/>
+								{#if $errors.alamat_pemohon}<span class="text-xs text-red-500"
+										>{$errors.alamat_pemohon}</span
+									>{/if}
+							</div>
 						</div>
 
 						<div class="mt-2 border-t-2 border-gray-100 pt-6 pb-2 dark:border-slate-700">
@@ -345,151 +245,159 @@
 								<div class="mb-2 flex items-start">
 									<input
 										type="checkbox"
-										id="showInstansi"
+										id="isKuasa"
 										bind:checked={isInstansi}
 										class="mt-0.5 h-4 w-4 cursor-pointer rounded border-gray-300 text-ppid-primary focus:ring-ppid-primary"
 									/>
 									<label
-										for="showInstansi"
+										for="isKuasa"
 										class="ml-3 block cursor-pointer text-sm font-semibold text-gray-800 dark:text-gray-200"
 									>
-										{m['form.agency_question']()}
+										{m['objection.proxy']()} / {m['form.agency_question']()}
 									</label>
 								</div>
-								<p class="ml-7 text-xs leading-relaxed text-gray-600 dark:text-gray-300">
-									{m['form.agency_hint']()}
-								</p>
 							</div>
 						</div>
 
 						{#if isInstansi}
+							<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+								<div class="space-y-2">
+									<h1 class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+										{m['objection.name_proxy']()}
+									</h1>
+									<input
+										type="text"
+										name="nama_kuasa"
+										bind:value={$form.nama_kuasa}
+										class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+									/>
+								</div>
+								<div class="space-y-2">
+									<h1 class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+										{m['objection.phone']()} (Kuasa)
+									</h1>
+									<input
+										type="text"
+										name="no_telp_kuasa"
+										bind:value={$form.no_telp_kuasa}
+										class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+									/>
+								</div>
+							</div>
 							<div class="space-y-2">
-								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									{m['form.agency_number']()} <span class="text-red-500">*</span>
-								</label>
+								<h1 class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+									{m['contact.address']()} (Kuasa)
+								</h1>
 								<input
 									type="text"
-									bind:value={formData.nmr_pengesahan}
-									placeholder={m['form.agency_number_placeholder']()}
-									required={isInstansi}
-									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+									name="alamat_kuasa"
+									bind:value={$form.alamat_kuasa}
+									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 								/>
 							</div>
 						{/if}
 					</div>
 
-					<!-- Section 2: Detail Keberatan -->
 					<div
-						class="space-y-6 rounded-2xl border border-gray-100 bg-gradient-to-br from-white to-gray-50/50 p-6 dark:border-slate-700 dark:from-slate-800 dark:to-slate-800/50"
+						class="space-y-6 rounded-2xl border border-gray-100 bg-linear-to-br from-white to-gray-50/50 p-6 dark:border-slate-700 dark:from-slate-800 dark:to-slate-800/50"
 					>
 						<h3
 							class="flex items-center gap-3 border-b-2 border-ppid-primary/20 pb-4 text-xl font-bold text-ppid-primary dark:text-white"
 						>
 							<div
-								class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-ppid-primary to-ppid-accent text-base font-bold text-white shadow-lg"
+								class="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-ppid-primary to-ppid-accent text-base font-bold text-white shadow-lg"
 							>
 								2
 							</div>
 							<div class="flex-1">
-								<div class="flex items-center gap-2">
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										width="20"
-										height="20"
-										viewBox="0 0 24 24"
-										fill="none"
-										stroke="currentColor"
-										stroke-width="2"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-									>
-										<path
-											d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-										/>
-									</svg>
-									{m['layanan_pages.keberatan_detail']()}
-								</div>
-								<p class="mt-1 text-xs font-normal text-gray-500 dark:text-gray-400">
-									{m['layanan_pages.keberatan_detail_desc']()}
-								</p>
+								{m['layanan_pages.keberatan_detail']()}
 							</div>
 						</h3>
 
 						<div class="space-y-2">
-							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-								{m['form.request_number']()} <span class="text-red-500">*</span>
-							</label>
+							<h1 class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+								{m['objection.reg_no']()} <span class="text-red-500">*</span>
+							</h1>
 							<input
 								type="text"
-								bind:value={formData.id_permohonan}
+								name="no_pendaftaran"
+								bind:value={$form.no_pendaftaran}
 								placeholder={m['form.request_number_placeholder']()}
-								class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-								required
+								class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 							/>
-							<p class="mt-1 text-xs text-gray-500">
-								{m['form.request_number_hint']()}
-							</p>
+							{#if $errors.no_pendaftaran}<span class="text-xs text-red-500"
+									>{$errors.no_pendaftaran}</span
+								>{/if}
 						</div>
 
 						<div class="space-y-2">
-							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-								{m['form.objection_reason']()} <span class="text-red-500">*</span>
-							</label>
+							<h1 class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+								{m['objection.purpose']()} <span class="text-red-500">*</span>
+							</h1>
 							<textarea
-								bind:value={formData.alasan_keberatan}
-								rows="5"
-								placeholder={m['form.objection_reason_placeholder']()}
-								class="w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-								required
+								name="tujuan"
+								bind:value={$form.tujuan}
+								rows="3"
+								placeholder={m['objection.purpose_placeholder']()}
+								class="w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 							></textarea>
+							{#if $errors.tujuan}<span class="text-xs text-red-500">{$errors.tujuan}</span>{/if}
 						</div>
 
 						<div class="space-y-2">
-							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+							<h1 class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+								{m['form.objection_reason']()} <span class="text-red-500">*</span>
+							</h1>
+							<div class="grid grid-cols-1 gap-2 md:grid-cols-2">
+								{#each data.alasanOptions as opt}
+									<label
+										class="flex items-start gap-2 rounded-lg border border-gray-200 p-3 hover:bg-gray-50 dark:border-slate-700 dark:hover:bg-slate-700"
+									>
+										<input
+											type="checkbox"
+											name="alasan"
+											value={opt.label}
+											bind:group={$form.alasan}
+											class="mt-1 h-4 w-4 rounded border-gray-300 text-ppid-primary focus:ring-ppid-primary"
+										/>
+										<span class="text-sm text-gray-700 dark:text-gray-300">
+											{opt.label}
+										</span>
+									</label>
+								{/each}
+							</div>
+							{#if $errors.alasan}
+								<span class="text-xs text-red-500">{$errors.alasan}</span>
+							{/if}
+						</div>
+
+						<div class="space-y-2">
+							<h1 class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
 								{m['form.case_position']()} <span class="text-red-500">*</span>
-							</label>
+							</h1>
 							<textarea
-								bind:value={formData.kasus_posisi}
+								name="kasus"
+								bind:value={$form.kasus}
 								rows="5"
 								placeholder={m['form.case_position_placeholder']()}
-								class="w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-								required
+								class="w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 							></textarea>
-							<p class="mt-1 text-xs text-gray-500">
-								{m['form.case_position_hint']()}
-							</p>
+							{#if $errors.kasus}<span class="text-xs text-red-500">{$errors.kasus}</span>{/if}
 						</div>
 					</div>
 
-					<!-- Submit Buttons -->
 					<div class="mt-2 pt-8">
 						<div class="flex flex-col justify-end gap-4 sm:flex-row">
 							<button
-								type="reset"
-								onclick={resetForm}
-								class="flex items-center justify-center gap-2 rounded-lg bg-gray-100 px-6 py-3 font-semibold text-gray-700 transition-all hover:bg-gray-200"
-							>
-								{m['form.reset']()}
-							</button>
-							<button
 								type="submit"
-								class="flex transform items-center justify-center gap-2 rounded-lg bg-ppid-primary px-8 py-3.5 font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-ppid-primary/90 hover:shadow-xl"
+								disabled={$delayed}
+								class="flex transform items-center justify-center gap-2 rounded-lg bg-ppid-primary px-8 py-3.5 font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-ppid-primary/90 hover:shadow-xl disabled:opacity-50"
 							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="20"
-									height="20"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								>
-									<line x1="22" x2="11" y1="2" y2="13" />
-									<polygon points="22 2 15 22 11 13 2 9 22 2" />
-								</svg>
-								{m['form.submit_objection']()}
+								{#if $delayed}
+									{m['form.submitting']()}
+								{:else}
+									{m['form.submit_objection']()}
+								{/if}
 							</button>
 						</div>
 					</div>
