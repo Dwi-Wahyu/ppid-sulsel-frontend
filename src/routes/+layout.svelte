@@ -8,6 +8,7 @@
 	import AccessibilityMenu from '$lib/components/AccessibilityMenu.svelte';
 
 	import Header from '$lib/components/Header.svelte';
+	import ScrollButtons from '$lib/components/ScrollButtons.svelte';
 
 	let { children } = $props();
 
@@ -56,3 +57,5 @@
 		</a>
 	{/each}
 </div>
+
+<ScrollButtons />
