@@ -82,7 +82,7 @@
 					<div class="h-96 animate-pulse rounded-4xl bg-slate-100 dark:bg-slate-800"></div>
 				{/each}
 			{:else if news.length > 0}
-				{#each news as item (item.id)}
+				{#each news as item, index (item.id)}
 					<article
 						in:fade
 						class="group flex flex-col overflow-hidden rounded-4xl border border-slate-100 bg-white shadow-xs transition-all hover:border-blue-100 hover:shadow-2xl dark:border-slate-800 dark:bg-slate-800"

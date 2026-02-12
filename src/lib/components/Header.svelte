@@ -105,7 +105,7 @@
 				<img src="/images/ppid-3.png" alt="Logo" class=" h-10 w-auto md:h-14" />
 			{/if}
 
-			<div class="flex flex-col justify-center">
+			<div class="hidden flex-col justify-center md:flex">
 				<span
 					class="font-['Plus_Jakarta_Sans'] text-xs font-extrabold text-gray-700 md:text-base dark:text-white"
 				>
@@ -213,7 +213,7 @@
 
 			<button
 				onclick={() => (mobileMenu = !mobileMenu)}
-				class="rounded-lg bg-white/10 p-2 text-white lg:hidden"
+				class="rounded-lg bg-transparent p-2 text-black lg:hidden dark:text-white"
 				aria-label="Toggle mobile menu"
 			>
 				<svg

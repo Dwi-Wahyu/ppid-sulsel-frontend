@@ -32,6 +32,8 @@
 	let isLoading = $state(true);
 	let searchModalOpen = $state(false);
 
+	let scrollY = $state(0);
+
 	// Fetch banners from API
 	async function fetchBanners() {
 		try {
@@ -116,6 +118,8 @@
 	});
 </script>
 
+<svelte:window bind:scrollY />
+
 <section
 	id="hero-banner"
 	aria-roledescription="carousel"
@@ -146,8 +150,9 @@
 				>
 					<img
 						src={slide}
-						class="pointer-events-none absolute inset-0 h-full w-full bg-white object-cover object-center md:object-contain dark:bg-slate-800"
-						alt={index}
+						class="pointer-events-none absolute inset-0 h-full w-full bg-white object-cover object-center will-change-transform md:object-contain dark:bg-slate-800"
+						style="transform: translateY({scrollY * 0.5}px)"
+						alt={String(index)}
 					/>
 					<div
 						class="pointer-events-none absolute inset-0 bg-linear-to-t from-ppid-primary/90 via-ppid-primary/40 to-transparent"
