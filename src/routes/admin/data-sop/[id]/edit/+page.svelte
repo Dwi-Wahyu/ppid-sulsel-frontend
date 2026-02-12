@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { api } from '$lib/api';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import FilePond from '$lib/components/FilePond.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
@@ -35,20 +36,20 @@
 
 	async function fetchSOP() {
 		try {
-			const response = await fetch(`${PUBLIC_API_URL}/admin/data-sop/${sopId}`, {
-				credentials: 'include'
-			});
-			const result = await response.json();
+			// Menggunakan api.get
+			const result = await api.get(`/admin/sop/${sopId}`);
 
 			if (result.success) {
 				const data: SOP = result.data;
 				judul = data.judul;
 				currentFile = data.file;
+			} else {
+				throw new Error(result.message || 'Gagal memuat data SOP');
 			}
-		} catch (error) {
+		} catch (error: any) {
 			console.error('Failed to fetch SOP:', error);
 			notificationType = 'error';
-			notificationMessage = 'Gagal memuat data SOP';
+			notificationMessage = error.message || 'Gagal memuat data SOP';
 			showNotification = true;
 		} finally {
 			isLoading = false;
@@ -67,15 +68,10 @@
 				formData.append('file', file);
 			}
 
-			const response = await fetch(`${PUBLIC_API_URL}/admin/data-sop/${sopId}`, {
-				method: 'POST',
-				credentials: 'include',
-				body: formData
-			});
+			// Menggunakan api.post untuk mengirim FormData (method spoofing PUT)
+			const result = await api.post(`/admin/sop/${sopId}`, formData);
 
-			const result = await response.json();
-
-			if (response.ok) {
+			if (result.success) {
 				notificationType = 'success';
 				notificationMessage = 'SOP berhasil diperbarui';
 				showNotification = true;
@@ -84,13 +80,12 @@
 					goto('/admin/data-sop');
 				}, 1500);
 			} else {
-				notificationType = 'error';
-				notificationMessage = result.message || 'Gagal memperbarui SOP';
-				showNotification = true;
+				throw new Error(result.message || 'Gagal memperbarui SOP');
 			}
-		} catch (error) {
+		} catch (error: any) {
+			console.error('Error updating SOP:', error);
 			notificationType = 'error';
-			notificationMessage = 'Terjadi kesalahan saat menyimpan data';
+			notificationMessage = error.message || 'Terjadi kesalahan saat menyimpan data';
 			showNotification = true;
 		} finally {
 			isSaving = false;
@@ -107,7 +102,7 @@
 	<div class="flex items-center gap-4">
 		<a
 			href="/admin/data-sop"
-			class="rounded-xl border border-slate-200 bg-white p-2 text-slate-400 transition-all hover:text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:hover:text-slate-300"
+			class="rounded-xl border border-slate-200 bg-white p-2.5 text-slate-400 shadow-sm transition-all hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:hover:text-slate-300"
 			aria-label="Kembali ke daftar SOP"
 		>
 			<svg
@@ -138,7 +133,7 @@
 		>
 			<div class="flex flex-col items-center gap-3">
 				<svg
-					class="h-8 w-8 animate-spin text-indigo-600"
+					class="h-8 w-8 animate-spin text-ppid-primary"
 					xmlns="http://www.w3.org/2000/svg"
 					fill="none"
 					viewBox="0 0 24 24"
@@ -180,7 +175,7 @@
 						bind:value={judul}
 						required
 						aria-required="true"
-						class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-slate-900 placeholder-slate-400 transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:placeholder-slate-500"
+						class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 shadow-sm transition-all focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary/20 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-ppid-primary"
 						placeholder="Contoh: SOP Pelayanan Informasi Publik"
 					/>
 				</div>
@@ -192,14 +187,14 @@
 							File Saat Ini
 						</label>
 						<div
-							class="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-700/50"
+							class="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-700 dark:bg-slate-700/50"
 						>
 							<div
 								class="flex h-12 w-12 items-center justify-center rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-600 dark:bg-slate-800"
 							>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
-									class="h-6 w-6 text-indigo-600 dark:text-indigo-400"
+									class="h-6 w-6 text-ppid-primary dark:text-ppid-primary-light"
 									fill="none"
 									viewBox="0 0 24 24"
 									stroke="currentColor"
@@ -219,7 +214,7 @@
 									href={`${PUBLIC_API_URL.replace('/api', '')}/storage/sop/${currentFile}`}
 									target="_blank"
 									rel="noopener noreferrer"
-									class="text-xs text-indigo-600 hover:underline dark:text-indigo-400"
+									class="text-xs font-semibold text-ppid-primary hover:underline dark:text-ppid-primary-light"
 								>
 									{currentFile}
 								</a>
@@ -260,7 +255,7 @@
 			<div class="flex items-center justify-end gap-3">
 				<a
 					href="/admin/data-sop"
-					class="rounded-xl border border-slate-200 px-6 py-2.5 text-sm font-semibold text-slate-600 transition-all hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+					class="rounded-xl border border-slate-200 bg-white px-6 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:text-slate-900 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
 				>
 					Batal
 				</a>
@@ -268,7 +263,7 @@
 					type="submit"
 					disabled={isSaving}
 					aria-busy={isSaving}
-					class="rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+					class="rounded-xl bg-gradient-to-r from-ppid-primary to-ppid-primary-light px-8 py-2.5 text-sm font-semibold text-white shadow-md transition-all hover:from-ppid-primary-light hover:to-ppid-primary hover:shadow-lg focus:ring-2 focus:ring-ppid-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 				>
 					{isSaving ? 'Menyimpan...' : 'Perbarui SOP'}
 				</button>

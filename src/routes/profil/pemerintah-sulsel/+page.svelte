@@ -80,7 +80,7 @@
 					</svg>
 				</div>
 				<p class="mb-1 text-2xl font-bold text-ppid-primary dark:text-white">46.717,48 km²</p>
-				<p class="text-sm text-gray-600 dark:text-gray-300">Luas Wilayah</p>
+				<p class="text-sm text-gray-600 dark:text-gray-300">{m['gov_profile.area_label']()}</p>
 			</div>
 			<div
 				class="rounded-lg border border-gray-200 bg-white p-6 text-center shadow-sm dark:border-slate-700 dark:bg-slate-800"
@@ -107,7 +107,9 @@
 					</svg>
 				</div>
 				<p class="mb-1 text-2xl font-bold text-ppid-primary dark:text-white">9,07 Juta Jiwa</p>
-				<p class="text-sm text-gray-600 dark:text-gray-300">Jumlah Penduduk</p>
+				<p class="text-sm text-gray-600 dark:text-gray-300">
+					{m['gov_profile.population_label']()}
+				</p>
 			</div>
 			<div
 				class="rounded-lg border border-gray-200 bg-white p-6 text-center shadow-sm dark:border-slate-700 dark:bg-slate-800"
@@ -136,8 +138,10 @@
 						<path d="M10 18h4" />
 					</svg>
 				</div>
-				<p class="mb-1 text-2xl font-bold text-ppid-primary dark:text-white">24 Wilayah</p>
-				<p class="text-sm text-gray-600 dark:text-gray-300">Kabupaten/Kota</p>
+				<p class="mb-1 text-2xl font-bold text-ppid-primary dark:text-white">
+					{m['gov_profile.districts_count']()}
+				</p>
+				<p class="text-sm text-gray-600 dark:text-gray-300">{m['gov_profile.districts_label']()}</p>
 			</div>
 		</div>
 
@@ -151,7 +155,7 @@
 				>
 					<div class="mb-5">
 						<h2 class="mb-2 text-2xl font-bold text-ppid-primary dark:text-white">
-							Profil Provinsi
+							{m['gov_profile.profile_title']()}
 						</h2>
 						<div class="h-1 w-20 rounded-full bg-ppid-primary"></div>
 					</div>
@@ -166,12 +170,12 @@
 				>
 					<div class="mb-5">
 						<h2 class="mb-2 text-2xl font-bold text-ppid-primary dark:text-white">
-							Data Geografis
+							{m['gov_profile.geo_data_title']()}
 						</h2>
 						<div class="h-1 w-20 rounded-full bg-ppid-accent"></div>
 					</div>
 					<div class="grid gap-4 sm:grid-cols-2">
-						{#each [{ label: 'Ibukota', value: 'Makassar' }, { label: 'Gubernur', value: 'Andi Sudirman Sulaiman' }, { label: 'Wakil Gubernur', value: 'Fatmawati Rusdi' }, { label: 'Jumlah Kecamatan', value: '304 Kecamatan' }, { label: 'Jumlah Kelurahan/Desa', value: '3.054 Kel/Desa' }] as item}
+						{#each [{ label: m['gov_profile.capital_label'](), value: 'Makassar' }, { label: m['profile.governor'](), value: 'Andi Sudirman Sulaiman' }, { label: m['profile.vice_governor'](), value: 'Fatmawati Rusdi' }, { label: m['gov_profile.districts_sub_label'](), value: '304 Kecamatan' }, { label: m['gov_profile.subdistricts_label'](), value: '3.054 Kel/Desa' }] as item}
 							<div class="flex items-center gap-3 rounded-lg bg-gray-50 p-4 dark:bg-slate-900">
 								<div class="h-2 w-2 shrink-0 rounded-full bg-ppid-primary"></div>
 								<div>
@@ -188,7 +192,9 @@
 					class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm md:p-8 dark:border-slate-700 dark:bg-slate-800"
 				>
 					<div class="mb-5">
-						<h2 class="mb-2 text-2xl font-bold text-ppid-primary dark:text-white">Visi & Misi</h2>
+						<h2 class="mb-2 text-2xl font-bold text-ppid-primary dark:text-white">
+							{m['profile.vision_mission_title']()}
+						</h2>
 						<div class="h-1 w-20 rounded-full bg-ppid-primary"></div>
 					</div>
 
@@ -197,12 +203,11 @@
 						<h3
 							class="mb-3 text-sm font-bold tracking-wide text-ppid-primary uppercase dark:text-white"
 						>
-							Visi
+							{m['profile.vision_title']()}
 						</h3>
 						<div class="rounded-r-lg border-l-4 border-ppid-primary bg-ppid-primary/5 p-5">
 							<p class="leading-relaxed font-medium text-gray-700">
-								Mewujudkan Sulawesi Selatan sebagai Provinsi Terdepan dalam Peningkatan Kualitas
-								Hidup Masyarakat
+								{m['gov_profile.vision_text']()}
 							</p>
 						</div>
 					</div>
@@ -212,10 +217,10 @@
 						<h3
 							class="mb-3 text-sm font-bold tracking-wide text-ppid-primary uppercase dark:text-white"
 						>
-							Misi
+							{m['profile.mission_title']()}
 						</h3>
 						<div class="space-y-3">
-							{#each ['Meningkatkan kualitas dan aksesibilitas pelayanan dasar', 'Mengembangkan ekonomi kerakyatan berbasis potensi lokal', 'Membangun infrastruktur yang merata dan berkualitas', 'Memperkuat tata kelola pemerintahan yang baik', 'Melestarikan nilai-nilai budaya dan kearifan lokal'] as item, index}
+							{#each [m['gov_profile.missions.m1'](), m['gov_profile.missions.m2'](), m['gov_profile.missions.m3'](), m['gov_profile.missions.m4'](), m['gov_profile.missions.m5']()] as item, index}
 								<div class="flex items-start gap-3">
 									<div
 										class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-ppid-primary text-xs font-bold text-white"
@@ -237,7 +242,7 @@
 					class="sticky top-24 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
 				>
 					<div class="bg-ppid-primary px-5 py-4">
-						<h3 class="font-bold text-white">Pejabat Pemerintah</h3>
+						<h3 class="font-bold text-white">{m['gov_profile.officials_title']()}</h3>
 					</div>
 
 					<div class="space-y-4 p-5">
@@ -274,7 +279,9 @@
 							<p class="text-sm font-bold text-ppid-primary dark:text-white">
 								Andi Sudirman Sulaiman
 							</p>
-							<p class="text-xs font-medium text-ppid-accent">Gubernur Sulawesi Selatan</p>
+							<p class="text-xs font-medium text-ppid-accent">
+								{m['profile.governor']()} Sulawesi Selatan
+							</p>
 						</div>
 
 						<!-- Wakil Gubernur -->
@@ -308,20 +315,22 @@
 								{/if}
 							</div>
 							<p class="text-sm font-bold text-ppid-primary dark:text-white">Fatmawati Rusdi</p>
-							<p class="text-xs font-medium text-[#B08D26]">Wakil Gubernur Sulawesi Selatan</p>
+							<p class="text-xs font-medium text-[#B08D26]">
+								{m['profile.vice_governor']()} Sulawesi Selatan
+							</p>
 						</div>
 					</div>
 				</div>
 
 				<!-- Potensi -->
 				<div class="rounded-xl bg-linear-to-br from-ppid-primary to-ppid-text p-6 text-white">
-					<h4 class="mb-3 font-bold">Potensi Daerah</h4>
+					<h4 class="mb-3 font-bold">{m['gov_profile.potential_title']()}</h4>
 					<div class="space-y-2 text-sm text-white/90">
-						<div>• Pertanian & Perkebunan</div>
-						<div>• Perikanan & Kelautan</div>
-						<div>• Pariwisata Budaya</div>
-						<div>• Perdagangan & Jasa</div>
-						<div>• Industri Kreatif</div>
+						<div>• {m['gov_profile.potentials.p1']()}</div>
+						<div>• {m['gov_profile.potentials.p2']()}</div>
+						<div>• {m['gov_profile.potentials.p3']()}</div>
+						<div>• {m['gov_profile.potentials.p4']()}</div>
+						<div>• {m['gov_profile.potentials.p5']()}</div>
 					</div>
 				</div>
 			</div>

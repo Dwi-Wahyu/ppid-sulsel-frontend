@@ -70,7 +70,8 @@
 						{ href: '/admin/dokumen-publik', label: 'Publikasi Dokumen' },
 						{ href: '/admin/pengadaan-barang-jasa', label: 'Pengadaan Barang & Jasa' },
 						{ href: '/admin/berita', label: 'Berita & Artikel' },
-						{ href: '/admin/galeri', label: 'Galeri & Video' }
+						{ href: '/admin/galeri', label: 'Galeri & Video' },
+						{ href: '/admin/data-sop', label: 'SOP' }
 					]
 				}
 			]

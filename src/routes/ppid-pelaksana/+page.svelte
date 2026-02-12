@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { PUBLIC_API_URL } from '$env/static/public';
+	import * as m from '$lib/paraglide/messages.js';
 
 	let { data } = $props();
 
@@ -22,7 +23,7 @@
 </script>
 
 <svelte:head>
-	<title>PPID Pelaksana - Provinsi Sulawesi Selatan</title>
+	<title>{m['ppid_pel.title_meta']()}</title>
 </svelte:head>
 
 <!-- Breadcrumb + Title Section -->
@@ -63,7 +64,9 @@
 			>
 				<path d="m9 18 6-6-6-6" />
 			</svg>
-			<span class="font-medium text-ppid-primary dark:text-white">Profil</span>
+			<span class="font-medium text-ppid-primary dark:text-white"
+				>{m['menu.profile_dropdown']()}</span
+			>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				width="16"
@@ -78,17 +81,19 @@
 			>
 				<path d="m9 18 6-6-6-6" />
 			</svg>
-			<span class="font-bold text-ppid-primary dark:text-white">PPID Pelaksana</span>
+			<span class="font-bold text-ppid-primary dark:text-white"
+				>{m['breadcrumb.ppid_pelaksana']()}</span
+			>
 		</div>
 
 		<!-- Title -->
 		<div class="flex items-end justify-between">
 			<div>
 				<h1 class="mb-2 text-3xl font-bold text-ppid-primary md:text-4xl dark:text-white">
-					PPID Pelaksana
+					{m['ppid_pelaksana.title']()}
 				</h1>
 				<p class="text-gray-600 dark:text-gray-300">
-					Pejabat Pengelola Informasi dan Dokumentasi Pelaksana Provinsi Sulawesi Selatan
+					{m['ppid_pel.subtitle']()}
 				</p>
 			</div>
 			<div class="hidden md:block">
@@ -120,7 +125,7 @@
 							<input
 								type="text"
 								bind:value={searchQuery}
-								placeholder="Cari SKPD..."
+								placeholder={m['ppid_pel.search_placeholder']()}
 								class="flex-1 border-0 bg-transparent px-4 py-3 text-base text-gray-800 placeholder-gray-400 outline-none focus:border-0 focus:ring-0 focus:outline-none dark:text-white dark:placeholder-gray-500"
 							/>
 							<button
@@ -134,7 +139,7 @@
 										class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
 									></div>
 								{:else}
-									<span>Cari</span>
+									<span>{m['public_info.search_btn']()}</span>
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
 										width="16"
@@ -162,8 +167,12 @@
 					class="mt-5 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-10 text-center dark:border-slate-600 dark:bg-slate-700/50"
 				>
 					<p class="mb-4 text-5xl">🔍</p>
-					<p class="mb-1 font-medium text-gray-700 dark:text-gray-300">Tidak ada hasil ditemukan</p>
-					<p class="text-sm text-gray-500 dark:text-gray-400">Coba kata kunci lain</p>
+					<p class="mb-1 font-medium text-gray-700 dark:text-gray-300">
+						{m['ppid_pel.no_result']()}
+					</p>
+					<p class="text-sm text-gray-500 dark:text-gray-400">
+						{m['ppid_pel.try_other_keyword']()}
+					</p>
 				</div>
 			{/if}
 
@@ -242,7 +251,7 @@
 										<circle cx="12" cy="10" r="3" />
 									</svg>
 									<span class="line-clamp-2 text-left">
-										{skpd.alamat || 'Alamat belum tersedia'}
+										{skpd.alamat || m['ppid_pel.address_unavailable']()}
 									</span>
 								</div>
 							</div>
@@ -252,7 +261,7 @@
 								<div
 									class="inline-flex items-center gap-2 rounded-full bg-ppid-primary/5 px-4 py-2 text-sm font-bold text-ppid-primary transition-all duration-300 group-hover:bg-ppid-primary group-hover:text-white dark:bg-ppid-accent/10 dark:text-ppid-accent dark:group-hover:text-white"
 								>
-									Lihat Detail
+									{m['common.view_detail']()}
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
 										width="16"
@@ -283,11 +292,14 @@
 						disabled={data.pagination.current_page === 1}
 						class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-700 shadow-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-200 dark:hover:bg-slate-700"
 					>
-						&laquo; Sebelumnya
+						&laquo; {m['common.prev']()}
 					</button>
 
 					<span class="px-4 py-2 text-gray-600 dark:text-gray-300">
-						Halaman {data.pagination.current_page} dari {data.pagination.last_page}
+						{m['ppid_pel.page']()}
+						{data.pagination.current_page}
+						{m['common.from']()}
+						{data.pagination.last_page}
 					</span>
 
 					<button
@@ -295,7 +307,7 @@
 						disabled={data.pagination.current_page === data.pagination.last_page}
 						class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-700 shadow-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-200 dark:hover:bg-slate-700"
 					>
-						Selanjutnya &raquo;
+						{m['common.next']()} &raquo;
 					</button>
 				</div>
 			{/if}

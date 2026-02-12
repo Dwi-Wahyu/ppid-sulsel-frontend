@@ -57,20 +57,28 @@
 				<div
 					class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800"
 				>
-					<div class="mb-2 text-xs tracking-wide text-gray-500 uppercase">Penanggung Jawab</div>
-					<p class="font-bold text-gray-900 dark:text-white">Gubernur Sulawesi Selatan</p>
+					<div class="mb-2 text-xs tracking-wide text-gray-500 uppercase">
+						{m['org_struct.responsible_person']()}
+					</div>
+					<p class="font-bold text-gray-900 dark:text-white">
+						{m['profile.governor']()} Sulawesi Selatan
+					</p>
 				</div>
 				<div
 					class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800"
 				>
-					<div class="mb-2 text-xs tracking-wide text-gray-500 uppercase">Atasan PPID</div>
-					<p class="font-bold text-gray-900 dark:text-white">Sekretaris Daerah Provinsi</p>
+					<div class="mb-2 text-xs tracking-wide text-gray-500 uppercase">
+						{m['org_struct.ppid_supervisor']()}
+					</div>
+					<p class="font-bold text-gray-900 dark:text-white">{m['org_struct.prov_secretary']()}</p>
 				</div>
 				<div
 					class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800"
 				>
-					<div class="mb-2 text-xs tracking-wide text-gray-500 uppercase">PPID Utama</div>
-					<p class="font-bold text-gray-900 dark:text-white">Kepala Dinas Kominfo</p>
+					<div class="mb-2 text-xs tracking-wide text-gray-500 uppercase">
+						{m['profile.head_main_ppid']()}
+					</div>
+					<p class="font-bold text-gray-900 dark:text-white">{m['profile.head_comm_service']()}</p>
 				</div>
 			</div>
 
@@ -81,7 +89,7 @@
 				<div
 					class="flex items-center justify-between border-b border-gray-200 bg-gray-50 px-6 py-4 dark:border-slate-700 dark:bg-slate-900"
 				>
-					<h2 class="font-bold text-gray-900 dark:text-white">Bagan Struktur Organisasi PPID</h2>
+					<h2 class="font-bold text-gray-900 dark:text-white">{m['org_struct.chart_title']()}</h2>
 					<a
 						href={profil.struktur_organisasi_path || '#'}
 						download={profil.struktur_organisasi_path ? true : undefined}
@@ -103,7 +111,7 @@
 							<polyline points="7 10 12 15 17 10" />
 							<line x1="12" x2="12" y1="15" y2="3" />
 						</svg>
-						Download
+						{m['common.download']()}
 					</a>
 				</div>
 
@@ -120,14 +128,15 @@
 								title="Struktur Organisasi PPID"
 							>
 								<p>
-									Browser Anda tidak mendukung pratinjau PDF.
-									<a href={profil.struktur_organisasi_path}>Download PDF</a> untuk melihatnya.
+									{m['org_struct.pdf_unavailable']()}
+									<a href={profil.struktur_organisasi_path}>{m['org_struct.download_pdf']()}</a>
+									{m['org_struct.to_view']()}
 								</p>
 							</iframe>
 						{:else}
 							<img
 								src="https://placehold.co/1200x800/EEE/31343C?text=Bagan+Struktur+Organisasi+PPID"
-								alt="Struktur Organisasi PPID Sulawesi Selatan"
+								alt={m['profile.org_subtitle']()}
 								class="h-full w-full object-cover"
 							/>
 						{/if}
@@ -159,28 +168,36 @@
 								<path d="M12 8h.01" />
 							</svg>
 						</div>
-						<h3 class="font-bold text-gray-900 dark:text-white">Komponen PPID</h3>
+						<h3 class="font-bold text-gray-900 dark:text-white">
+							{m['org_struct.components_title']()}
+						</h3>
 					</div>
 					<div class="space-y-3 text-sm text-gray-700">
 						<div class="flex gap-3">
 							<span class="mt-1 text-ppid-primary dark:text-white">•</span>
 							<div>
-								<strong class="text-gray-900 dark:text-white">PPID Utama:</strong> Bertanggung jawab atas
-								pengelolaan informasi di tingkat provinsi
+								<strong class="text-gray-900 dark:text-white"
+									>{m['org_struct.main_ppid_label']()}</strong
+								>
+								{m['org_struct.main_ppid_desc']()}
 							</div>
 						</div>
 						<div class="flex gap-3">
 							<span class="mt-1 text-ppid-primary dark:text-white">•</span>
 							<div>
-								<strong class="text-gray-900 dark:text-white">PPID Pembantu:</strong> Mengelola informasi
-								di setiap SKPD lingkup Pemprov Sulsel
+								<strong class="text-gray-900 dark:text-white"
+									>{m['org_struct.asst_ppid_label']()}</strong
+								>
+								{m['org_struct.asst_ppid_desc']()}
 							</div>
 						</div>
 						<div class="flex gap-3">
 							<span class="mt-1 text-ppid-primary dark:text-white">•</span>
 							<div>
-								<strong class="text-gray-900 dark:text-white">PPID Pelaksana:</strong> Melaksanakan tugas
-								teknis pelayanan informasi
+								<strong class="text-gray-900 dark:text-white"
+									>{m['org_struct.impl_ppid_label']()}</strong
+								>
+								{m['org_struct.impl_ppid_desc']()}
 							</div>
 						</div>
 					</div>
@@ -206,28 +223,29 @@
 								<path d="M12 8h.01" />
 							</svg>
 						</div>
-						<h3 class="font-bold text-ppid-primary dark:text-white">Koordinasi & Supervisi</h3>
+						<h3 class="font-bold text-ppid-primary dark:text-white">
+							{m['org_struct.coord_supervision_title']()}
+						</h3>
 					</div>
 					<p class="mb-3 text-sm text-gray-700">
-						PPID Utama melakukan koordinasi dan supervisi terhadap PPID Pembantu di seluruh SKPD
-						untuk memastikan:
+						{m['org_struct.coord_desc']()}
 					</p>
 					<div class="space-y-2 text-sm text-gray-700">
 						<div class="flex gap-2">
 							<span class="text-ppid-primary dark:text-white">•</span>
-							<span>Standarisasi pengelolaan informasi</span>
+							<span>{m['org_struct.coord_points.p1']()}</span>
 						</div>
 						<div class="flex gap-2">
 							<span class="text-ppid-primary dark:text-white">•</span>
-							<span>Kualitas layanan yang konsisten</span>
+							<span>{m['org_struct.coord_points.p2']()}</span>
 						</div>
 						<div class="flex gap-2">
 							<span class="text-ppid-primary dark:text-white">•</span>
-							<span>Kepatuhan terhadap regulasi KIP</span>
+							<span>{m['org_struct.coord_points.p3']()}</span>
 						</div>
 						<div class="flex gap-2">
 							<span class="text-ppid-primary dark:text-white">•</span>
-							<span>Peningkatan kapasitas SDM</span>
+							<span>{m['org_struct.coord_points.p4']()}</span>
 						</div>
 					</div>
 				</div>
