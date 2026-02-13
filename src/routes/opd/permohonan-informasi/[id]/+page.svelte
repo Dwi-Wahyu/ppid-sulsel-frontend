@@ -117,7 +117,7 @@
 
 <!-- Header -->
 <div
-	class="relative mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-ppid-primary to-ppid-primary/80 p-8 text-white shadow-xl"
+	class="relative mb-6 overflow-hidden rounded-2xl bg-linear-to-br from-ppid-primary to-ppid-primary/80 p-8 text-white shadow-xl"
 >
 	<div class="absolute top-0 right-0 -mt-4 -mr-4 h-32 w-32 rounded-full bg-white/10 blur-3xl"></div>
 	<div
@@ -406,7 +406,7 @@
 					<button
 						type="button"
 						onclick={() => (showResponseModal = true)}
-						class="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-ppid-primary to-ppid-primary-light px-4 py-3 font-bold text-white shadow-lg transition-transform hover:scale-[1.02] active:scale-95"
+						class="flex w-full items-center justify-center gap-2 rounded-lg bg-linear-to-r from-ppid-primary to-ppid-primary-light px-4 py-3 font-bold text-white shadow-lg transition-transform hover:scale-[1.02] active:scale-95"
 					>
 						<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path
@@ -563,7 +563,7 @@
 						type="button"
 						onclick={handleResponseSubmit}
 						disabled={!responseMessage}
-						class="flex-1 rounded-lg bg-gradient-to-r from-ppid-primary to-ppid-primary-light px-6 py-3 font-semibold text-white shadow-md transition-all hover:from-ppid-primary-light hover:to-ppid-primary disabled:cursor-not-allowed disabled:opacity-50"
+						class="flex-1 rounded-lg bg-linear-to-r from-ppid-primary to-ppid-primary-light px-6 py-3 font-semibold text-white shadow-md transition-all hover:from-ppid-primary-light hover:to-ppid-primary disabled:cursor-not-allowed disabled:opacity-50"
 					>
 						Kirim Respon
 					</button>

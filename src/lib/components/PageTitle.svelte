@@ -23,6 +23,6 @@
 		{/if}
 	</div>
 	<div class="hidden md:block">
-		<div class="h-1 w-20 rounded-full bg-gradient-to-r from-ppid-primary to-transparent"></div>
+		<div class="h-1 w-20 rounded-full bg-linear-to-r from-ppid-primary to-transparent"></div>
 	</div>
 </div>

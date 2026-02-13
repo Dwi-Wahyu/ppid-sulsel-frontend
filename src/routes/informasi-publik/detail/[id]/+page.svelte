@@ -123,7 +123,7 @@
 				<p class="text-gray-600 dark:text-gray-300">{m['public_info.detail.subtitle']()}</p>
 			</div>
 			<div class="hidden md:block">
-				<div class="h-1 w-20 rounded-full bg-gradient-to-r from-ppid-primary to-transparent"></div>
+				<div class="h-1 w-20 rounded-full bg-linear-to-r from-ppid-primary to-transparent"></div>
 			</div>
 		</div>
 	</div>
@@ -138,7 +138,7 @@
 			>
 				<!-- Detail Header -->
 				<div
-					class="relative overflow-hidden bg-gradient-to-br from-ppid-primary to-[#2A4A8E] p-8 text-white"
+					class="relative overflow-hidden bg-linear-to-br from-ppid-primary to-[#2A4A8E] p-8 text-white"
 				>
 					<div class="absolute top-0 right-0 p-8 opacity-10">
 						<svg

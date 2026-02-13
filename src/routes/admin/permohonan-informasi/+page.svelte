@@ -4,7 +4,6 @@
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 	import type { PageData } from './$types';
-	import type { PermohonanInformasi } from '$lib/types/PermohonanInformasiTypes';
 
 	let { data }: { data: PageData } = $props();
 

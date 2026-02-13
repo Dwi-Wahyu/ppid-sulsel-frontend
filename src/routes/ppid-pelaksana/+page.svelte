@@ -97,9 +97,7 @@
 				</p>
 			</div>
 			<div class="hidden md:block">
-				<div
-					class="h-1.5 w-24 rounded-full bg-gradient-to-r from-ppid-primary to-ppid-accent"
-				></div>
+				<div class="h-1.5 w-24 rounded-full bg-linear-to-r from-ppid-primary to-ppid-accent"></div>
 			</div>
 		</div>
 	</div>
@@ -185,12 +183,12 @@
 					>
 						<!-- Gradient Overlay on Hover -->
 						<div
-							class="pointer-events-none absolute inset-0 bg-gradient-to-br from-ppid-primary/0 via-transparent to-ppid-accent/0 transition-all duration-500 group-hover:from-ppid-primary/5 group-hover:to-ppid-accent/5"
+							class="pointer-events-none absolute inset-0 bg-linear-to-br from-ppid-primary/0 via-transparent to-ppid-accent/0 transition-all duration-500 group-hover:from-ppid-primary/5 group-hover:to-ppid-accent/5"
 						></div>
 
 						<!-- Top Accent Line -->
 						<div
-							class="absolute top-0 right-0 left-0 h-1.5 origin-center scale-x-0 transform bg-gradient-to-r from-ppid-primary via-ppid-accent to-ppid-primary transition-transform duration-500 group-hover:scale-x-100"
+							class="absolute top-0 right-0 left-0 h-1.5 origin-center scale-x-0 transform bg-linear-to-r from-ppid-primary via-ppid-accent to-ppid-primary transition-transform duration-500 group-hover:scale-x-100"
 						></div>
 
 						<!-- Logo with Animated Ring -->
@@ -198,7 +196,7 @@
 							class="relative mx-auto mb-6 h-24 w-24 shrink-0 transform transition-transform duration-500 group-hover:scale-105"
 						>
 							<div
-								class="absolute inset-0 rounded-full bg-gradient-to-br from-ppid-primary to-ppid-accent opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-10 dark:group-hover:opacity-30"
+								class="absolute inset-0 rounded-full bg-linear-to-br from-ppid-primary to-ppid-accent opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-10 dark:group-hover:opacity-30"
 							></div>
 							<div
 								class="relative flex h-full w-full items-center justify-center rounded-full border-4 border-white bg-white shadow-lg transition-colors duration-300 group-hover:border-ppid-accent/30 dark:border-slate-600 dark:bg-slate-700"
@@ -226,7 +224,7 @@
 
 							<!-- Divider -->
 							<div
-								class="mx-auto h-1 w-12 shrink-0 rounded-full bg-gradient-to-r from-ppid-primary to-ppid-accent opacity-50 transition-opacity group-hover:opacity-100"
+								class="mx-auto h-1 w-12 shrink-0 rounded-full bg-linear-to-r from-ppid-primary to-ppid-accent opacity-50 transition-opacity group-hover:opacity-100"
 							></div>
 
 							<!-- Info Grid -->

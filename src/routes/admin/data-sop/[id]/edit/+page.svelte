@@ -263,7 +263,7 @@
 					type="submit"
 					disabled={isSaving}
 					aria-busy={isSaving}
-					class="rounded-xl bg-gradient-to-r from-ppid-primary to-ppid-primary-light px-8 py-2.5 text-sm font-semibold text-white shadow-md transition-all hover:from-ppid-primary-light hover:to-ppid-primary hover:shadow-lg focus:ring-2 focus:ring-ppid-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+					class="rounded-xl bg-linear-to-r from-ppid-primary to-ppid-primary-light px-8 py-2.5 text-sm font-semibold text-white shadow-md transition-all hover:from-ppid-primary-light hover:to-ppid-primary hover:shadow-lg focus:ring-2 focus:ring-ppid-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 				>
 					{isSaving ? 'Menyimpan...' : 'Perbarui SOP'}
 				</button>

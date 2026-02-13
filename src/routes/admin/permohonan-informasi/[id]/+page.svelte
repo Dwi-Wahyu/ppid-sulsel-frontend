@@ -108,7 +108,7 @@
 
 <!-- Header -->
 <div
-	class="mb-6 overflow-hidden rounded-2xl bg-gradient-to-br from-ppid-primary to-ppid-primary-dark p-8 text-white shadow-xl"
+	class="mb-6 overflow-hidden rounded-2xl bg-linear-to-br from-ppid-primary to-ppid-primary-dark p-8 text-white shadow-xl"
 >
 	<div class="flex items-start justify-between">
 		<div class="flex-1">
@@ -159,7 +159,7 @@
 			class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
 		>
 			<div
-				class="border-b border-white/10 bg-gradient-to-r from-ppid-primary to-ppid-primary-light p-4"
+				class="border-b border-white/10 bg-linear-to-r from-ppid-primary to-ppid-primary-light p-4"
 			>
 				<h2 class="flex items-center gap-2 text-lg font-bold text-white">
 					<svg
@@ -249,7 +249,7 @@
 			class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
 		>
 			<div
-				class="border-b border-white/10 bg-gradient-to-r from-ppid-primary to-ppid-primary-light p-4"
+				class="border-b border-white/10 bg-linear-to-r from-ppid-primary to-ppid-primary-light p-4"
 			>
 				<h2 class="flex items-center gap-2 text-lg font-bold text-white">
 					<svg
@@ -317,7 +317,7 @@
 				class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
 			>
 				<div
-					class="border-b border-white/10 bg-gradient-to-r from-ppid-primary to-ppid-primary-light p-4"
+					class="border-b border-white/10 bg-linear-to-r from-ppid-primary to-ppid-primary-light p-4"
 				>
 					<h2 class="flex items-center gap-2 text-lg font-bold text-white">
 						<svg
@@ -357,12 +357,12 @@
 								<div
 									class="flex items-center justify-between border-b p-4 {disposisi.status ===
 									'selesai'
-										? 'border-emerald-200 bg-gradient-to-r from-emerald-100 to-emerald-50 dark:border-emerald-800 dark:from-emerald-900/30 dark:to-emerald-900/10'
+										? 'border-emerald-200 bg-linear-to-r from-emerald-100 to-emerald-50 dark:border-emerald-800 dark:from-emerald-900/30 dark:to-emerald-900/10'
 										: disposisi.status === 'diproses'
-											? 'border-blue-200 bg-gradient-to-r from-blue-100 to-blue-50 dark:border-blue-800 dark:from-blue-900/30 dark:to-blue-900/10'
+											? 'border-blue-200 bg-linear-to-r from-blue-100 to-blue-50 dark:border-blue-800 dark:from-blue-900/30 dark:to-blue-900/10'
 											: disposisi.status === 'ditolak'
-												? 'border-red-200 bg-gradient-to-r from-red-100 to-red-50 dark:border-red-800 dark:from-red-900/30 dark:to-red-900/10'
-												: 'border-amber-200 bg-gradient-to-r from-amber-100 to-amber-50 dark:border-amber-800 dark:from-amber-900/30 dark:to-amber-900/10'}"
+												? 'border-red-200 bg-linear-to-r from-red-100 to-red-50 dark:border-red-800 dark:from-red-900/30 dark:to-red-900/10'
+												: 'border-amber-200 bg-linear-to-r from-amber-100 to-amber-50 dark:border-amber-800 dark:from-amber-900/30 dark:to-amber-900/10'}"
 								>
 									<div class="flex items-center gap-3">
 										<div
@@ -510,7 +510,7 @@
 
 											{#each disposisi.respon as respon, responIndex}
 												<div
-													class="overflow-hidden rounded-lg border-2 border-ppid-primary/20 bg-gradient-to-br from-white to-ppid-primary/5 shadow-md dark:border-ppid-primary/30 dark:from-slate-800 dark:to-ppid-primary/10"
+													class="overflow-hidden rounded-lg border-2 border-ppid-primary/20 bg-linear-to-br from-white to-ppid-primary/5 shadow-md dark:border-ppid-primary/30 dark:from-slate-800 dark:to-ppid-primary/10"
 												>
 													<div
 														class="flex items-center justify-between border-b border-ppid-primary/20 bg-ppid-primary/10 p-3 dark:border-ppid-primary/30 dark:bg-ppid-primary/20"
@@ -611,7 +611,7 @@
 				class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
 			>
 				<div
-					class="border-b border-white/10 bg-gradient-to-r from-ppid-primary to-ppid-primary-light p-4"
+					class="border-b border-white/10 bg-linear-to-r from-ppid-primary to-ppid-primary-light p-4"
 				>
 					<h3 class="flex items-center gap-2 text-lg font-bold text-white">
 						<svg
@@ -641,7 +641,7 @@
 							aria-label="Buka form jawab langsung"
 						>
 							<div
-								class="absolute inset-0 bg-gradient-to-r from-emerald-50 to-transparent opacity-0 transition-opacity group-hover:opacity-100 dark:from-emerald-900/20"
+								class="absolute inset-0 bg-linear-to-r from-emerald-50 to-transparent opacity-0 transition-opacity group-hover:opacity-100 dark:from-emerald-900/20"
 							></div>
 							<div class="relative flex items-center gap-4 p-4">
 								<div
@@ -684,7 +684,7 @@
 							aria-label="Buka form buat disposisi"
 						>
 							<div
-								class="absolute inset-0 bg-gradient-to-r from-purple-50 to-transparent opacity-0 transition-opacity group-hover:opacity-100 dark:from-purple-900/20"
+								class="absolute inset-0 bg-linear-to-r from-purple-50 to-transparent opacity-0 transition-opacity group-hover:opacity-100 dark:from-purple-900/20"
 							></div>
 							<div class="relative flex items-center gap-4 p-4">
 								<div
@@ -727,7 +727,7 @@
 							aria-label="Buka form tolak permohonan"
 						>
 							<div
-								class="absolute inset-0 bg-gradient-to-r from-red-50 to-transparent opacity-0 transition-opacity group-hover:opacity-100 dark:from-red-900/20"
+								class="absolute inset-0 bg-linear-to-r from-red-50 to-transparent opacity-0 transition-opacity group-hover:opacity-100 dark:from-red-900/20"
 							></div>
 							<div class="relative flex items-center gap-4 p-4">
 								<div
@@ -768,7 +768,7 @@
 				class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
 			>
 				<div
-					class="border-b border-white/10 bg-gradient-to-r from-ppid-primary to-ppid-primary-light p-4"
+					class="border-b border-white/10 bg-linear-to-r from-ppid-primary to-ppid-primary-light p-4"
 				>
 					<h3 class="flex items-center gap-2 text-lg font-bold text-white">
 						<svg
@@ -792,7 +792,7 @@
 					<button
 						type="button"
 						onclick={() => (showDispositionModal = true)}
-						class="w-full rounded-lg bg-gradient-to-r from-ppid-primary to-ppid-primary-light px-6 py-3 font-semibold text-white shadow-md transition-all hover:from-ppid-primary-hover hover:to-ppid-primary"
+						class="w-full rounded-lg bg-linear-to-r from-ppid-primary to-ppid-primary-light px-6 py-3 font-semibold text-white shadow-md transition-all hover:from-ppid-primary-hover hover:to-ppid-primary"
 					>
 						Buka Form Disposisi
 					</button>
@@ -816,7 +816,7 @@
 			onclick={(e) => e.stopPropagation()}
 		>
 			<div
-				class="flex items-center justify-between border-b border-emerald-200 bg-gradient-to-r from-emerald-600 to-emerald-700 p-6"
+				class="flex items-center justify-between border-b border-emerald-200 bg-linear-to-r from-emerald-600 to-emerald-700 p-6"
 			>
 				<h3 id="update-modal-title" class="flex items-center gap-2 text-xl font-bold text-white">
 					<svg
@@ -929,7 +929,7 @@
 						</button>
 						<button
 							type="submit"
-							class="flex-1 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-700 px-6 py-3 font-semibold text-white shadow-md transition-all hover:from-emerald-700 hover:to-emerald-800"
+							class="flex-1 rounded-lg bg-linear-to-r from-emerald-600 to-emerald-700 px-6 py-3 font-semibold text-white shadow-md transition-all hover:from-emerald-700 hover:to-emerald-800"
 						>
 							Simpan Jawaban
 						</button>
@@ -954,7 +954,7 @@
 			onclick={(e) => e.stopPropagation()}
 		>
 			<div
-				class="flex items-center justify-between border-b border-red-200 bg-gradient-to-r from-red-600 to-red-700 p-6"
+				class="flex items-center justify-between border-b border-red-200 bg-linear-to-r from-red-600 to-red-700 p-6"
 			>
 				<h3 id="reject-modal-title" class="flex items-center gap-2 text-xl font-bold text-white">
 					<svg
@@ -1068,7 +1068,7 @@
 						</button>
 						<button
 							type="submit"
-							class="flex-1 rounded-lg bg-gradient-to-r from-red-600 to-red-700 px-6 py-3 font-semibold text-white shadow-md transition-all hover:from-red-700 hover:to-red-800"
+							class="flex-1 rounded-lg bg-linear-to-r from-red-600 to-red-700 px-6 py-3 font-semibold text-white shadow-md transition-all hover:from-red-700 hover:to-red-800"
 						>
 							Tolak Permohonan
 						</button>
@@ -1093,7 +1093,7 @@
 			onclick={(e) => e.stopPropagation()}
 		>
 			<div
-				class="flex items-center justify-between border-b border-white/10 bg-gradient-to-r from-ppid-primary to-ppid-primary-light p-6"
+				class="flex items-center justify-between border-b border-white/10 bg-linear-to-r from-ppid-primary to-ppid-primary-light p-6"
 			>
 				<h3
 					id="disposition-modal-title"
@@ -1248,7 +1248,7 @@
 							<button
 								type="submit"
 								disabled={selectedSkpd.length === 0}
-								class="flex-1 rounded-lg bg-gradient-to-r from-ppid-primary to-ppid-primary-light px-6 py-3 font-semibold text-white shadow-md transition-all hover:from-ppid-primary-hover hover:to-ppid-primary disabled:cursor-not-allowed disabled:opacity-50"
+								class="flex-1 rounded-lg bg-linear-to-r from-ppid-primary to-ppid-primary-light px-6 py-3 font-semibold text-white shadow-md transition-all hover:from-ppid-primary-hover hover:to-ppid-primary disabled:cursor-not-allowed disabled:opacity-50"
 							>
 								Buat Disposisi
 							</button>

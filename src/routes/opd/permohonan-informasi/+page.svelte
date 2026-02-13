@@ -78,10 +78,10 @@
 <div class="mb-6 flex items-center justify-between">
 	<div>
 		<h1 class="font-['Plus_Jakarta_Sans'] text-2xl font-bold text-slate-900 dark:text-white">
-			Permohonan Informasi (Disposisi)
+			Permohonan Informasi
 		</h1>
 		<p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
-			Daftar permohonan informasi yang didisposisikan ke OPD Anda.
+			Daftar permohonan informasi yang didisposisikan.
 		</p>
 	</div>
 </div>

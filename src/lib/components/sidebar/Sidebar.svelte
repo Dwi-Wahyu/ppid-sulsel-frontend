@@ -14,9 +14,9 @@
 </script>
 
 <aside
-	class="sidebar-transition absolute inset-y-0 left-0 z-30 flex h-full flex-col border-r border-white/10 bg-ppid-primary text-white shadow-xl md:static md:shadow-none {sidebar.isOpen
+	class="sidebar-transition absolute inset-y-0 left-0 z-50 flex h-full flex-col border-r border-white/10 bg-ppid-primary text-white shadow-xl md:static md:shadow-none {sidebar.isOpen
 		? 'w-72 translate-x-0'
-		: 'w-20 translate-x-full md:w-24 md:translate-x-0'}"
+		: 'w-20 -translate-x-full md:w-24 md:translate-x-0'}"
 >
 	<div
 		class="flex items-center justify-between {sidebar.isOpen ? 'p-6 pr-4 pb-0' : 'p-5 pb-0 pl-7'}"

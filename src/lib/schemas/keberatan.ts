@@ -13,17 +13,17 @@ export const keberatanSchema = yup.object({
 		.max(13, 'Maksimal 13 digit')
 		.matches(/^[0-9+]+$/, 'Hanya angka diperbolehkan')
 		.required('Nomor telepon wajib diisi'),
-	pekerjaan_pemohon: yup.string().required('Pekerjaan wajib dipilih'),
+	pekerjaan_id: yup.string().required('Pekerjaan wajib dipilih'),
 
 	// Alamat Pemohon
 	alamat_pemohon: yup.string().required('Alamat wajib diisi'),
-	city_pemohon: yup.string().required('Kabupaten/Kota wajib dipilih'),
-	state_pemohon: yup.string().default('Sulawesi Selatan'),
+	pemohon_domisili_id: yup.string().required('Domisili Pemohon wajib dipilih'),
 
 	// Data Kuasa (Opsional)
 	nama_kuasa: yup.string().notRequired(),
 	alamat_kuasa: yup.string().notRequired(),
 	no_telp_kuasa: yup.string().notRequired(),
+	kuasa_domisili_id: yup.string().notRequired(),
 
 	// Detail Keberatan
 	no_pendaftaran: yup.string().required('Nomor pendaftaran permohonan wajib diisi'),

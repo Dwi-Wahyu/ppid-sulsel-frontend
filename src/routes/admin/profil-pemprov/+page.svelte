@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { api } from '$lib/api'; // Gunakan helper proxy
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { PUBLIC_API_URL, PUBLIC_BACKEND_URL } from '$env/static/public';
 	import TinyMCE from '$lib/components/TinyMCE.svelte';
 	import FilePond from '$lib/components/FilePond.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
@@ -169,7 +169,7 @@
 							>
 							{#if currentData.foto_gubernur}
 								<img
-									src={`${PUBLIC_API_URL}/storage/${currentData.foto_gubernur}`}
+									src={`${PUBLIC_BACKEND_URL}/uploads/${currentData.foto_gubernur}`}
 									alt="Gubernur"
 									class="h-64 w-full rounded-xl object-cover shadow-md"
 								/>
@@ -201,7 +201,7 @@
 							>
 							{#if currentData.foto_wakil}
 								<img
-									src={`${PUBLIC_API_URL}/storage/${currentData.foto_wakil}`}
+									src={`${PUBLIC_BACKEND_URL}/uploads/${currentData.foto_wakil}`}
 									alt="Wakil Gubernur"
 									class="h-64 w-full rounded-xl object-cover shadow-md"
 								/>

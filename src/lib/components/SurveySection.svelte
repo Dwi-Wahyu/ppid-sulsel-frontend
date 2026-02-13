@@ -4,7 +4,7 @@
 
 <section
 	id="survey"
-	class="relative overflow-hidden bg-gradient-to-br from-ppid-primary to-ppid-primary-light py-12 font-['Plus_Jakarta_Sans'] transition-colors duration-300 md:py-20"
+	class="relative overflow-hidden bg-linear-to-br from-ppid-primary to-ppid-primary-light py-12 font-['Plus_Jakarta_Sans'] transition-colors duration-300 md:py-20"
 >
 	<!-- Background Decorative Elements -->
 	<div class="absolute inset-0 opacity-10">

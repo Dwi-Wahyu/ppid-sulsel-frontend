@@ -17,6 +17,7 @@ declare global {
 				} | null;
 			} | null;
 			token: string | null;
+			refresh_token: string | null;
 		}
 		// interface PageData {}
 		// interface PageState {}

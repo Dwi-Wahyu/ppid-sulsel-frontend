@@ -6,11 +6,11 @@
 	import { theme } from '$lib/state/theme.svelte';
 	import { api } from '$lib/api';
 
-	// --- Types ---
 	interface Notification {
 		id_notification: string;
 		title: string;
 		message: string;
+		url: string;
 		read_at: string | null;
 		created_at: string;
 	}
@@ -70,13 +70,20 @@
 		class="mr-4 rounded-lg p-2 text-slate-600 outline-none hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-500 lg:hidden dark:text-slate-400 dark:hover:bg-slate-800"
 		aria-label="Buka Sidebar"
 	>
-		<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-			<path
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				stroke-width="2"
-				d="M4 6h16M4 12h16m-7 6h7"
-			/>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+		>
+			<path d="M4 6a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2l0 -12" />
+			<path d="M9 4v16" />
+			<path d="M14 10l2 2l-2 2" />
 		</svg>
 	</button>
 
@@ -162,7 +169,7 @@
 					<div class="max-h-96 overflow-y-auto">
 						{#each notifications as notif (notif.id_notification)}
 							<a
-								href="/admin/notifications"
+								href={notif.url}
 								onclick={closeMenus}
 								class="block border-b border-slate-50 p-4 transition-colors hover:bg-slate-50 dark:border-slate-700/50 dark:hover:bg-slate-700"
 								role="menuitem"

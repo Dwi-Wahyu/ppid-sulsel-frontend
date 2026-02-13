@@ -1,5 +1,6 @@
 import { API_URL } from '$env/static/private';
 import type { PageServerLoad } from './$types';
+import type { PengajuanKeberatanApiResponse } from '$lib/types/PengajuanKeberatanTypes';
 
 export const load: PageServerLoad = async ({ fetch, cookies, url }) => {
 	const token = cookies.get('access_token');
@@ -16,10 +17,10 @@ export const load: PageServerLoad = async ({ fetch, cookies, url }) => {
 	});
 
 	const queryString = searchParams.toString();
-	const apiUrl = `${API_URL}/admin/permohonan-informasi${queryString ? `?${queryString}` : ''}`;
+	const apiUrl = `${API_URL}/admin/pengajuan-keberatan${queryString ? `?${queryString}` : ''}`;
 
 	try {
-		// Fetch permohonan informasi data
+		// Fetch pengajuan keberatan data
 		const response = await fetch(apiUrl, {
 			headers: {
 				Authorization: `Bearer ${token}`,
@@ -28,21 +29,23 @@ export const load: PageServerLoad = async ({ fetch, cookies, url }) => {
 		});
 
 		if (!response.ok) {
-			throw new Error('Failed to fetch permohonan informasi');
+			throw new Error('Failed to fetch pengajuan keberatan');
 		}
 
-		const result = await response.json();
+		const result: PengajuanKeberatanApiResponse = await response.json();
+
+		console.log(result);
 
 		return {
-			permohonan: result.data,
+			pengajuan: result.data,
 			filters: {
 				search: url.searchParams.get('search') || ''
 			}
 		};
 	} catch (error) {
-		console.error('Error loading permohonan informasi:', error);
+		console.error('Error loading pengajuan keberatan:', error);
 		return {
-			permohonan: {
+			pengajuan: {
 				current_page: 1,
 				data: [],
 				first_page_url: '',

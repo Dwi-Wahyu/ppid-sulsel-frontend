@@ -1,19 +1,58 @@
-<script>
+<script lang="ts">
 	import Footer from '$lib/components/Footer.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { api } from '$lib/api';
+	import { PUBLIC_API_URL } from '$env/static/public';
 
-	// State
-	let type = $state('permohonan'); // 'permohonan' or 'keberatan'
+	interface BaseResponse<T> {
+		success: boolean;
+		type: 'permohonan' | 'keberatan';
+		data: T[];
+		message?: string;
+	}
+
+	interface PermohonanData {
+		id_permohonan: number;
+		no_pendaftaran: string | null;
+		rincian: string | null;
+		tujuan: string | null;
+		status_label_display: string;
+		status_color: string;
+		formatted_date: string;
+		jawaban?: string | null;
+		keterangan?: string | null;
+		file?: string | null;
+	}
+
+	interface KeberatanData {
+		id_pengajuan: number;
+		no_pendaftaran: string | null;
+		kasus: string | null;
+		tujuan: string | null;
+		feedback: string | null;
+		status_label_display: string;
+		status_color: string;
+		formatted_date: string;
+		file?: string | null;
+		alasan_pengajuan?: Array<{ alasan: string }>;
+	}
+
+	type SearchResult = PermohonanData | KeberatanData;
+
+	// State menggunakan Svelte 5 Runes [cite: 20]
+	let type = $state<'permohonan' | 'keberatan'>('permohonan');
 	let email = $state('');
 	let loading = $state(false);
 	let error = $state('');
-	let results = $state([]);
+	let results = $state<SearchResult[]>([]);
 
-	// Functions
-	async function searchStatus(e) {
+	// Type Guard untuk pengecekan properti di template
+	function isPermohonan(item: SearchResult): item is PermohonanData {
+		return 'id_permohonan' in item;
+	}
+
+	async function searchStatus(e: Event) {
 		e.preventDefault();
-
 		if (!email) return;
 
 		loading = true;
@@ -21,38 +60,30 @@
 		results = [];
 
 		try {
-			// Call API based on type
-			let endpoint = '';
-			if (type === 'permohonan') {
-				endpoint = `/public/permohonan-informasi/search?email=${encodeURIComponent(email)}`;
-			} else {
-				// TODO: Implement endpoint for keberatan if needed, for now simulate or alert
-				// endpoint = `/public/pengajuan-keberatan/search?email=${encodeURIComponent(email)}`;
-				// Assuming currently only permohonan is requested
-				alert('Fitur cek status keberatan belum tersedia saat ini.');
-				loading = false;
-				return;
+			// Menggunakan PUBLIC_API_URL dan endpoint tunggal
+			const query = new URLSearchParams({ email, type }).toString();
+			const response = await fetch(`${PUBLIC_API_URL}/public/cek-status?${query}`);
+
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
 			}
 
-			const response = await api.get(endpoint);
-
-			if (response.success) {
-				results = response.data;
-
+			const data = await response.json();
+			if (data.success) {
+				results = data.data;
 				if (results.length === 0) {
 					error = m['common.no_data_email']();
 				} else {
-					// Scroll to results
 					setTimeout(() => {
 						document.getElementById('hasil-pencarian')?.scrollIntoView({ behavior: 'smooth' });
 					}, 100);
 				}
 			} else {
-				error = response.message || 'Gagal mengambil data.';
+				error = data.message || 'Gagal mengambil data.';
 			}
 		} catch (err) {
 			error = m['form.alert.server_error']();
-			console.error('Error:', err);
+			console.error('API Error:', err);
 		} finally {
 			loading = false;
 		}
@@ -62,406 +93,171 @@
 		results = [];
 		error = '';
 	}
-
-	function formatDate(dateString) {
-		if (!dateString) return '-';
-		const date = new Date(dateString);
-		return date.toLocaleDateString('id-ID', {
-			day: '2-digit',
-			month: 'long',
-			year: 'numeric'
-		});
-	}
-
-	function getStatusColor(status) {
-		switch (status) {
-			case 'Selesai':
-				return 'text-green-600 bg-green-50 border-green-200';
-			case 'Diproses':
-			case 'Ditinjau':
-				return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-			case 'Ditolak':
-				return 'text-red-600 bg-red-50 border-red-200';
-			default:
-				return 'text-gray-600 bg-gray-50 border-gray-200';
-		}
-	}
 </script>
 
-<!-- Hero Section -->
-<section
-	class="relative overflow-hidden bg-gradient-to-br from-ppid-primary via-ppid-primary-light to-ppid-primary pb-32 text-white md:pb-40"
->
-	<div class="relative z-10 container mx-auto px-4 pt-16 text-center sm:px-6 md:pt-24">
-		<!-- Title -->
-		<h1
-			class="mb-6 text-4xl leading-tight font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl"
-		>
-			<span class="bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">
-				{m['layanan_pages.check_status_title']()}
-			</span>
-		</h1>
+<svelte:head>
+	<title>{m['layanan_pages.check_status_title']()} | PPID Sulsel</title>
+</svelte:head>
 
-		<!-- Subtitle -->
-		<p
-			class="mb-12 text-lg leading-relaxed font-medium text-blue-100 sm:text-xl md:mb-16 md:text-2xl"
-		>
+<section
+	class="relative overflow-hidden bg-linear-to-br from-ppid-primary via-ppid-primary-light to-ppid-primary pb-32 text-white md:pb-40"
+>
+	<div class="relative z-10 container mx-auto px-4 pt-16 text-center md:pt-24">
+		<h1 class="mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl md:text-7xl">
+			{m['layanan_pages.check_status_title']()}
+		</h1>
+		<p class="mb-12 text-lg font-medium text-blue-100 sm:text-xl md:text-2xl">
 			{m['layanan_pages.check_status_subtitle']()}
 		</p>
 	</div>
-
-	<!-- Wave Divider -->
-	<div class="absolute right-0 bottom-0 left-0">
-		<svg
-			class="h-auto w-full"
-			viewBox="0 0 1440 120"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-			preserveAspectRatio="none"
-		>
-			<path
-				d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z"
-				fill="white"
-				class="dark:fill-slate-900"
-			/>
-		</svg>
-	</div>
 </section>
 
-<!-- Form Section -->
 <section class="relative z-20 -mt-24 pb-16 md:-mt-32">
-	<div class="relative container mx-auto px-4 sm:px-6">
-		<div class="mx-auto max-w-4xl">
-			<div
-				class="rounded-[2.5rem] border-2 border-ppid-primary/10 bg-gradient-to-br from-white via-slate-50 to-blue-50/30 p-8 shadow-2xl md:p-14 dark:border-blue-500/30 dark:from-slate-800 dark:via-slate-800 dark:to-slate-900"
-			>
-				<div class="mb-10 text-center">
-					<h2
-						class="mb-4 text-2xl font-bold text-ppid-primary sm:text-3xl md:text-4xl dark:text-white"
-					>
-						{m['layanan_pages.choose_service']()}
-					</h2>
-					<p class="text-slate-600 dark:text-slate-400">
-						{m['layanan_pages.choose_service_desc']()}
-					</p>
-				</div>
-
-				<!-- Type Selector -->
-				<div class="mb-10">
-					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-						<!-- Permohonan Button -->
-						<button
-							type="button"
-							onclick={() => {
-								type = 'permohonan';
-								resetForm();
-							}}
-							class="group relative transform rounded-2xl border-2 p-6 transition-all duration-300 hover:shadow-lg"
-							class:bg-gradient-to-r={type === 'permohonan'}
-							class:from-ppid-primary={type === 'permohonan'}
-							class:to-ppid-primary-light={type === 'permohonan'}
-							class:text-white={type === 'permohonan'}
-							class:shadow-xl={type === 'permohonan'}
-							class:scale-105={type === 'permohonan'}
-							class:border-ppid-accent={type === 'permohonan'}
-							class:bg-white={type !== 'permohonan'}
-							class:dark:bg-slate-700={type !== 'permohonan'}
-							class:text-slate-700={type !== 'permohonan'}
-							class:dark:text-slate-300={type !== 'permohonan'}
-							class:border-transparent={type !== 'permohonan'}
-						>
-							<div class="flex items-center gap-4">
-								<div
-									class="rounded-xl p-3 transition-colors {type === 'permohonan'
-										? 'bg-white/10'
-										: 'bg-slate-100 dark:bg-slate-600'}"
-								>
-									<svg
-										class="h-8 w-8 transition-colors {type === 'permohonan'
-											? 'text-ppid-accent'
-											: 'text-ppid-primary dark:text-slate-300'}"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-										></path>
-									</svg>
-								</div>
-								<div class="text-left">
-									<div class="mb-1 text-lg font-bold">{m['layanan_pages.permohonan_title']()}</div>
-									<div class="text-sm opacity-90">{m['layanan_pages.check_permohonan_desc']()}</div>
-								</div>
-							</div>
-							{#if type === 'permohonan'}
-								<div class="absolute top-3 right-3">
-									<svg class="h-6 w-6 text-ppid-accent" fill="currentColor" viewBox="0 0 20 20">
-										<path
-											fill-rule="evenodd"
-											d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-											clip-rule="evenodd"
-										></path>
-									</svg>
-								</div>
-							{/if}
-						</button>
-
-						<!-- Keberatan Button -->
-						<button
-							type="button"
-							onclick={() => {
-								type = 'keberatan';
-								resetForm();
-							}}
-							class="group relative transform rounded-2xl border-2 p-6 transition-all duration-300 hover:shadow-lg"
-							class:bg-gradient-to-r={type === 'keberatan'}
-							class:from-ppid-primary={type === 'keberatan'}
-							class:to-ppid-primary-light={type === 'keberatan'}
-							class:text-white={type === 'keberatan'}
-							class:shadow-xl={type === 'keberatan'}
-							class:scale-105={type === 'keberatan'}
-							class:border-ppid-accent={type === 'keberatan'}
-							class:bg-white={type !== 'keberatan'}
-							class:dark:bg-slate-700={type !== 'keberatan'}
-							class:text-slate-700={type !== 'keberatan'}
-							class:dark:text-slate-300={type !== 'keberatan'}
-							class:border-transparent={type !== 'keberatan'}
-						>
-							<div class="flex items-center gap-4">
-								<div
-									class="rounded-xl p-3 transition-colors {type === 'keberatan'
-										? 'bg-white/10'
-										: 'bg-slate-100 dark:bg-slate-600'}"
-								>
-									<svg
-										class="h-8 w-8 transition-colors {type === 'keberatan'
-											? 'text-ppid-accent'
-											: 'text-ppid-primary dark:text-slate-300'}"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-										></path>
-									</svg>
-								</div>
-								<div class="text-left">
-									<div class="mb-1 text-lg font-bold">{m['layanan_pages.keberatan_title']()}</div>
-									<div class="text-sm opacity-90">{m['layanan_pages.check_keberatan_desc']()}</div>
-								</div>
-							</div>
-							{#if type === 'keberatan'}
-								<div class="absolute top-3 right-3">
-									<svg class="h-6 w-6 text-ppid-accent" fill="currentColor" viewBox="0 0 20 20">
-										<path
-											fill-rule="evenodd"
-											d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-											clip-rule="evenodd"
-										></path>
-									</svg>
-								</div>
-							{/if}
-						</button>
+	<div class="container mx-auto px-4">
+		<div
+			class="mx-auto max-w-4xl rounded-[2.5rem] border-2 border-ppid-primary/10 bg-white p-8 shadow-2xl md:p-14 dark:bg-slate-800"
+		>
+			<div class="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2" role="radiogroup">
+				<button
+					type="button"
+					onclick={() => {
+						type = 'permohonan';
+						resetForm();
+					}}
+					class="flex items-center gap-4 rounded-2xl border-2 p-6 transition-all {type ===
+					'permohonan'
+						? 'scale-105 border-ppid-accent bg-ppid-primary text-white'
+						: 'border-transparent bg-slate-50 text-slate-700'}"
+				>
+					<div class="text-left">
+						<div class="text-lg font-bold">{m['layanan_pages.permohonan_title']()}</div>
+						<div class="text-sm opacity-80">Pantau permohonan informasi Anda</div>
 					</div>
-				</div>
+				</button>
 
-				<!-- Search Form -->
-				<form onsubmit={searchStatus} class="mx-auto max-w-2xl">
-					<div class="mb-8">
-						<label class="mb-3 block text-lg font-semibold text-ppid-primary dark:text-white">
-							{m['form.applicant_email']()}
-						</label>
-						<div class="group relative">
-							<input
-								type="email"
-								bind:value={email}
-								required
-								class="w-full rounded-2xl border-2 border-slate-300 bg-white px-6 py-5 text-xl text-slate-900 transition-all duration-300 focus:border-ppid-primary focus:ring-4 focus:ring-ppid-accent/30 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-								placeholder={m['form.email_example_placeholder']()}
-							/>
-						</div>
+				<button
+					type="button"
+					onclick={() => {
+						type = 'keberatan';
+						resetForm();
+					}}
+					class="flex items-center gap-4 rounded-2xl border-2 p-6 transition-all {type ===
+					'keberatan'
+						? 'scale-105 border-ppid-accent bg-ppid-primary text-white'
+						: 'border-transparent bg-slate-50 text-slate-700'}"
+				>
+					<div class="text-left">
+						<div class="text-lg font-bold">{m['layanan_pages.keberatan_title']()}</div>
+						<div class="text-sm opacity-80">Cek status pengajuan keberatan</div>
 					</div>
-
-					{#if error}
-						<div
-							class="mb-8 rounded-2xl border-2 border-red-300 bg-red-50 p-5 dark:border-red-700 dark:bg-red-900/30"
-						>
-							<p class="flex items-center gap-3 font-semibold text-red-700 dark:text-red-300">
-								<svg class="h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
-									<path
-										fill-rule="evenodd"
-										d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-										clip-rule="evenodd"
-									></path>
-								</svg>
-								<span>{error}</span>
-							</p>
-						</div>
-					{/if}
-
-					<button
-						type="submit"
-						disabled={loading}
-						class="flex w-full transform items-center justify-center gap-4 rounded-2xl bg-gradient-to-r from-ppid-primary to-ppid-primary-light px-8 py-6 text-xl font-bold text-white shadow-xl transition-all hover:scale-[1.02] hover:from-ppid-primary-hover hover:to-ppid-primary disabled:opacity-50 md:text-2xl"
-					>
-						{#if loading}
-							<svg class="h-7 w-7 animate-spin" fill="none" viewBox="0 0 24 24">
-								<circle
-									class="opacity-25"
-									cx="12"
-									cy="12"
-									r="10"
-									stroke="currentColor"
-									stroke-width="4"
-								></circle>
-								<path
-									class="opacity-75"
-									fill="currentColor"
-									d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-								></path>
-							</svg>
-							<span>{m['form.searching']()}</span>
-						{:else}
-							<span>{m['form.check_my_status']()}</span>
-						{/if}
-					</button>
-				</form>
+				</button>
 			</div>
+
+			<form onsubmit={searchStatus} class="space-y-6">
+				<div>
+					<label
+						for="email"
+						class="mb-3 block text-lg font-semibold text-ppid-primary dark:text-white"
+						>Email Pemohon</label
+					>
+					<input
+						id="email"
+						type="email"
+						bind:value={email}
+						required
+						class="w-full rounded-2xl border-2 border-slate-300 px-6 py-5 text-xl focus:border-ppid-primary focus:ring-4 focus:ring-ppid-accent/20 dark:bg-slate-700 dark:text-white"
+						placeholder="contoh@email.com"
+					/>
+				</div>
+
+				{#if error}
+					<div class="rounded-2xl border-2 border-red-200 bg-red-50 p-5 text-red-700" role="alert">
+						{error}
+					</div>
+				{/if}
+
+				<button
+					type="submit"
+					disabled={loading}
+					class="w-full rounded-2xl bg-ppid-primary py-6 text-2xl font-bold text-white shadow-xl transition-all hover:bg-ppid-primary-hover disabled:opacity-50"
+				>
+					{loading ? m['form.searching']() : m['form.check_my_status']()}
+				</button>
+			</form>
 		</div>
 	</div>
 </section>
 
-<!-- Results Section -->
 {#if results.length > 0}
-	<section id="hasil-pencarian" class="bg-slate-50 py-12 md:py-20 dark:bg-slate-900">
-		<div class="container mx-auto px-4 sm:px-6">
-			<div class="mb-12 text-center">
-				<div
-					class="inline-flex flex-col items-center gap-4 rounded-2xl border-2 border-ppid-primary/10 bg-white px-8 py-5 shadow-lg sm:flex-row dark:bg-slate-800"
+	<section id="hasil-pencarian" class="bg-slate-50 py-20 dark:bg-slate-900">
+		<div class="container mx-auto max-w-7xl space-y-8 px-4">
+			{#each results as item}
+				<article
+					class="overflow-hidden rounded-3xl border-2 border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-800"
 				>
-					<h2 class="text-2xl font-bold text-ppid-primary sm:text-3xl dark:text-white">
-						{type === 'permohonan'
-							? m['layanan_pages.history_permohonan']()
-							: m['layanan_pages.history_keberatan']()}
-					</h2>
-					<span class="rounded-full bg-ppid-accent px-4 py-1 text-sm font-bold text-white">
-						{results.length}
-						{m['common.data']()}
-					</span>
-				</div>
-			</div>
-
-			<div class="mx-auto max-w-7xl space-y-10">
-				{#each results as item (type === 'permohonan' ? item.id_permohonan : item.id_pengajuan)}
 					<div
-						class="overflow-hidden rounded-2xl border-2 border-gray-200 bg-white shadow-lg transition-all hover:shadow-xl dark:border-slate-700 dark:bg-slate-800"
+						class="flex flex-col items-start justify-between gap-4 bg-ppid-primary p-6 text-white md:flex-row md:items-center"
 					>
-						<!-- Header -->
-						<div class="bg-gradient-to-r from-ppid-primary to-ppid-primary-light p-6">
-							<div class="flex flex-col justify-between gap-4 md:flex-row md:items-center">
-								<div>
-									<h3 class="mb-2 text-2xl font-bold text-white">
-										{type === 'permohonan'
-											? `${m['common.request']()} #${item.id_permohonan}`
-											: `${m['common.objection']()} #${item.id_pengajuan}`}
-									</h3>
-									<p class="text-blue-100">
-										{m['common.date']()}: {formatDate(
-											type === 'permohonan' ? item.tgl_permohonan : item.tgl_pengajuan
-										)}
-									</p>
-								</div>
-								<div>
-									<span
-										class="inline-flex items-center gap-2 rounded-full border-2 px-6 py-2 text-base font-bold {getStatusColor(
-											item.status
-										)}"
-									>
-										<span class="h-2 w-2 rounded-full bg-current"></span>
-										{item.status}
-									</span>
-								</div>
-							</div>
+						<div>
+							<h3 class="text-2xl font-bold">
+								{isPermohonan(item)
+									? `Permohonan #${item.no_pendaftaran || item.id_permohonan}`
+									: `Keberatan #${item.no_pendaftaran || item.id_pengajuan}`}
+							</h3>
+							<p class="opacity-80">{item.formatted_date}</p>
+						</div>
+						<span
+							class="rounded-full px-6 py-2 text-sm font-bold ring-2 ring-white/30 {item.status_color}"
+						>
+							{item.status_label_display}
+						</span>
+					</div>
+
+					<div class="grid grid-cols-1 gap-8 p-8 md:grid-cols-2">
+						<div class="space-y-4">
+							<h4 class="text-xs font-bold tracking-widest text-slate-400 uppercase">
+								Detail Informasi
+							</h4>
+							<p class="text-lg font-medium text-slate-800 dark:text-white">
+								{isPermohonan(item) ? item.rincian : item.kasus}
+							</p>
+
+							{#if !isPermohonan(item) && item.alasan_pengajuan}
+								<ul class="list-inside list-disc text-slate-600 dark:text-slate-400">
+									{#each item.alasan_pengajuan as alasan}
+										<li>{alasan.alasan}</li>
+									{/each}
+								</ul>
+							{/if}
 						</div>
 
-						<!-- Body -->
-						<div class="p-6">
-							<div class="space-y-4">
-								<div>
-									<label class="mb-1 block text-sm font-semibold text-gray-600 dark:text-gray-400">
-										{type === 'permohonan'
-											? m['layanan_pages.detail_info']()
-											: m['form.objection_reason']()}
-									</label>
-									<p class="text-lg text-gray-800 dark:text-white">
-										{type === 'permohonan' ? item.rincian : item.alasan_keberatan}
-									</p>
-								</div>
+						<div class="space-y-4 rounded-2xl bg-slate-50 p-6 dark:bg-slate-700/50">
+							<h4 class="text-xs font-bold text-ppid-primary uppercase">Tanggapan PPID</h4>
+							<p class="text-slate-700 italic dark:text-slate-300">
+								"{isPermohonan(item)
+									? item.jawaban || item.keterangan || 'Menunggu verifikasi...'
+									: item.feedback || 'Sedang diproses...'}"
+							</p>
 
-								{#if item.tgl_selesai}
-									<div>
-										<label
-											class="mb-1 block text-sm font-semibold text-gray-600 dark:text-gray-400"
-										>
-											{m['form.completion_date']()}
-										</label>
-										<p class="text-lg text-gray-800 dark:text-white">
-											{formatDate(item.tgl_selesai)}
-										</p>
-									</div>
-								{/if}
-
-								<div>
-									<label class="mb-1 block text-sm font-semibold text-gray-600 dark:text-gray-400">
-										{type === 'permohonan' ? m['form.remarks']() : m['form.answer']()}
-									</label>
-									<p
-										class="rounded-lg bg-blue-50 p-4 text-gray-700 dark:bg-slate-700 dark:text-gray-300"
+							{#if item.file}
+								<div class="mt-4 border-t border-slate-200 pt-4 dark:border-slate-600">
+									<a
+										href="{PUBLIC_API_URL}/public/informasi/download/{isPermohonan(item)
+											? item.id_permohonan
+											: item.id_pengajuan}"
+										target="_blank"
+										class="inline-flex items-center gap-2 rounded-xl bg-ppid-primary px-5 py-2.5 text-sm font-bold text-white hover:bg-ppid-primary-dark"
 									>
-										{type === 'permohonan' ? item.keterangan : item.jawaban}
-									</p>
+										Unduh Lampiran Jawaban
+									</a>
 								</div>
-
-								{#if item.file_url}
-									<div class="mt-4">
-										<a
-											href={item.file_url}
-											target="_blank"
-											class="inline-flex items-center gap-2 rounded-lg bg-ppid-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-ppid-primary-dark"
-										>
-											<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-												<path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													stroke-width="2"
-													d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-												/>
-											</svg>
-											{m['form.download_response']()}
-										</a>
-									</div>
-								{/if}
-							</div>
+							{/if}
 						</div>
 					</div>
-				{/each}
-			</div>
+				</article>
+			{/each}
 		</div>
 	</section>
 {/if}
 
 <Footer />
-
-<style>
-	[x-cloak] {
-		display: none !important;
-	}
-</style>

@@ -174,7 +174,7 @@
 
 			<a
 				href="/admin/data-sop/create"
-				class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-ppid-primary to-ppid-primary-light px-4 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:from-ppid-primary-light hover:to-ppid-primary hover:shadow-lg"
+				class="inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-ppid-primary to-ppid-primary-light px-4 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:from-ppid-primary-light hover:to-ppid-primary hover:shadow-lg"
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"

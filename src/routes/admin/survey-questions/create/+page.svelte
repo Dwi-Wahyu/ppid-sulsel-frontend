@@ -217,7 +217,7 @@
 						<button
 							type="submit"
 							disabled={isSaving}
-							class="transform rounded-lg bg-gradient-to-r from-ppid-primary to-[#2A4A7E] px-8 py-3 font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:from-[#2A4A7E] hover:to-ppid-primary hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
+							class="transform rounded-lg bg-linear-to-r from-ppid-primary to-[#2A4A7E] px-8 py-3 font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:from-[#2A4A7E] hover:to-ppid-primary hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
 						>
 							{isSaving ? 'Menyimpan...' : 'Simpan Pertanyaan'}
 						</button>

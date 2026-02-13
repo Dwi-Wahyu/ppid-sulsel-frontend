@@ -157,7 +157,7 @@
 			>
 				<div class="overflow-x-auto">
 					<table class="w-full border-collapse text-left">
-						<thead class="bg-blue-700 text-white">
+						<thead class="bg-ppid-primary text-white">
 							<tr>
 								<th scope="col" class="w-16 px-6 py-4 text-center text-sm font-semibold">No</th>
 								<th scope="col" class="px-6 py-4 text-sm font-semibold"

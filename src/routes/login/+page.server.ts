@@ -16,8 +16,17 @@ const schema = object({
 // Set true untuk melewati verifikasi reCAPTCHA saat development
 const SKIP_RECAPTCHA_IN_DEV = true;
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ locals }) => {
 	const form = await superValidate(yup(schema));
+
+	// if (locals.user) {
+	// 	if (locals.user.id_skpd === null) {
+	// 		throw redirect(303, '/admin/dashboard');
+	// 	} else {
+	// 		throw redirect(303, '/opd/dashboard');
+	// 	}
+	// }
+
 	return { form };
 };
 
@@ -33,13 +42,6 @@ export const actions: Actions = {
 		try {
 			// === 1. Verifikasi reCAPTCHA ===
 			const recaptchaResponse = formData.get('g-recaptcha-response');
-
-			// Debugging log (bisa dihapus di production)
-			if (dev) {
-				console.log('=== LOGIN ATTEMPT ===');
-				console.log('User:', form.data.username);
-				console.log('Skip reCAPTCHA:', SKIP_RECAPTCHA_IN_DEV);
-			}
 
 			if (dev && SKIP_RECAPTCHA_IN_DEV) {
 				console.warn('⚠️ reCAPTCHA verification SKIPPED in development mode');
@@ -82,41 +84,52 @@ export const actions: Actions = {
 				}
 			});
 
+			// Sesuaikan destructuring dengan format JSON dari Laravel Anda
 			const result = await loginRes.json();
 
-			// Jika login gagal (status tidak 200-299)
 			if (!loginRes.ok || !result.token) {
-				console.error('Login API Error:', result);
 				form.errors._errors = [result.message || 'Username atau password salah'];
-				// Hapus password dari form yang dikembalikan untuk keamanan
 				form.data.password = '';
 				return fail(401, { form });
 			}
 
-			// === 3. Set Cookie & Redirect ===
-			const maxAge = form.data.remember ? 60 * 60 * 24 * 30 : 60 * 60 * 24;
+			const { access_token, refresh_token } = result.token;
+			const user = result.user;
 
-			cookies.set('access_token', result.token, {
+			// Simpan Access Token
+			cookies.set('access_token', access_token, {
 				path: '/',
 				httpOnly: true,
 				sameSite: 'lax',
-				secure: !dev, // False di localhost, True di production (HTTPS)
-				maxAge
+				secure: !dev,
+				maxAge: 60 * 60
 			});
 
-			// Cek role/skpd user untuk redirect
-			const user = result.user;
+			// Simpan Refresh Token
+			cookies.set('refresh_token', refresh_token, {
+				path: '/',
+				httpOnly: true,
+				sameSite: 'lax',
+				secure: !dev,
+				maxAge: 60 * 60 * 24 * 7
+			});
 
-			// === Throw Redirect di sini ===
+			// Simpan data user agar Hooks tidak perlu fetch di setiap klik
+			cookies.set('user_data', JSON.stringify(user), {
+				path: '/',
+				httpOnly: true,
+				sameSite: 'lax',
+				secure: !dev,
+				maxAge: 60 * 60 * 8
+			});
+
+			// Redirect berdasarkan Role
 			if (user.id_skpd === null) {
 				throw redirect(303, '/admin/dashboard');
 			} else {
 				throw redirect(303, '/opd/dashboard');
 			}
 		} catch (error) {
-			// === PERBAIKAN KRUSIAL DI SINI ===
-			// SvelteKit menggunakan throw untuk redirect.
-			// Kita harus menangkapnya dan melemparnya kembali agar navigasi terjadi.
 			if (isRedirect(error)) {
 				throw error;
 			}

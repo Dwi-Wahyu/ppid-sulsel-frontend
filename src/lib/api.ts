@@ -32,7 +32,7 @@ export const apiFetch = async (endpoint: string, options: any = {}) => {
 
 		// Tangani sesi expired secara global
 		if (response.status === 401) {
-			window.location.href = '/auth/login?error=session_expired';
+			window.location.href = '/login?error=session_expired';
 			return;
 		}
 

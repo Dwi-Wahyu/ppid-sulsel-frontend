@@ -4,7 +4,7 @@
 	let { children } = $props();
 </script>
 
-<div class="flex h-screen overflow-hidden bg-page-bg">
+<div class="flex h-screen overflow-hidden bg-page-bg dark:bg-slate-900/80">
 	<OpdSidebar />
 	<main class="relative flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
 		<AdminHeader />

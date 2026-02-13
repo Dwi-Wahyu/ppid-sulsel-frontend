@@ -89,7 +89,7 @@
 			</p>
 		</div>
 		<div class="flex flex-wrap gap-3">
-			<div class="relative min-w-[240px]">
+			<div class="relative min-w-60">
 				<input
 					type="text"
 					bind:value={search}
@@ -153,6 +153,7 @@
 								<td class="px-6 py-5 text-right">
 									<div class="flex justify-end gap-2">
 										<a
+											title="Edit Informasi Publik"
 											href="/admin/daftar-informasi-publik/{item.id}/edit"
 											class="rounded-xl bg-blue-50 p-2.5 text-blue-600 transition-all hover:bg-blue-600 hover:text-white dark:bg-blue-900/20"
 										>
@@ -174,6 +175,7 @@
 												idToDelete = item.id;
 												showDeleteConfirm = true;
 											}}
+											title="Hapus Informasi Publik"
 											class="rounded-xl bg-red-50 p-2.5 text-red-600 transition-all hover:bg-red-600 hover:text-white dark:bg-red-900/20"
 										>
 											<svg

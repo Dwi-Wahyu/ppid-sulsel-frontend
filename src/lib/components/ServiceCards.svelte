@@ -37,7 +37,7 @@
 					>
 						<!-- Hover Accent Line -->
 						<div
-							class="absolute top-0 left-0 h-1 w-full scale-x-0 bg-gradient-to-r from-transparent via-ppid-accent to-transparent transition-transform duration-500 group-hover:scale-x-100"
+							class="absolute top-0 left-0 h-1 w-full scale-x-0 bg-linear-to-r from-transparent via-ppid-accent to-transparent transition-transform duration-500 group-hover:scale-x-100"
 						></div>
 
 						<div class="relative z-10 flex h-full flex-row gap-4 md:flex-col md:gap-0">

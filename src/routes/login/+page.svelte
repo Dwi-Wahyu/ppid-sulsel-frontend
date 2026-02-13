@@ -3,6 +3,10 @@
 	import type { PageData } from './$types';
 	import { onMount } from 'svelte';
 	import { PUBLIC_RECAPTCHA_SITE_KEY } from '$env/static/public';
+	import { dev } from '$app/environment';
+	import { page } from '$app/state';
+
+	const error = $derived(page.url.searchParams.get('error'));
 
 	let { data }: { data: PageData } = $props();
 
@@ -13,42 +17,27 @@
 
 	// Setup Superforms
 	const { form, errors, enhance, delayed, message } = superForm(data.form, {
-		// Reset error recaptcha saat form mulai submit
 		onSubmit: ({ cancel }) => {
 			recaptchaError = null;
 
-			// Cek reCAPTCHA di sisi klien sebelum kirim ke server
-			const recaptchaResponse = (window as any).grecaptcha?.getResponse();
-
-			// Opsional: Anda bisa skip cek ini di local dev jika mau,
-			// tapi lebih aman dibiarkan aktif di UI.
-			if (!recaptchaResponse) {
-				// Cek apakah kita di mode dev (opsional, sesuaikan kebutuhan)
-				// Jika ingin strict validation di client:
-				const isDev = window.location.hostname === 'localhost';
-				// Jika di localhost dan Anda ingin skip validasi client-side:
-				// if (!isDev) { ... }
-
-				// Default behavior: Wajib isi
-				cancel();
-				recaptchaError = 'Silakan selesaikan verifikasi reCAPTCHA terlebih dahulu';
-				return;
+			// Validasi reCAPTCHA hanya dilakukan jika BUKAN mode dev
+			if (!dev) {
+				const recaptchaResponse = (window as any).grecaptcha?.getResponse();
+				if (!recaptchaResponse) {
+					cancel();
+					recaptchaError = 'Silakan selesaikan verifikasi reCAPTCHA terlebih dahulu';
+					return;
+				}
 			}
-		},
-		// Bersihkan password jika ada error dari server (security best practice)
-		onError: () => {
-			// Optional logic
 		}
 	});
 
-	// Callback global untuk reCAPTCHA script
-	if (typeof window !== 'undefined') {
+	onMount(() => {
+		// Daftarkan callback global agar bisa dipanggil oleh script reCAPTCHA
 		(window as any).onRecaptchaLoad = () => {
 			recaptchaLoaded = true;
 		};
-	}
 
-	onMount(() => {
 		if ((window as any).grecaptcha) {
 			recaptchaLoaded = true;
 		}
@@ -297,15 +286,17 @@
 						{/if}
 					</div>
 
-					<div class="space-y-2">
-						<div
-							class="g-recaptcha flex justify-center"
-							data-sitekey={PUBLIC_RECAPTCHA_SITE_KEY}
-						></div>
-						{#if recaptchaError}
-							<p class="text-center text-sm text-ppid-error">{recaptchaError}</p>
-						{/if}
-					</div>
+					{#if !dev}
+						<div class="space-y-2">
+							<div
+								class="g-recaptcha flex justify-center"
+								data-sitekey={PUBLIC_RECAPTCHA_SITE_KEY}
+							></div>
+							{#if recaptchaError}
+								<p class="text-center text-sm text-ppid-error">{recaptchaError}</p>
+							{/if}
+						</div>
+					{/if}
 
 					<label class="group flex cursor-pointer items-center">
 						<input
@@ -335,6 +326,10 @@
 					>
 						{$delayed ? 'MEMPROSES...' : 'MASUK SEKARANG'}
 					</button>
+
+					{#if error === 'session_expired'}
+						<p class="text-red-500">Session kamu sudah expired, silakan login kembali.</p>
+					{/if}
 
 					<div class="mt-8 border-t border-gray-100 pt-6 text-center lg:hidden">
 						<p class="text-xs text-gray-400">

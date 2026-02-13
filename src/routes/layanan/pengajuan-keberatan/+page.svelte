@@ -9,15 +9,9 @@
 	// Superforms
 	import { superForm } from 'sveltekit-superforms/client';
 	import type { PageData } from './$types';
-	import { untrack } from 'svelte';
 
 	// Props dari server
 	let { data }: { data: PageData } = $props();
-
-	// Ambil daftar provinsi unik dari data domisili
-	const provinsiOptions = [...new Set(data.domisiliOptions.map((item: any) => item.provinsi))].map(
-		(prov) => ({ value: prov, label: prov })
-	);
 
 	// Inisialisasi Superform
 	const { form, errors, enhance, delayed, message } = superForm(data.form, {
@@ -30,31 +24,7 @@
 		}
 	});
 
-	// Gunakan $derived untuk memfilter kota berdasarkan provinsi yang dipilih di form
-	// Kita hubungkan dengan $form.state_pemohon (sesuai input hidden yang Anda miliki)
-	let filteredDomisili = $derived(
-		$form.state_pemohon
-			? data.domisiliOptions.filter((item: any) => item.provinsi === $form.state_pemohon)
-			: []
-	);
-
-	$effect(() => {
-		// Kita ingin effect ini HANYA bereaksi saat provinsi (state_pemohon) berubah
-		const selectedProvince = $form.state_pemohon;
-
-		// Gunakan untrack untuk operasi pengecekan dan perubahan kota
-		untrack(() => {
-			if (selectedProvince) {
-				// Cek apakah kota yang sekarang dipilih masih ada di dalam daftar kota provinsi baru
-				const isValid = filteredDomisili.some((opt: any) => opt.value === $form.city_pemohon);
-
-				// Jika tidak valid (atau kota belum dipilih), reset ke kosong
-				if (!isValid && $form.city_pemohon !== '') {
-					$form.city_pemohon = '';
-				}
-			}
-		});
-	});
+	$inspect($errors);
 
 	let isInstansi = $state<boolean>(false);
 	let showSuccessModal = $state<boolean>(false);
@@ -94,7 +64,6 @@
 
 				<form method="POST" use:enhance class="space-y-8" id="keberatanForm">
 					<input type="text" name="website" class="hidden" bind:value={$form.website} />
-					<input type="hidden" name="state_pemohon" bind:value={$form.state_pemohon} />
 
 					<div
 						class="space-y-6 rounded-2xl border border-gray-100 bg-linear-to-br from-white to-gray-50/50 p-6 dark:border-slate-700 dark:from-slate-800 dark:to-slate-800/50"
@@ -170,14 +139,14 @@
 								</h1>
 								<SearchableSelect
 									options={data.pekerjaanOptions}
-									bind:value={$form.pekerjaan_pemohon}
-									name="pekerjaan_pemohon"
+									bind:value={$form.pekerjaan_id}
+									name="pekerjaan_id"
 									placeholder={m['form.job_placeholder']()}
 									idKey="value"
 									labelKey="label"
 								/>
-								{#if $errors.pekerjaan_pemohon}<span class="text-xs text-red-500"
-										>{$errors.pekerjaan_pemohon}</span
+								{#if $errors.pekerjaan_id}<span class="text-xs text-red-500"
+										>{$errors.pekerjaan_id}</span
 									>{/if}
 							</div>
 						</div>
@@ -185,45 +154,26 @@
 						<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 							<div class="space-y-2">
 								<h1 class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									Provinsi <span class="text-red-500">*</span>
+									{m['form.domicile']()} <span class="text-red-500">*</span>
 								</h1>
 								<SearchableSelect
-									options={provinsiOptions}
-									bind:value={$form.state_pemohon}
-									name="state_pemohon"
-									placeholder="Pilih Provinsi..."
-									idKey="value"
-									labelKey="label"
-								/>
-								{#if $errors.state_pemohon}<span class="text-xs text-red-500"
-										>{$errors.state_pemohon}</span
-									>{/if}
-							</div>
-
-							<div class="space-y-2">
-								<h1 class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									{m['form.domicile']()} (Kab/Kota) <span class="text-red-500">*</span>
-								</h1>
-								<SearchableSelect
-									options={filteredDomisili}
-									bind:value={$form.city_pemohon}
-									name="city_pemohon"
-									placeholder={$form.state_pemohon
+									options={data.domisiliOptions}
+									bind:value={$form.pemohon_domisili_id}
+									name="pemohon_domisili_id"
+									placeholder={$form.pemohon_domisili_id
 										? m['form.domicile_placeholder']()
 										: 'Pilih provinsi terlebih dahulu'}
 									idKey="value"
 									labelKey="label"
 								/>
-								{#if $errors.city_pemohon}<span class="text-xs text-red-500"
-										>{$errors.city_pemohon}</span
+								{#if $errors.pemohon_domisili_id}<span class="text-xs text-red-500"
+										>{$errors.pemohon_domisili_id}</span
 									>{/if}
 							</div>
-						</div>
 
-						<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 							<div class="space-y-2">
 								<h1 class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-									{m['contact.address']()} <span class="text-red-500">*</span>
+									{m['objection.address']()} <span class="text-red-500">*</span>
 								</h1>
 								<input
 									type="text"
@@ -284,6 +234,24 @@
 									/>
 								</div>
 							</div>
+
+							<div class="space-y-2">
+								<h1 class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+									{m['objection.domicile_proxy']()}
+								</h1>
+								<SearchableSelect
+									options={data.domisiliOptions}
+									bind:value={$form.kuasa_domisili_id}
+									name="kuasa_domisili_id"
+									placeholder={m['form.domicile_placeholder']()}
+									idKey="value"
+									labelKey="label"
+								/>
+								{#if $errors.kuasa_domisili_id}<span class="text-xs text-red-500"
+										>{$errors.kuasa_domisili_id}</span
+									>{/if}
+							</div>
+
 							<div class="space-y-2">
 								<h1 class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
 									{m['contact.address']()} (Kuasa)

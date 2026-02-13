@@ -186,7 +186,7 @@
 				</div>
 				<button
 					type="submit"
-					class="inline-flex items-center gap-1 rounded-xl bg-gradient-to-r from-ppid-primary to-[#2A4A7E] px-6 py-2.5 font-semibold text-white shadow-md transition-all hover:from-[#2A4A7E] hover:to-ppid-primary hover:shadow-lg"
+					class="inline-flex items-center gap-1 rounded-xl bg-linear-to-r from-ppid-primary to-[#2A4A7E] px-6 py-2.5 font-semibold text-white shadow-md transition-all hover:from-[#2A4A7E] hover:to-ppid-primary hover:shadow-lg"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -224,7 +224,7 @@
 			<div class="overflow-x-auto">
 				<table class="w-full">
 					<thead>
-						<tr class="bg-gradient-to-r from-ppid-primary to-[#2A4A7E] text-white">
+						<tr class="bg-linear-to-r from-ppid-primary to-[#2A4A7E] text-white">
 							<th class="px-6 py-4 text-left text-sm font-semibold">Kode Survey</th>
 							<th class="px-6 py-4 text-left text-sm font-semibold">Nama</th>
 							<th class="px-6 py-4 text-left text-sm font-semibold">Email</th>

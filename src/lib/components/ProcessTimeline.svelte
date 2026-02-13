@@ -39,7 +39,7 @@
 			<div class="relative grid grid-cols-1 gap-8 sm:gap-10 md:grid-cols-4 md:gap-8">
 				<!-- Connecting Line -->
 				<div
-					class="absolute top-16 right-0 left-0 hidden h-1 bg-gradient-to-r from-ppid-primary/10 via-ppid-accent/20 to-ppid-primary/10 md:block dark:from-white/5 dark:via-ppid-accent/20 dark:to-white/5"
+					class="absolute top-16 right-0 left-0 hidden h-1 bg-linear-to-r from-ppid-primary/10 via-ppid-accent/20 to-ppid-primary/10 md:block dark:from-white/5 dark:via-ppid-accent/20 dark:to-white/5"
 					style="width: calc(100% - 8rem); left: 4rem;"
 				></div>
 
@@ -53,14 +53,14 @@
 								<div class="shrink-0">
 									<!-- Number Badge - Desktop only -->
 									<div
-										class="absolute -top-4 -left-4 z-10 hidden h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br {s.col} text-xl font-bold text-white shadow-lg md:flex"
+										class="absolute -top-4 -left-4 z-10 hidden h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br {s.col} text-xl font-bold text-white shadow-lg md:flex"
 									>
 										{s.n}
 									</div>
 
 									<!-- Icon Badge -->
 									<div
-										class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br {s.col} text-white shadow-md transition-transform group-hover:scale-110 md:mb-6 md:h-16 md:w-16"
+										class="flex h-12 w-12 items-center justify-center rounded-2xl bg-linear-to-br {s.col} text-white shadow-md transition-transform group-hover:scale-110 md:mb-6 md:h-16 md:w-16"
 									>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"

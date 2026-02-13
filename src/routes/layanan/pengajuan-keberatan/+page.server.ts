@@ -1,9 +1,9 @@
 import { superValidate } from 'sveltekit-superforms/server';
 import { yup, zod } from 'sveltekit-superforms/adapters';
 import { fail } from '@sveltejs/kit';
-import { keberatanSchema } from '$lib/schemas/keberatan';
 import { API_URL } from '$env/static/private';
 import { PUBLIC_API_URL } from '$env/static/public';
+import { keberatanSchema } from '$lib/schemas/keberatan.js';
 
 export const load = async ({ fetch }) => {
 	const form = await superValidate(yup(keberatanSchema));
@@ -62,17 +62,17 @@ export const actions = {
 			console.log(response);
 
 			if (!response.ok) {
-				// Jika Laravel mengembalikan error validasi 422
 				if (response.status === 422 && result.errors) {
-					// Mapping error Laravel ke field form
-					Object.keys(result.errors).forEach((key) => {
-						// Handle array errors seperti alasan.0 -> alasan
-						const fieldName = key.split('.')[0] as keyof typeof form.data;
-						form.errors[fieldName] = result.errors[key];
+					// Gunakan setError agar Superforms tahu ini error resmi
+					Object.entries(result.errors).forEach(([key, messages]) => {
+						const field = key.split('.')[0];
+						// @ts-ignore
+						setError(form, field, messages[0]);
 					});
 					return fail(422, { form });
 				}
-				return fail(response.status, { form, message: result.message || 'Terjadi kesalahan' });
+				// Jika ada pesan error umum dari backend
+				return fail(400, { form, message: result.message || 'Gagal menyimpan data' });
 			}
 
 			return { form, success: true, message: result.message };

@@ -9,17 +9,11 @@
 	// State untuk input pencarian
 	let searchQuery = $state('');
 
-	// Sinkronisasi searchQuery dengan data dari URL (prop data)
 	// Ini memastikan jika user klik "Back" atau "Clear", input ikut ter-update
 	$effect(() => {
 		searchQuery = data.matriksData.filters.search || '';
 	});
 
-	/** * REAKTIVITAS:
-	 * Kita harus mengakses `data.matriksData` secara langsung di dalam $derived.
-	 * Jika kita membuat `const matriksData = data.matriksData` di luar sini,
-	 * referensi tersebut akan "stuck" pada objek data yang lama.
-	 */
 	let matriks = $derived(data.matriksData.data.data);
 	let pagination = $derived(data.matriksData.data);
 	let filters = $derived(data.matriksData.filters);
@@ -51,7 +45,11 @@
 >
 	<div class="container mx-auto px-4 py-6">
 		<nav class="mb-4 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-			<a href="/" class="transition-colors hover:text-ppid-primary dark:text-white">
+			<a
+				href="/"
+				title="Kembali ke beranda"
+				class="transition-colors hover:text-ppid-primary dark:text-white"
+			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					width="16"
@@ -176,15 +174,20 @@
 						<tbody class="divide-y divide-gray-100 dark:divide-slate-700">
 							{#each matriks as item, i (item.id)}
 								<tr class="transition-colors hover:bg-ppid-primary/5 dark:hover:bg-slate-700/50">
-									<td class="px-4 py-4 text-sm font-medium">
+									<td class="px-4 py-4 text-sm font-medium text-gray-600 dark:text-gray-300">
 										{(pagination.current_page - 1) * pagination.per_page + i + 1}
 									</td>
-									<td class="min-w-[200px] px-4 py-4 text-sm leading-relaxed">{item.a}</td>
-									<td class="min-w-[250px] px-4 py-4 text-sm text-gray-600 dark:text-gray-300"
+									<td
+										class="min-w-50 px-4 py-4 text-sm leading-relaxed text-gray-600 dark:text-gray-300"
+										>{item.a}</td
+									>
+									<td class="min-w-62.5 px-4 py-4 text-sm text-gray-600 dark:text-gray-300"
 										>{item.b}</td
 									>
-									<td class="px-4 py-4 text-sm">{item.c}</td>
-									<td class="px-4 py-4 text-sm whitespace-nowrap">{item.f}</td>
+									<td class="px-4 py-4 text-sm text-gray-600 dark:text-gray-300">{item.c}</td>
+									<td class="px-4 py-4 text-sm whitespace-nowrap text-gray-600 dark:text-gray-300"
+										>{item.f}</td
+									>
 									<td class="px-4 py-4 text-sm">
 										<a
 											href={item.h}

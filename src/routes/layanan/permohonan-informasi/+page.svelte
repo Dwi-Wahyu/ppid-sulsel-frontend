@@ -258,9 +258,7 @@
 				subtitle={m['layanan_pages.permohonan_subtitle']()}
 			/>
 			<div class="hidden md:block">
-				<div
-					class="h-1.5 w-24 rounded-full bg-gradient-to-r from-ppid-primary to-ppid-accent"
-				></div>
+				<div class="h-1.5 w-24 rounded-full bg-linear-to-r from-ppid-primary to-ppid-accent"></div>
 			</div>
 		</div>
 	</div>
@@ -314,13 +312,13 @@
 
 					<!-- Section 1: Data Pribadi -->
 					<div
-						class="space-y-6 rounded-2xl border border-gray-100 bg-gradient-to-br from-white to-gray-50/50 p-6 dark:border-slate-700 dark:from-slate-800 dark:to-slate-800/50"
+						class="space-y-6 rounded-2xl border border-gray-100 bg-linear-to-br from-white to-gray-50/50 p-6 dark:border-slate-700 dark:from-slate-800 dark:to-slate-800/50"
 					>
 						<h3
 							class="flex items-center gap-3 border-b-2 border-ppid-primary/20 pb-4 text-xl font-bold text-ppid-primary dark:text-white"
 						>
 							<div
-								class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-ppid-primary to-ppid-accent text-base font-bold text-white shadow-lg"
+								class="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-ppid-primary to-ppid-accent text-base font-bold text-white shadow-lg"
 							>
 								1
 							</div>
@@ -484,7 +482,7 @@
 								type="file"
 								onchange={(e) => handleFileUpload(e, 'dokumen_pendukung')}
 								accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-								class="block w-full cursor-pointer rounded-lg border border-gray-300 bg-white text-sm text-gray-700 file:mr-4 file:border-0 file:bg-gradient-to-r file:from-ppid-primary/90 file:to-ppid-primary file:px-6 file:py-3 file:text-sm file:font-semibold file:text-white hover:file:from-ppid-primary hover:file:to-ppid-primary/90 focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800 dark:text-gray-300"
+								class="block w-full cursor-pointer rounded-lg border border-gray-300 bg-white text-sm text-gray-700 file:mr-4 file:border-0 file:bg-linear-to-r file:from-ppid-primary/90 file:to-ppid-primary file:px-6 file:py-3 file:text-sm file:font-semibold file:text-white hover:file:from-ppid-primary hover:file:to-ppid-primary/90 focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800 dark:text-gray-300"
 							/>
 							<p class="mt-1 text-xs leading-relaxed text-gray-500">
 								{m['form.supporting_doc_hint']()}
@@ -541,13 +539,13 @@
 
 					<!-- Section 2: Detail Informasi -->
 					<div
-						class="space-y-6 rounded-2xl border border-gray-100 bg-gradient-to-br from-white to-gray-50/50 p-6 dark:border-slate-700 dark:from-slate-800 dark:to-slate-800/50"
+						class="space-y-6 rounded-2xl border border-gray-100 bg-linear-to-br from-white to-gray-50/50 p-6 dark:border-slate-700 dark:from-slate-800 dark:to-slate-800/50"
 					>
 						<h3
 							class="flex items-center gap-3 border-b-2 border-ppid-primary/20 pb-4 text-xl font-bold text-ppid-primary dark:text-white"
 						>
 							<div
-								class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-ppid-primary to-ppid-accent text-base font-bold text-white shadow-lg"
+								class="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-ppid-primary to-ppid-accent text-base font-bold text-white shadow-lg"
 							>
 								2
 							</div>
