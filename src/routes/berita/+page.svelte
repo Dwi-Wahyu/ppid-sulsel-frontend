@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { PUBLIC_API_URL, PUBLIC_BACKEND_URL } from '$env/static/public';
 	import Footer from '$lib/components/Footer.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 
@@ -230,8 +230,10 @@
 								<div class="relative aspect-video overflow-hidden">
 									{#if item.image}
 										<img
-											src={item.image}
-											alt=""
+											src={item.image
+												? `${PUBLIC_BACKEND_URL}/uploads/berita/${item.image}`
+												: '/img/placeholder-news.jpg'}
+											alt={item.title}
 											role="presentation"
 											class="size-full object-cover transition-transform duration-500 group-hover:scale-105"
 										/>

@@ -4,6 +4,7 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { env } from '$env/dynamic/public';
 	import SearchModal from './SearchModal.svelte';
+	import { PUBLIC_API_URL, PUBLIC_BACKEND_URL } from '$env/static/public';
 
 	// Define types based on Laravel API contract
 	interface SlideBanner {
@@ -20,9 +21,6 @@
 		data: SlideBanner[];
 	}
 
-	// Get Backend URL from env, fallback to localhost:8000
-	const BACKEND_URL = env.PUBLIC_BACKEND_URL || 'http://localhost:8000';
-
 	// State management
 	let slides = $state<string[]>([]);
 	let activeSlide = $state(0);
@@ -37,12 +35,7 @@
 	// Fetch banners from API
 	async function fetchBanners() {
 		try {
-			// const res = await fetch(`${BACKEND_URL}/api/public/slide-banner`);
-			// Kita jalankan fetch dan delay secara paralel
-			const [res] = await Promise.all([
-				fetch(`${BACKEND_URL}/api/public/slide-banner`),
-				delay(1500) // Banner akan pulsing minimal selama 1.5 detik
-			]);
+			const [res] = await Promise.all([fetch(`${PUBLIC_API_URL}/public/slide-banner`)]);
 			const json: ApiResponse = await res.json();
 
 			if (json.success && json.data) {
@@ -50,7 +43,9 @@
 				const activeSlides = json.data.filter((s) => s.is_active).sort((a, b) => a.order - b.order);
 
 				// Transform filename to full URL
-				slides = activeSlides.map((s) => `${BACKEND_URL}/uploads/slide-banner/${s.nm_slide}`);
+				slides = activeSlides.map(
+					(s) => `${PUBLIC_BACKEND_URL}/uploads/slide-banner/${s.nm_slide}`
+				);
 			}
 		} catch (e) {
 			console.error('Failed to fetch banners:', e);

@@ -3,6 +3,7 @@
 	import { env } from '$env/dynamic/public';
 	import * as m from '$lib/paraglide/messages.js';
 	import { fade } from 'svelte/transition';
+	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
 	// Types
 	interface NewsItem {
@@ -90,7 +91,7 @@
 						<div class="relative aspect-video overflow-hidden">
 							<img
 								src={item.image
-									? `${env.PUBLIC_API_URL.replace('/api', '')}/storage/berita/${item.image}`
+									? `${PUBLIC_BACKEND_URL}/uploads/berita/${item.image}`
 									: '/img/placeholder-news.jpg'}
 								alt={item.title}
 								class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"

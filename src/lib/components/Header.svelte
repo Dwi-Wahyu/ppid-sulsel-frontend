@@ -3,11 +3,11 @@
 	import { fly, fade, slide } from 'svelte/transition';
 	import * as m from '$lib/paraglide/messages.js';
 	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
-	import { env } from '$env/dynamic/public';
 	import SearchModal from './SearchModal.svelte';
 	import Sosmed from './Sosmed.svelte';
 	import { theme } from '$lib/state/theme.svelte';
 	import { afterNavigate } from '$app/navigation';
+	import { PUBLIC_API_URL } from '$env/static/public';
 
 	// State
 	let mobileMenu = $state(false);
@@ -52,8 +52,6 @@
 		waktu: string;
 	}
 
-	const BACKEND_URL = env.PUBLIC_BACKEND_URL || 'http://localhost:8000';
-
 	// Variabel di luar fungsi komponen bertindak sebagai cache sederhana
 	let cachedKategori: Kategori[] | null = null;
 	let cachedTahun: TahunInfo[] | null = null;
@@ -77,8 +75,8 @@
 			}
 
 			const [resKategori, resTahun] = await Promise.all([
-				fetch(`${BACKEND_URL}/api/public/informasi/kategori`),
-				fetch(`${BACKEND_URL}/api/public/informasi/tahun`)
+				fetch(`${PUBLIC_API_URL}/public/informasi/kategori`),
+				fetch(`${PUBLIC_API_URL}/public/informasi/tahun`)
 			]);
 
 			const resultKat = await resKategori.json();
