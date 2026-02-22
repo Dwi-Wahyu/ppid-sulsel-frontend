@@ -130,8 +130,8 @@
 				class="border-b border-slate-100 bg-slate-50 text-xs text-slate-500 uppercase dark:border-slate-700 dark:bg-slate-700/50 dark:text-slate-400"
 			>
 				<tr>
-					<th scope="col" class="px-6 py-3">ID SKPD</th>
 					<th scope="col" class="px-6 py-3">Nama SKPD</th>
+					<th scope="col" class="px-6 py-3">Username</th>
 					<th scope="col" class="px-6 py-3">Email</th>
 					<th scope="col" class="px-6 py-3">Jenis</th>
 					<th scope="col" class="px-6 py-3">Status</th>
@@ -143,7 +143,7 @@
 					<tr
 						class="border-b border-slate-100 bg-white transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700/30"
 					>
-						<td class="px-6 py-4 font-medium text-slate-900 dark:text-slate-100">{skpd.id_skpd}</td>
+						<td class="px-6 py-4 font-medium text-slate-900 dark:text-slate-100">{skpd.nm_skpd}</td>
 						<td class="px-6 py-4 font-medium text-slate-900 dark:text-slate-100">{skpd.nm_skpd}</td>
 						<td class="px-6 py-4">{skpd.email || '-'}</td>
 						<td class="px-6 py-4">

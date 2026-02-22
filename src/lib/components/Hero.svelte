@@ -32,10 +32,17 @@
 	let isLoading = $state(true);
 	let searchModalOpen = $state(false);
 
+	const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
 	// Fetch banners from API
 	async function fetchBanners() {
 		try {
-			const res = await fetch(`${BACKEND_URL}/api/public/slide-banner`);
+			// const res = await fetch(`${BACKEND_URL}/api/public/slide-banner`);
+			// Kita jalankan fetch dan delay secara paralel
+			const [res] = await Promise.all([
+				fetch(`${BACKEND_URL}/api/public/slide-banner`),
+				delay(1500) // Banner akan pulsing minimal selama 1.5 detik
+			]);
 			const json: ApiResponse = await res.json();
 
 			if (json.success && json.data) {
@@ -43,7 +50,7 @@
 				const activeSlides = json.data.filter((s) => s.is_active).sort((a, b) => a.order - b.order);
 
 				// Transform filename to full URL
-				slides = activeSlides.map((s) => `${BACKEND_URL}/storage/slide-banner/${s.nm_slide}`);
+				slides = activeSlides.map((s) => `${BACKEND_URL}/uploads/slide-banner/${s.nm_slide}`);
 			}
 		} catch (e) {
 			console.error('Failed to fetch banners:', e);
@@ -120,15 +127,13 @@
 	id="hero-banner"
 	aria-roledescription="carousel"
 	aria-label="Hero Banner Slideshow"
-	class="group relative z-10 mt-24 block h-[50vh] w-full overflow-hidden font-['Plus_Jakarta_Sans'] sm:mt-32 sm:h-[85vh] md:mt-40 md:h-screen"
+	class="group relative z-10 mt-16 block h-[50vh] w-full overflow-hidden font-['Plus_Jakarta_Sans'] sm:mt-32 sm:h-[85vh] md:mt-40 md:h-screen"
 	onmouseenter={stopTimer}
 	onmouseleave={startTimer}
 >
 	{#if isLoading}
-		<div class="flex h-full w-full items-center justify-center bg-slate-50 dark:bg-slate-900">
-			<div
-				class="h-12 w-12 animate-spin rounded-full border-4 border-ppid-accent border-t-transparent"
-			></div>
+		<div class="relative h-full w-full bg-slate-200 dark:bg-slate-800">
+			<div class="absolute inset-0 animate-pulse bg-slate-300 dark:bg-slate-700"></div>
 		</div>
 	{:else}
 		<div
@@ -146,8 +151,8 @@
 				>
 					<img
 						src={slide}
-						class="pointer-events-none absolute inset-0 h-full w-full bg-white object-cover object-center md:object-contain dark:bg-slate-800"
-						alt={index}
+						class="pointer-events-none absolute inset-0 h-full w-full bg-white object-cover object-center dark:bg-slate-800"
+						alt={index.toString()}
 					/>
 					<div
 						class="pointer-events-none absolute inset-0 bg-linear-to-t from-ppid-primary/90 via-ppid-primary/40 to-transparent"
@@ -166,7 +171,7 @@
 						out:fade={{ duration: 300 }}
 						class="mx-auto flex max-w-6xl flex-col items-center justify-center gap-4 md:gap-6 lg:gap-12"
 					>
-						<div class="flex items-center justify-center gap-6 md:hidden">
+						<div class="hidden items-center justify-center gap-6 md:flex">
 							<img
 								src="/images/logo-sulsel.png"
 								alt="Logo Sulawesi Selatan"
@@ -190,14 +195,14 @@
 
 							<div class="max-w-3xl flex-1">
 								<h1
-									class="mb-1.5 text-xs leading-tight font-bold text-white drop-shadow-lg sm:mb-4 sm:text-2xl md:text-4xl lg:text-5xl"
+									class="mb-1.5 leading-tight font-bold text-white drop-shadow-lg sm:mb-4 sm:text-2xl md:text-4xl lg:text-5xl"
 								>
 									{m['hero.welcome']()}<br />
 									<span class="text-ppid-accent">{m['hero.ppid_main']()}</span><br />
 									{m['hero.province']()}
 								</h1>
 								<p
-									class="mb-2 text-[10px] leading-tight font-medium text-white/90 drop-shadow-md sm:mb-6 sm:text-sm md:mb-8 md:text-lg lg:text-xl"
+									class="mb-2 leading-tight font-medium text-white/90 drop-shadow-md sm:mb-6 sm:text-sm md:mb-8 md:text-lg lg:text-xl"
 								>
 									{m['hero.tagline']()}
 								</p>
@@ -253,14 +258,14 @@
 
 						<div class="max-w-3xl flex-1 md:hidden">
 							<h1
-								class="mb-1.5 text-xs leading-tight font-bold text-white drop-shadow-lg sm:mb-4 sm:text-2xl"
+								class="mb-1.5 text-xl leading-tight font-bold text-white drop-shadow-lg sm:mb-4 sm:text-2xl"
 							>
 								{m['hero.welcome']()}<br />
 								<span class="text-ppid-accent">{m['hero.ppid_main']()}</span><br />
 								{m['hero.province']()}
 							</h1>
 							<p
-								class="mb-2 text-[10px] leading-tight font-medium text-white/90 drop-shadow-md sm:mb-6 sm:text-sm"
+								class="mb-2 text-lg leading-tight font-medium text-white/90 drop-shadow-md sm:mb-6 sm:text-sm"
 							>
 								{m['hero.tagline']()}
 							</p>
@@ -310,7 +315,7 @@
 
 		{#if slides.length > 1}
 			<div
-				class="absolute bottom-6 left-1/2 z-30 flex -translate-x-1/2 space-x-2 sm:bottom-24 md:bottom-28"
+				class="absolute bottom-14 left-1/2 z-30 flex -translate-x-1/2 space-x-2 sm:bottom-24 md:bottom-28"
 			>
 				{#each slides as _, index}
 					<button

@@ -1,77 +1,29 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	// Gunakan helper api yang sudah mendukung Proxy
-	import { api } from '$lib/api';
+	import { enhance } from '$app/forms';
 	import TinyMCE from '$lib/components/TinyMCE.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 
-	interface ProfilData {
-		nm_profil: string;
-		deskripsi: string;
-	}
+	let { data, form } = $props();
 
-	let formData = $state<ProfilData>({
-		nm_profil: 'Profil PPID',
-		deskripsi: ''
+	let formData = $state({
+		nm_profil: data.profil?.nm_profil || 'Profil PPID',
+		deskripsi: data.profil?.deskripsi || ''
 	});
 
-	let currentData = $state<ProfilData>({
-		nm_profil: 'Profil PPID',
-		deskripsi: ''
-	});
-
-	let isLoading = $state(true);
 	let isSaving = $state(false);
-
-	// Notification states
 	let showNotification = $state(false);
 	let notificationType = $state<'success' | 'error'>('success');
 	let notificationMessage = $state('');
 
-	onMount(async () => {
-		try {
-			// Sesuai api.php, endpoint-nya adalah 'profil-ppid'
-			const result = await api.get('/admin/profil-ppid');
-
-			if (result.success && result.data) {
-				formData = {
-					nm_profil: result.data.nm_profil || 'Profil PPID',
-					deskripsi: result.data.deskripsi || ''
-				};
-				currentData = { ...formData };
-			}
-		} catch (error) {
-			console.error('Error fetching profil:', error);
-		} finally {
-			isLoading = false;
+	// Reaktif terhadap hasil form action
+	$effect(() => {
+		if (form) {
+			notificationType = form.success ? 'success' : 'error';
+			notificationMessage = form.message;
+			showNotification = true;
+			isSaving = false;
 		}
 	});
-
-	async function handleSubmit(e: Event) {
-		e.preventDefault();
-		isSaving = true;
-
-		try {
-			// Mengirim data ke ProfilPpidController@store
-			const result = await api.post('/admin/profil-ppid', {
-				nm_profil: formData.nm_profil,
-				deskripsi: formData.deskripsi
-			});
-
-			if (result.success) {
-				currentData = { ...formData };
-				notificationType = 'success';
-				notificationMessage = 'Data berhasil disimpan!';
-			}
-		} catch (error: any) {
-			notificationType = 'error';
-			// Menangkap pesan error dari validasi Laravel
-			notificationMessage = error.message || 'Terjadi kesalahan saat menyimpan data';
-		} finally {
-			isSaving = false;
-			showNotification = true;
-		}
-	}
 </script>
 
 <svelte:head>
@@ -87,107 +39,84 @@
 			</div>
 		</div>
 
-		{#if isLoading}
-			<div class="flex justify-center py-20">
-				<div class="h-12 w-12 animate-spin rounded-full border-b-2 border-ppid-primary"></div>
-			</div>
-		{:else}
-			<div
-				class="mb-8 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-800"
-			>
-				<div class="mb-6 flex items-center gap-3">
-					<div
-						class="flex h-12 w-12 items-center justify-center rounded-full bg-ppid-primary text-white"
+		<div
+			class="mb-8 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+		>
+			<div class="mb-6 flex items-center gap-3">
+				<div
+					class="flex h-12 w-12 items-center justify-center rounded-full bg-ppid-primary text-white"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-6 w-6"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
 					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="h-6 w-6"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-							/>
-						</svg>
-					</div>
-					<h2 class="text-xl font-bold text-slate-800 dark:text-white">Editor Konten</h2>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+						/>
+					</svg>
+				</div>
+				<h2 class="text-xl font-bold text-slate-800 dark:text-white">Editor Konten</h2>
+			</div>
+
+			<form
+				method="POST"
+				use:enhance={() => {
+					isSaving = true;
+					return async ({ update }) => {
+						await update();
+						isSaving = false;
+					};
+				}}
+			>
+				<div class="mb-6">
+					<label
+						for="nm_profil"
+						class="mb-3 block text-sm font-semibold text-slate-700 dark:text-slate-300"
+					>
+						Judul Halaman
+					</label>
+					<input
+						type="text"
+						name="nm_profil"
+						id="nm_profil"
+						bind:value={formData.nm_profil}
+						required
+						class="w-full rounded-xl border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 focus:border-ppid-primary focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+					/>
 				</div>
 
-				<form onsubmit={handleSubmit}>
-					<div class="mb-6">
-						<label
-							for="nm_profil"
-							class="mb-3 block text-sm font-semibold text-slate-700 dark:text-slate-300"
-						>
-							Judul Halaman
-						</label>
-						<input
-							type="text"
-							id="nm_profil"
-							bind:value={formData.nm_profil}
-							required
-							class="w-full rounded-xl border-2 border-slate-300 bg-white px-4 py-3 text-slate-900 focus:border-ppid-primary focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-						/>
-					</div>
+				<div class="mb-6">
+					<label
+						for="deskripsi"
+						class="mb-3 block text-sm font-semibold text-slate-700 dark:text-slate-300"
+					>
+						Konten Halaman
+					</label>
+					<input type="hidden" name="deskripsi" value={formData.deskripsi} />
+					<TinyMCE id="deskripsi" bind:value={formData.deskripsi} height={400} />
+				</div>
 
-					<div class="mb-6">
-						<label
-							for="deskripsi"
-							class="mb-3 block text-sm font-semibold text-slate-700 dark:text-slate-300"
-						>
-							Konten Halaman
-						</label>
-						<TinyMCE id="deskripsi" bind:value={formData.deskripsi} height={400} />
-					</div>
-
-					<div class="flex justify-end">
-						<button
-							type="submit"
-							disabled={isSaving}
-							class="hover:bg-opacity-90 flex items-center gap-2 rounded-xl bg-ppid-primary px-6 py-3 font-semibold text-white shadow-md transition-all disabled:opacity-50"
-						>
-							{#if isSaving}
-								<div
-									class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
-								></div>
-								Menyimpan...
-							{:else}
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class="h-5 w-5"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M5 13l4 4L19 7"
-									/>
-								</svg>
-								Simpan Perubahan
-							{/if}
-						</button>
-					</div>
-				</form>
-			</div>
-
-			{#if currentData.deskripsi}
-				<div
-					class="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-800"
-				>
-					<div class="mb-6 flex items-center gap-3">
-						<div
-							class="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
-						>
+				<div class="flex justify-end">
+					<button
+						type="submit"
+						disabled={isSaving}
+						class="hover:bg-opacity-90 flex items-center gap-2 rounded-xl bg-ppid-primary px-6 py-3 font-semibold text-white shadow-md transition-all disabled:opacity-50"
+					>
+						{#if isSaving}
+							<div
+								class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+							></div>
+							Menyimpan...
+						{:else}
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
-								class="h-6 w-6"
+								class="h-5 w-5"
 								fill="none"
 								viewBox="0 0 24 24"
 								stroke="currentColor"
@@ -196,24 +125,15 @@
 									stroke-linecap="round"
 									stroke-linejoin="round"
 									stroke-width="2"
-									d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-								/>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+									d="M5 13l4 4L19 7"
 								/>
 							</svg>
-						</div>
-						<h2 class="text-xl font-bold text-slate-800 dark:text-white">Preview Konten</h2>
-					</div>
-					<div class="prose max-w-none prose-slate dark:prose-invert">
-						{@html currentData.deskripsi}
-					</div>
+							Simpan Perubahan
+						{/if}
+					</button>
 				</div>
-			{/if}
-		{/if}
+			</form>
+		</div>
 	</div>
 </div>
 

@@ -9,6 +9,7 @@
 		required?: boolean;
 		idKey?: string;
 		labelKey?: string;
+		extraClass?: string;
 	}
 
 	let {
@@ -18,7 +19,8 @@
 		name = '',
 		required = false,
 		idKey = 'id',
-		labelKey = 'label'
+		labelKey = 'label',
+		extraClass = ''
 	}: Props = $props();
 
 	let isOpen = $state(false);
@@ -109,7 +111,7 @@
 		onclick={toggleDropdown}
 		aria-haspopup="listbox"
 		aria-expanded={isOpen}
-		class="flex w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-4 py-3 text-left text-gray-700 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800 dark:text-gray-300"
+		class={`flex w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-4 py-3 text-left text-gray-700 transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 dark:text-gray-300 ${extraClass}`}
 	>
 		<span class:text-gray-400={!value}>{selectedLabel()}</span>
 		<svg

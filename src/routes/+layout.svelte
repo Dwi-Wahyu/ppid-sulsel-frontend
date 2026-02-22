@@ -8,6 +8,7 @@
 	import AccessibilityMenu from '$lib/components/AccessibilityMenu.svelte';
 
 	import Header from '$lib/components/Header.svelte';
+	import { SvelteKitTopLoader } from 'sveltekit-top-loader';
 
 	let { children } = $props();
 
@@ -32,7 +33,9 @@
 	let showHeader = $derived(isPublicPage);
 
 	// Add padding top for non-home pages when header is visible
-	let mainClass = $derived(showHeader && page.url.pathname !== '/' ? 'pt-32 lg:pt-48' : '');
+	let mainClass = $derived(
+		showHeader && page.url.pathname !== '/' ? 'pt-[4.5rem] lg:pt-[11.5rem]' : ''
+	);
 </script>
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
@@ -44,6 +47,8 @@
 {#if showHeader}
 	<Header />
 {/if}
+
+<SvelteKitTopLoader showSpinner={false} />
 
 <main class={mainClass}>
 	{@render children()}

@@ -4,6 +4,7 @@
 	import { api } from '$lib/api.js';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 	import TrackingCardPengajuan from '$lib/components/TrackingCardPengajuan.svelte';
+	import { PUBLIC_API_URL, PUBLIC_BACKEND_URL } from '$env/static/public';
 
 	let { data } = $props();
 	const pengajuan = $derived(data.pengajuan);
@@ -21,6 +22,10 @@
 	let showNotification = $state(false);
 	let notificationType = $state<'success' | 'error'>('success');
 	let notificationMessage = $state('');
+
+	const disposisi = $derived(
+		pengajuan.disposisi.find((d: any) => d.id_skpd === data.user?.id_skpd)
+	);
 
 	async function handleOpdResponse(e: Event) {
 		e.preventDefault();
@@ -109,14 +114,16 @@
 				</div>
 			</div>
 
-			<div class="flex gap-2">
-				<button
-					onclick={() => (showOpdResponseModal = true)}
-					class="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-700 active:scale-95"
-				>
-					Kirim Jawaban OPD
-				</button>
-			</div>
+			{#if !disposisi.respon}
+				<div class="flex gap-2">
+					<button
+						onclick={() => (showOpdResponseModal = true)}
+						class="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-700 active:scale-95"
+					>
+						Kirim Jawaban OPD
+					</button>
+				</div>
+			{/if}
 		</header>
 
 		<div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -300,13 +307,47 @@
 					</div>
 				</div>
 
-				<div
-					class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
-				>
-					<span class="mb-4 block text-xs font-bold tracking-widest text-slate-400 uppercase">
-						Respon
-					</span>
-				</div>
+				{#if disposisi}
+					<div
+						class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+					>
+						<span class="mb-4 block text-xs font-bold tracking-widest text-slate-400 uppercase">
+							Respon Anda
+						</span>
+
+						{#if disposisi.respon[0]}
+							<div>
+								<h1>
+									{disposisi.respon[0].isi_respon}
+								</h1>
+
+								{#if disposisi.respon[0].file}
+									<a
+										href={`${PUBLIC_BACKEND_URL}/uploads/${disposisi.respon[0].file}`}
+										target="_blank"
+										class="mt-2 inline-flex items-center gap-1 text-sm text-blue-600 hover:underline"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											width="16"
+											height="16"
+											viewBox="0 0 24 24"
+											><g fill="none"
+												><path
+													d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"
+												/><path
+													fill="currentColor"
+													d="M13.586 2a2 2 0 0 1 1.284.467l.13.119L19.414 7a2 2 0 0 1 .578 1.238l.008.176V20a2 2 0 0 1-1.85 1.995L18 22H6a2 2 0 0 1-1.995-1.85L4 20V4a2 2 0 0 1 1.85-1.995L6 2zM12 4H6v16h12V10h-4.5A1.5 1.5 0 0 1 12 8.5zm2 .414V8h3.586z"
+												/></g
+											></svg
+										>
+										Lihat File Dilampirkan
+									</a>
+								{/if}
+							</div>
+						{/if}
+					</div>
+				{/if}
 			</div>
 		</div>
 	</div>

@@ -1,9 +1,10 @@
 import { superValidate } from 'sveltekit-superforms/server';
-import { yup, zod } from 'sveltekit-superforms/adapters';
+import { yup } from 'sveltekit-superforms/adapters';
 import { fail } from '@sveltejs/kit';
 import { API_URL } from '$env/static/private';
 import { PUBLIC_API_URL } from '$env/static/public';
 import { keberatanSchema } from '$lib/schemas/keberatan.js';
+import { setError } from 'sveltekit-superforms/server';
 
 export const load = async ({ fetch }) => {
 	const form = await superValidate(yup(keberatanSchema));
@@ -60,6 +61,7 @@ export const actions = {
 			const result = await response.json();
 
 			console.log(response);
+			console.log(result);
 
 			if (!response.ok) {
 				if (response.status === 422 && result.errors) {

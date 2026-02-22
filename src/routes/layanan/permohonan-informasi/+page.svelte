@@ -351,29 +351,31 @@
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
 									{m['form.fullname']()} <span class="text-red-500">*</span>
+
+									<input
+										type="text"
+										bind:value={formData.nama}
+										placeholder={m['form.fullname_placeholder']()}
+										class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+										required
+									/>
 								</label>
-								<input
-									type="text"
-									bind:value={formData.nama}
-									placeholder={m['form.fullname_placeholder']()}
-									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-									required
-								/>
 							</div>
 
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
 									{m['form.nik']()} <span class="text-red-500">*</span>
+
+									<input
+										type="text"
+										bind:value={formData.nik}
+										oninput={validateNik}
+										placeholder={m['form.nik_placeholder']()}
+										maxlength="16"
+										class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+										required
+									/>
 								</label>
-								<input
-									type="text"
-									bind:value={formData.nik}
-									oninput={validateNik}
-									placeholder={m['form.nik_placeholder']()}
-									maxlength="16"
-									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-									required
-								/>
 								<p class="mt-1 text-xs text-gray-500">{m['form.nik_error']()}</p>
 							</div>
 						</div>
@@ -383,27 +385,29 @@
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
 									{m['contact.email']()} <span class="text-red-500">*</span>
+
+									<input
+										type="email"
+										bind:value={formData.email}
+										placeholder="contoh@email.com"
+										class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+										required
+									/>
 								</label>
-								<input
-									type="email"
-									bind:value={formData.email}
-									placeholder="contoh@email.com"
-									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-									required
-								/>
 							</div>
 
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
 									{m['contact.phone']()} <span class="text-red-500">*</span>
+
+									<input
+										type="text"
+										bind:value={formData.no_hp}
+										placeholder="08xxxxxxxxxx"
+										class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+										required
+									/>
 								</label>
-								<input
-									type="text"
-									bind:value={formData.no_hp}
-									placeholder="08xxxxxxxxxx"
-									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-									required
-								/>
 							</div>
 						</div>
 
@@ -412,31 +416,33 @@
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
 									{m['form.job']()} <span class="text-red-500">*</span>
+
+									<SearchableSelect
+										options={masterPekerjaan}
+										bind:value={formData.pekerjaan_id}
+										name="pekerjaan_id"
+										placeholder={m['form.job_placeholder']()}
+										idKey="id"
+										labelKey="nama_pekerjaan"
+										required={true}
+									/>
 								</label>
-								<SearchableSelect
-									options={masterPekerjaan}
-									bind:value={formData.pekerjaan_id}
-									name="pekerjaan_id"
-									placeholder={m['form.job_placeholder']()}
-									idKey="id"
-									labelKey="nama_pekerjaan"
-									required={true}
-								/>
 							</div>
 
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
 									{m['form.domicile']()} <span class="text-red-500">*</span>
+
+									<SearchableSelect
+										options={masterDomisili}
+										bind:value={formData.domisili_id}
+										name="domisili_id"
+										placeholder={m['form.domicile_placeholder']()}
+										idKey="id"
+										labelKey="nama_daerah"
+										required={true}
+									/>
 								</label>
-								<SearchableSelect
-									options={masterDomisili}
-									bind:value={formData.domisili_id}
-									name="domisili_id"
-									placeholder={m['form.domicile_placeholder']()}
-									idKey="id"
-									labelKey="nama_daerah"
-									required={true}
-								/>
 								<p class="mt-1 text-xs text-gray-500">{m['form.domicile_hint']()}</p>
 							</div>
 						</div>
@@ -445,28 +451,31 @@
 						<div class="space-y-2">
 							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
 								{m['contact.address']()} <span class="text-red-500">*</span>
+
+								<input
+									type="text"
+									bind:value={formData.alamat}
+									placeholder={m['form.address_placeholder']()}
+									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+									required
+								/>
 							</label>
-							<input
-								type="text"
-								bind:value={formData.alamat}
-								placeholder={m['form.address_placeholder']()}
-								class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-								required
-							/>
 						</div>
 
 						<!-- Row 5: Upload KTP -->
 						<div class="space-y-2">
 							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
 								{m['form.upload_ktp']()} <span class="text-red-500">*</span>
+
+								<input
+									type="file"
+									onchange={(e) => handleFileUpload(e, 'foto_ktp')}
+									accept="image/jpeg,image/jpg,image/png"
+									class="block w-full cursor-pointer rounded-lg border border-gray-300 bg-white text-sm text-gray-700 file:mr-4 file:border-0 file:bg-ppid-primary file:px-6 file:py-3 file:text-sm file:font-semibold file:text-white hover:file:bg-ppid-primary/90 focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800 dark:text-gray-300"
+									required
+								/>
 							</label>
-							<input
-								type="file"
-								onchange={(e) => handleFileUpload(e, 'foto_ktp')}
-								accept="image/jpeg,image/jpg,image/png"
-								class="block w-full cursor-pointer rounded-lg border border-gray-300 bg-white text-sm text-gray-700 file:mr-4 file:border-0 file:bg-ppid-primary file:px-6 file:py-3 file:text-sm file:font-semibold file:text-white hover:file:bg-ppid-primary/90 focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800 dark:text-gray-300"
-								required
-							/>
+
 							<p class="mt-1 text-xs text-gray-500">
 								<i class="fas fa-info-circle mr-1"></i>
 								{m['form.file_format_hint']()}
@@ -477,13 +486,15 @@
 						<div class="space-y-2">
 							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
 								{m['form.upload_supporting_doc']()}
+
+								<input
+									type="file"
+									onchange={(e) => handleFileUpload(e, 'dokumen_pendukung')}
+									accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+									class="block w-full cursor-pointer rounded-lg border border-gray-300 bg-white text-sm text-gray-700 file:mr-4 file:border-0 file:bg-linear-to-r file:from-ppid-primary/90 file:to-ppid-primary file:px-6 file:py-3 file:text-sm file:font-semibold file:text-white hover:file:from-ppid-primary hover:file:to-ppid-primary/90 focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800 dark:text-gray-300"
+								/>
 							</label>
-							<input
-								type="file"
-								onchange={(e) => handleFileUpload(e, 'dokumen_pendukung')}
-								accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-								class="block w-full cursor-pointer rounded-lg border border-gray-300 bg-white text-sm text-gray-700 file:mr-4 file:border-0 file:bg-linear-to-r file:from-ppid-primary/90 file:to-ppid-primary file:px-6 file:py-3 file:text-sm file:font-semibold file:text-white hover:file:from-ppid-primary hover:file:to-ppid-primary/90 focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800 dark:text-gray-300"
-							/>
+
 							<p class="mt-1 text-xs leading-relaxed text-gray-500">
 								{m['form.supporting_doc_hint']()}
 							</p>
@@ -522,14 +533,15 @@
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
 									{m['form.agency_number']()} <span class="text-red-500">*</span>
+
+									<input
+										type="text"
+										bind:value={formData.nmr_pengesahan}
+										placeholder={m['form.agency_number_placeholder']()}
+										required={isInstansi}
+										class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+									/>
 								</label>
-								<input
-									type="text"
-									bind:value={formData.nmr_pengesahan}
-									placeholder={m['form.agency_number_placeholder']()}
-									required={isInstansi}
-									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-								/>
 								<p class="mt-1 text-xs text-gray-500">
 									{m['form.agency_number_required']()}
 								</p>
@@ -578,28 +590,30 @@
 						<div class="space-y-2">
 							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
 								{m['form.purpose']()} <span class="text-red-500">*</span>
+
+								<input
+									type="text"
+									bind:value={formData.tujuan}
+									placeholder={m['form.purpose_placeholder']()}
+									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+									required
+								/>
 							</label>
-							<input
-								type="text"
-								bind:value={formData.tujuan}
-								placeholder={m['form.purpose_placeholder']()}
-								class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-								required
-							/>
 						</div>
 
 						<!-- Row 2: Rincian -->
 						<div class="space-y-2">
 							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
 								{m['form.details']()} <span class="text-red-500">*</span>
+
+								<textarea
+									bind:value={formData.rincian}
+									rows="5"
+									placeholder={m['form.details_placeholder']()}
+									class="w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+									required
+								></textarea>
 							</label>
-							<textarea
-								bind:value={formData.rincian}
-								rows="5"
-								placeholder={m['form.details_placeholder']()}
-								class="w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-								required
-							></textarea>
 							<p class="mt-1 text-xs text-gray-500">
 								{m['form.details_hint']()}
 							</p>
@@ -610,29 +624,31 @@
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
 									{m['form.format']()} <span class="text-red-500">*</span>
+
+									<select
+										bind:value={formData.id_bentuk_informasi}
+										class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+										required
+									>
+										<option value="">{m['form.format_placeholder']()}</option>
+										{#each bentukInformasis as bentuk}
+											<option value={bentuk.id}>{bentuk.judul}</option>
+										{/each}
+									</select>
 								</label>
-								<select
-									bind:value={formData.id_bentuk_informasi}
-									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-									required
-								>
-									<option value="">{m['form.format_placeholder']()}</option>
-									{#each bentukInformasis as bentuk}
-										<option value={bentuk.id}>{bentuk.judul}</option>
-									{/each}
-								</select>
 							</div>
 
 							<div class="space-y-2">
 								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
 									{m['form.example_link']()}
+
+									<input
+										type="text"
+										bind:value={formData.contoh_informasi}
+										placeholder="https://contoh-link-informasi.com"
+										class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+									/>
 								</label>
-								<input
-									type="text"
-									bind:value={formData.contoh_informasi}
-									placeholder="https://contoh-link-informasi.com"
-									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-								/>
 								<p class="mt-1 text-xs text-gray-500">
 									{m['form.example_link_hint']()}
 								</p>

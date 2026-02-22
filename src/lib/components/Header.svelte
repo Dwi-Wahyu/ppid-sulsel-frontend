@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount } from 'svelte';
 	import { fly, fade, slide } from 'svelte/transition';
 	import * as m from '$lib/paraglide/messages.js';
 	import { getLocale, setLocale } from '$lib/paraglide/runtime.js';
@@ -7,6 +7,7 @@
 	import SearchModal from './SearchModal.svelte';
 	import Sosmed from './Sosmed.svelte';
 	import { theme } from '$lib/state/theme.svelte';
+	import { afterNavigate } from '$app/navigation';
 
 	// State
 	let mobileMenu = $state(false);
@@ -43,7 +44,7 @@
 
 	// Interfaces
 	interface Kategori {
-		nm_kat_info: string;
+		name: string;
 		slug: string;
 	}
 
@@ -53,9 +54,13 @@
 
 	const BACKEND_URL = env.PUBLIC_BACKEND_URL || 'http://localhost:8000';
 
+	// Variabel di luar fungsi komponen bertindak sebagai cache sederhana
+	let cachedKategori: Kategori[] | null = null;
+	let cachedTahun: TahunInfo[] | null = null;
+
 	// Dynamic Data State
-	let kategoriInformasi = $state<Kategori[]>([]);
-	let listTahun = $state<TahunInfo[]>([]);
+	let kategoriInformasi = $state<Kategori[]>(cachedKategori || []);
+	let listTahun = $state<TahunInfo[]>(cachedTahun || []);
 	let isLoading = $state(true);
 
 	onMount(async () => {
@@ -66,6 +71,11 @@
 
 		// Fetch data
 		try {
+			if (cachedKategori && cachedTahun) {
+				isLoading = false;
+				return; // Jangan fetch jika sudah ada di memory
+			}
+
 			const [resKategori, resTahun] = await Promise.all([
 				fetch(`${BACKEND_URL}/api/public/informasi/kategori`),
 				fetch(`${BACKEND_URL}/api/public/informasi/tahun`)
@@ -74,17 +84,28 @@
 			const resultKat = await resKategori.json();
 			const resultThn = await resTahun.json();
 
-			if (resultKat.data) {
-				kategoriInformasi = resultKat.data;
+			if (resultKat) {
+				kategoriInformasi = resultKat;
 			}
-			if (resultThn.data) {
-				listTahun = resultThn.data;
+			if (resultThn) {
+				listTahun = resultThn;
 			}
 		} catch (error) {
 			console.error('Gagal mengambil data header:', error);
 		} finally {
 			isLoading = false;
 		}
+	});
+
+	afterNavigate(() => {
+		mobileMenu = false;
+		openProfil = false;
+		openDaftar = false;
+		openInformasi = false;
+		openLayanan = false;
+		openService = false;
+		openLang = false;
+		searchModalOpen = false;
 	});
 </script>
 
@@ -105,7 +126,7 @@
 				<img src="/images/ppid-3.png" alt="Logo" class=" h-10 w-auto md:h-14" />
 			{/if}
 
-			<div class="flex flex-col justify-center">
+			<div class="hidden flex-col justify-center md:flex">
 				<span
 					class="font-['Plus_Jakarta_Sans'] text-xs font-extrabold text-gray-700 md:text-base dark:text-white"
 				>
@@ -121,7 +142,9 @@
 
 		<div class="flex items-center gap-3 md:gap-4">
 			<!-- Search Trigger Button -->
-			<a href="/login" class="text-sm font-medium text-gray-700 dark:text-white"> Login </a>
+			<a href="/login" class="hidden text-sm font-medium text-gray-700 lg:block dark:text-white">
+				Login
+			</a>
 
 			<button
 				onclick={() => (searchModalOpen = true)}
@@ -213,7 +236,7 @@
 
 			<button
 				onclick={() => (mobileMenu = !mobileMenu)}
-				class="rounded-lg bg-white/10 p-2 text-white lg:hidden"
+				class="rounded-lg bg-white/10 p-2 text-gray-700 lg:hidden dark:text-white"
 				aria-label="Toggle mobile menu"
 			>
 				<svg
@@ -411,7 +434,7 @@
 										{(() => {
 											const key = `public_info_types.${kat.slug.replace(/-/g, '_')}`;
 											// @ts-ignore
-											return m[key] ? m[key]() : kat.nm_kat_info;
+											return m[key] ? m[key]() : kat.name;
 										})()}
 									</a>
 								</li>
@@ -536,10 +559,19 @@
 						</ul>
 					{/if}
 				</li>
+
+				<li class="group relative border-b border-white/10 md:hidden lg:border-none">
+					<a
+						href="/login"
+						class="flex w-full items-center justify-between px-6 py-4 hover:text-ppid-accent lg:px-4"
+					>
+						<span>Login</span>
+					</a>
+				</li>
 			</ul>
 
 			<!-- Mobile Social Media -->
-			<div class="mt-6 flex justify-center border-t border-white/10 pt-6 lg:hidden">
+			<div class="flex justify-center border-white/10 pt-6 lg:hidden">
 				<Sosmed />
 			</div>
 		</div>

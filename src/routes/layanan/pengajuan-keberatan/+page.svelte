@@ -6,14 +6,11 @@
 	import SuccessModal from '$lib/components/SuccessModal.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 
-	// Superforms
 	import { superForm } from 'sveltekit-superforms/client';
 	import type { PageData } from './$types';
 
-	// Props dari server
 	let { data }: { data: PageData } = $props();
 
-	// Inisialisasi Superform
 	const { form, errors, enhance, delayed, message } = superForm(data.form, {
 		taintedMessage: null,
 		scrollToError: 'smooth',
@@ -241,7 +238,7 @@
 								</h1>
 								<SearchableSelect
 									options={data.domisiliOptions}
-									bind:value={$form.kuasa_domisili_id}
+									bind:value={$form.kuasa_domisili_id as string}
 									name="kuasa_domisili_id"
 									placeholder={m['form.domicile_placeholder']()}
 									idKey="value"

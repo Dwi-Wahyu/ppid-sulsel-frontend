@@ -1,17 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { api } from '$lib/api'; // Menggunakan Proxy API [cite: 10]
+	import { api } from '$lib/api'; // Menggunakan Proxy API
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
-
-	interface SocialLink {
-		id_sosmed?: number;
-		sosmed: string; // Sesuai kolom database: 'sosmed'
-		judul: string; // Sesuai kolom database: 'judul'
-		link_sosmed: string;
-		icon_sosmed: string;
-		urutan: number;
-	}
 
 	// Daftar ikon bawaan untuk dropdown
 	const predefinedIcons: Record<string, string> = {
@@ -124,7 +115,7 @@
 			}
 		} catch (error: any) {
 			notificationType = 'error';
-			// Menampilkan pesan error spesifik (termasuk SQL error jika terjadi) [cite: 25]
+			// Menampilkan pesan error spesifik (termasuk SQL error jika terjadi)
 			notificationMessage = error.message || 'Terjadi kesalahan sistem saat menyimpan data.';
 		} finally {
 			isSaving = false;

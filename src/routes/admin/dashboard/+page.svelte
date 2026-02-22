@@ -25,11 +25,6 @@
 		return new Intl.NumberFormat('id-ID').format(num);
 	}
 
-	// Helper untuk format k (ribuan)
-	function formatK(num: number) {
-		return num >= 1000 ? (num / 1000).toFixed(1) + 'k' : num;
-	}
-
 	onMount(() => {
 		fetchDashboard();
 	});

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Footer from '$lib/components/Footer.svelte';
 	import * as m from '$lib/paraglide/messages.js';
-	import { api } from '$lib/api';
 	import { PUBLIC_API_URL } from '$env/static/public';
 
 	interface BaseResponse<T> {

@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import { goto, invalidateAll } from '$app/navigation';
-	import { PUBLIC_API_URL } from '$env/static/public';
-	import { onMount } from 'svelte';
+	import { api } from '$lib/api.js';
+	import toast, { Toaster } from 'svelte-5-french-toast';
 
-	export let data;
+	const { data } = $props();
 
-	let activeTab = data.activeTab;
+	let activeTab = $state(data.activeTab);
 	let showAll: Record<string, boolean> = {
 		kategori: false,
 		tahun: false,
@@ -25,26 +24,26 @@
 	}
 
 	// Modal states
-	let modals: Record<string, ModalState> = {
+	let modals = $state<Record<string, ModalState>>({
 		tahun: { show: false, mode: 'create', item: null },
 		domisili: { show: false, mode: 'create', item: null },
 		pekerjaan: { show: false, mode: 'create', item: null },
 		alasan: { show: false, mode: 'create', item: null },
 		bentuk_informasi: { show: false, mode: 'create', item: null }
-	};
+	});
 
-	let deleteConfirm = {
+	let deleteConfirm = $state({
 		show: false,
 		type: '',
 		id: null as number | null
-	};
+	});
 
-	let loading = false;
-	let notification = {
+	let loading = $state(false);
+	let notification = $state({
 		show: false,
 		type: '',
 		message: ''
-	};
+	});
 
 	function switchTab(tab: string) {
 		activeTab = tab;
@@ -68,37 +67,27 @@
 
 	async function handleSubmit(type: string, formData: any) {
 		loading = true;
-		const token = document.cookie
-			.split('; ')
-			.find((row) => row.startsWith('access_token='))
-			?.split('=')[1];
 
 		try {
 			const endpoint =
 				modals[type].mode === 'create'
-					? `${PUBLIC_API_URL}/admin/master-data/${type === 'alasan' ? 'alasan-pengajuan' : type === 'bentuk_informasi' ? 'bentuk-informasi' : type === 'kategori' ? 'kategori-informasi' : type}`
-					: `${PUBLIC_API_URL}/admin/master-data/${type === 'alasan' ? 'alasan-pengajuan' : type === 'bentuk_informasi' ? 'bentuk-informasi' : type === 'kategori' ? 'kategori-informasi' : type}/${modals[type].item.id || modals[type].item.id_kat_info}`;
+					? `/admin/master-data/${type === 'pekerjaan' ? 'pekerjaan' : type === 'domisili' ? 'domisili' : type === 'bentuk_informasi' ? 'bentuk-informasi' : type === 'kategori' ? 'kategori-informasi' : type}`
+					: `/admin/master-data/${type === 'pekerjaan' ? 'pekerjaan' : type === 'domisili' ? 'domisili' : type === 'bentuk_informasi' ? 'bentuk-informasi' : type === 'kategori' ? 'kategori-informasi' : type}/${modals[type].item.id || modals[type].item.id_kat_info}`;
 
-			const method = modals[type].mode === 'create' ? 'POST' : 'PUT';
+			let result: any;
 
-			const response = await fetch(endpoint, {
-				method,
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${token}`,
-					Accept: 'application/json'
-				},
-				body: JSON.stringify(formData)
-			});
+			if (modals[type].mode === 'create') {
+				result = await api.post(endpoint, formData);
+			} else {
+				result = await api.put(endpoint, formData);
+			}
 
-			const result = await response.json();
-
-			if (response.ok && result.success) {
-				showNotification('success', result.message);
+			if (result.success) {
+				toast.success(result.message);
 				closeModal(type);
 				await invalidateAll();
 			} else {
-				showNotification('error', result.message || 'Operasi gagal');
+				toast.error(result.message || 'Operasi gagal');
 			}
 		} catch (error) {
 			showNotification('error', 'Terjadi kesalahan pada server');
@@ -109,46 +98,35 @@
 
 	async function handleDelete() {
 		loading = true;
-		const token = document.cookie
-			.split('; ')
-			.find((row) => row.startsWith('access_token='))
-			?.split('=')[1];
 
 		try {
 			const typeMap: Record<string, string> = {
 				tahun: 'tahun',
 				domisili: 'domisili',
 				pekerjaan: 'pekerjaan',
-				alasan: 'alasan-pengajuan',
 				bentuk_informasi: 'bentuk-informasi'
 			};
 
-			const endpoint = `${PUBLIC_API_URL}/admin/master-data/${typeMap[deleteConfirm.type]}/${deleteConfirm.id}`;
+			const endpoint = `/admin/master-data/${typeMap[deleteConfirm.type]}/${deleteConfirm.id}`;
 
-			const response = await fetch(endpoint, {
-				method: 'DELETE',
-				headers: {
-					Authorization: `Bearer ${token}`,
-					Accept: 'application/json'
-				}
-			});
+			const result = await api.delete(endpoint);
 
-			const result = await response.json();
-
-			if (response.ok && result.success) {
-				showNotification('success', result.message);
-				deleteConfirm = { show: false, type: '', id: null };
+			if (result.success) {
 				await invalidateAll();
+				toast.success(result.message);
+				deleteConfirm = { show: false, type: '', id: null };
 			} else {
-				showNotification('error', result.message || 'Gagal menghapus data');
+				toast.error(result.message || 'Gagal menghapus data');
 			}
 		} catch (error) {
-			showNotification('error', 'Terjadi kesalahan pada server');
+			toast.error('Terjadi kesalahan pada server');
 		} finally {
 			loading = false;
 		}
 	}
 </script>
+
+<Toaster />
 
 <svelte:head>
 	<title>Master Data - Admin PPID</title>
@@ -167,60 +145,51 @@
 <div
 	class="overflow-hidden rounded-t-xl border border-slate-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
 >
-	<div class="flex overflow-x-auto border-b border-slate-200 dark:border-slate-700">
+	<div class="flex overflow-x-auto border-slate-200 dark:border-slate-700">
 		<button
-			on:click={() => switchTab('kategori')}
-			class="px-6 py-3 text-sm font-medium whitespace-nowrap transition-colors {activeTab ===
+			onclick={() => switchTab('kategori')}
+			class="cursor-pointer px-6 py-3 text-sm font-medium whitespace-nowrap transition-colors {activeTab ===
 			'kategori'
-				? 'border-b-2 border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
+				? 'bg-black/5	dark:text-white'
 				: 'text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'}"
 		>
 			Kategori Informasi
 		</button>
 		<button
-			on:click={() => switchTab('tahun')}
-			class="px-6 py-3 text-sm font-medium whitespace-nowrap transition-colors {activeTab ===
+			onclick={() => switchTab('tahun')}
+			class="cursor-pointer px-6 py-3 text-sm font-medium whitespace-nowrap transition-colors {activeTab ===
 			'tahun'
-				? 'border-b-2 border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
+				? 'bg-black/5	dark:text-white'
 				: 'text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'}"
 		>
 			Tahun Informasi
 		</button>
 		<button
-			on:click={() => switchTab('domisili')}
-			class="px-6 py-3 text-sm font-medium whitespace-nowrap transition-colors {activeTab ===
+			onclick={() => switchTab('bentuk_informasi')}
+			class="cursor-pointer px-6 py-3 text-sm font-medium whitespace-nowrap transition-colors {activeTab ===
+			'bentuk_informasi'
+				? 'bg-black/5	dark:text-white'
+				: 'text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'}"
+		>
+			Bentuk Informasi
+		</button>
+		<button
+			onclick={() => switchTab('domisili')}
+			class="cursor-pointer px-6 py-3 text-sm font-medium whitespace-nowrap transition-colors {activeTab ===
 			'domisili'
-				? 'border-b-2 border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
+				? 'bg-black/5	dark:text-white'
 				: 'text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'}"
 		>
 			Domisili
 		</button>
 		<button
-			on:click={() => switchTab('pekerjaan')}
-			class="px-6 py-3 text-sm font-medium whitespace-nowrap transition-colors {activeTab ===
+			onclick={() => switchTab('pekerjaan')}
+			class="cursor-pointer px-6 py-3 text-sm font-medium whitespace-nowrap transition-colors {activeTab ===
 			'pekerjaan'
 				? 'border-b-2 border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
 				: 'text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'}"
 		>
 			Pekerjaan
-		</button>
-		<button
-			on:click={() => switchTab('alasan')}
-			class="px-6 py-3 text-sm font-medium whitespace-nowrap transition-colors {activeTab ===
-			'alasan'
-				? 'border-b-2 border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
-				: 'text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'}"
-		>
-			Alasan Pengajuan Keberatan
-		</button>
-		<button
-			on:click={() => switchTab('bentuk_informasi')}
-			class="px-6 py-3 text-sm font-medium whitespace-nowrap transition-colors {activeTab ===
-			'bentuk_informasi'
-				? 'border-b-2 border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
-				: 'text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'}"
-		>
-			Bentuk Informasi
 		</button>
 	</div>
 </div>
@@ -280,7 +249,7 @@
 			{#if data.kategoris.length > 10}
 				<div class="mt-4 text-center">
 					<button
-						on:click={() => (showAll.kategori = !showAll.kategori)}
+						onclick={() => (showAll.kategori = !showAll.kategori)}
 						class="rounded-lg px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-slate-50 dark:text-blue-400 dark:hover:bg-slate-700"
 					>
 						{showAll.kategori
@@ -298,7 +267,7 @@
 			<div class="mb-4 flex items-center justify-between">
 				<h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100">Tahun Informasi</h3>
 				<button
-					on:click={() => openModal('tahun', 'create')}
+					onclick={() => openModal('tahun', 'create')}
 					class="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
 				>
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -331,8 +300,9 @@
 									<td class="px-6 py-4 text-right">
 										<div class="flex items-center justify-end gap-2">
 											<button
-												on:click={() => openModal('tahun', 'edit', tahun)}
+												onclick={() => openModal('tahun', 'edit', tahun)}
 												class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-50 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-blue-400"
+												title="Edit Tahun Informasi"
 											>
 												<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 													<path
@@ -344,9 +314,10 @@
 												</svg>
 											</button>
 											<button
-												on:click={() =>
+												onclick={() =>
 													(deleteConfirm = { show: true, type: 'tahun', id: tahun.id })}
 												class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-slate-400 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+												title="Hapus Tahun Informasi"
 											>
 												<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 													<path
@@ -375,7 +346,7 @@
 			{#if data.tahuns.length > 10}
 				<div class="mt-4 text-center">
 					<button
-						on:click={() => (showAll.tahun = !showAll.tahun)}
+						onclick={() => (showAll.tahun = !showAll.tahun)}
 						class="rounded-lg px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-slate-50 dark:text-blue-400 dark:hover:bg-slate-700"
 					>
 						{showAll.tahun
@@ -393,7 +364,7 @@
 			<div class="mb-4 flex items-center justify-between">
 				<h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100">Domisili</h3>
 				<button
-					on:click={() => openModal('domisili', 'create')}
+					onclick={() => openModal('domisili', 'create')}
 					class="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
 				>
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -442,8 +413,9 @@
 									<td class="px-6 py-4 text-right">
 										<div class="flex items-center justify-end gap-2">
 											<button
-												on:click={() => openModal('domisili', 'edit', domisili)}
+												onclick={() => openModal('domisili', 'edit', domisili)}
 												class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-50 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-blue-400"
+												title="Edit Domisili"
 											>
 												<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 													<path
@@ -455,9 +427,10 @@
 												</svg>
 											</button>
 											<button
-												on:click={() =>
+												onclick={() =>
 													(deleteConfirm = { show: true, type: 'domisili', id: domisili.id })}
 												class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-slate-400 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+												title="Hapus Domisili"
 											>
 												<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 													<path
@@ -486,7 +459,7 @@
 			{#if data.domisilis.length > 10}
 				<div class="mt-4 text-center">
 					<button
-						on:click={() => (showAll.domisili = !showAll.domisili)}
+						onclick={() => (showAll.domisili = !showAll.domisili)}
 						class="rounded-lg px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-slate-50 dark:text-blue-400 dark:hover:bg-slate-700"
 					>
 						{showAll.domisili
@@ -504,7 +477,7 @@
 			<div class="mb-4 flex items-center justify-between">
 				<h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100">Pekerjaan</h3>
 				<button
-					on:click={() => openModal('pekerjaan', 'create')}
+					onclick={() => openModal('pekerjaan', 'create')}
 					class="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
 				>
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -551,8 +524,9 @@
 									<td class="px-6 py-4 text-right">
 										<div class="flex items-center justify-end gap-2">
 											<button
-												on:click={() => openModal('pekerjaan', 'edit', pekerjaan)}
+												onclick={() => openModal('pekerjaan', 'edit', pekerjaan)}
 												class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-50 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-blue-400"
+												title="Edit Pekerjaan"
 											>
 												<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 													<path
@@ -564,9 +538,10 @@
 												</svg>
 											</button>
 											<button
-												on:click={() =>
+												onclick={() =>
 													(deleteConfirm = { show: true, type: 'pekerjaan', id: pekerjaan.id })}
 												class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-slate-400 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+												title="Hapus Pekerjaan"
 											>
 												<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 													<path
@@ -595,109 +570,12 @@
 			{#if data.pekerjaans.length > 10}
 				<div class="mt-4 text-center">
 					<button
-						on:click={() => (showAll.pekerjaan = !showAll.pekerjaan)}
+						onclick={() => (showAll.pekerjaan = !showAll.pekerjaan)}
 						class="rounded-lg px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-slate-50 dark:text-blue-400 dark:hover:bg-slate-700"
 					>
 						{showAll.pekerjaan
 							? 'Tampilkan Lebih Sedikit'
 							: `Tampilkan Seluruhnya (${data.pekerjaans.length} items)`}
-					</button>
-				</div>
-			{/if}
-		</div>
-	{/if}
-
-	<!-- Alasan Pengajuan Tab -->
-	{#if activeTab === 'alasan'}
-		<div class="p-6">
-			<div class="mb-4 flex items-center justify-between">
-				<h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100">
-					Alasan Pengajuan Keberatan
-				</h3>
-				<button
-					on:click={() => openModal('alasan', 'create')}
-					class="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-				>
-					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"
-						></path>
-					</svg>
-					Tambah Alasan
-				</button>
-			</div>
-
-			<div class="overflow-x-auto">
-				<table class="w-full text-left text-sm text-slate-600 dark:text-slate-300">
-					<thead
-						class="border-b border-slate-100 bg-slate-50 text-xs text-slate-500 uppercase dark:border-slate-700 dark:bg-slate-700/50 dark:text-slate-400"
-					>
-						<tr>
-							<th scope="col" class="px-6 py-3">Alasan</th>
-							<th scope="col" class="px-6 py-3 text-right">Aksi</th>
-						</tr>
-					</thead>
-					<tbody>
-						{#each data.alasanPengajuans as alasan, index}
-							{#if showAll.alasan || index < limitedCount}
-								<tr
-									class="border-b border-slate-100 bg-white transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700/30"
-								>
-									<td class="px-6 py-4 font-medium text-slate-900 dark:text-slate-100">
-										{alasan.alasan}
-									</td>
-									<td class="px-6 py-4 text-right">
-										<div class="flex items-center justify-end gap-2">
-											<button
-												on:click={() => openModal('alasan', 'edit', alasan)}
-												class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-50 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-blue-400"
-											>
-												<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-													<path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-													></path>
-												</svg>
-											</button>
-											<button
-												on:click={() =>
-													(deleteConfirm = { show: true, type: 'alasan', id: alasan.id })}
-												class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-slate-400 dark:hover:bg-red-900/20 dark:hover:text-red-400"
-											>
-												<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-													<path
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														stroke-width="2"
-														d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-													></path>
-												</svg>
-											</button>
-										</div>
-									</td>
-								</tr>
-							{/if}
-						{:else}
-							<tr>
-								<td colspan="2" class="px-6 py-8 text-center text-slate-500 dark:text-slate-400">
-									<p>Belum ada data alasan pengajuan</p>
-								</td>
-							</tr>
-						{/each}
-					</tbody>
-				</table>
-			</div>
-
-			{#if data.alasanPengajuans.length > 10}
-				<div class="mt-4 text-center">
-					<button
-						on:click={() => (showAll.alasan = !showAll.alasan)}
-						class="rounded-lg px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-slate-50 dark:text-blue-400 dark:hover:bg-slate-700"
-					>
-						{showAll.alasan
-							? 'Tampilkan Lebih Sedikit'
-							: `Tampilkan Seluruhnya (${data.alasanPengajuans.length} items)`}
 					</button>
 				</div>
 			{/if}
@@ -710,7 +588,7 @@
 			<div class="mb-4 flex items-center justify-between">
 				<h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100">Bentuk Informasi</h3>
 				<button
-					on:click={() => openModal('bentuk_informasi', 'create')}
+					onclick={() => openModal('bentuk_informasi', 'create')}
 					class="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
 				>
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -743,8 +621,9 @@
 									<td class="px-6 py-4 text-right">
 										<div class="flex items-center justify-end gap-2">
 											<button
-												on:click={() => openModal('bentuk_informasi', 'edit', bentuk)}
+												onclick={() => openModal('bentuk_informasi', 'edit', bentuk)}
 												class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-50 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-blue-400"
+												title="Edit Bentuk Informasi"
 											>
 												<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 													<path
@@ -756,9 +635,10 @@
 												</svg>
 											</button>
 											<button
-												on:click={() =>
+												onclick={() =>
 													(deleteConfirm = { show: true, type: 'bentuk_informasi', id: bentuk.id })}
 												class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-slate-400 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+												title="Hapus Bentuk Informasi"
 											>
 												<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 													<path
@@ -787,7 +667,7 @@
 			{#if data.bentukInformasis.length > 10}
 				<div class="mt-4 text-center">
 					<button
-						on:click={() => (showAll.bentuk_informasi = !showAll.bentuk_informasi)}
+						onclick={() => (showAll.bentuk_informasi = !showAll.bentuk_informasi)}
 						class="rounded-lg px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-slate-50 dark:text-blue-400 dark:hover:bg-slate-700"
 					>
 						{showAll.bentuk_informasi
@@ -808,29 +688,35 @@
 				{modals.tahun.mode === 'create' ? 'Tambah' : 'Edit'} Tahun Informasi
 			</h3>
 			<form
-				on:submit|preventDefault={() => {
+				onsubmit={(e) => {
+					e.preventDefault();
+
 					const formData = {
-						waktu: modals.tahun.item?.waktu || document.getElementById('tahun-waktu').value
+						waktu:
+							modals.tahun.item?.waktu ||
+							(document.getElementById('tahun-waktu') as HTMLInputElement).value
 					};
+
 					handleSubmit('tahun', formData);
 				}}
 			>
 				<div class="mb-4">
 					<label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-						>Tahun</label
-					>
-					<input
-						id="tahun-waktu"
-						type="text"
-						value={modals.tahun.item?.waktu || ''}
-						required
-						class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-					/>
+						>Tahun
+
+						<input
+							id="tahun-waktu"
+							type="text"
+							value={modals.tahun.item?.waktu || ''}
+							required
+							class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
+						/>
+					</label>
 				</div>
 				<div class="flex justify-end gap-2">
 					<button
 						type="button"
-						on:click={() => closeModal('tahun')}
+						onclick={() => closeModal('tahun')}
 						class="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700"
 					>
 						Batal
@@ -855,7 +741,9 @@
 				{modals.domisili.mode === 'create' ? 'Tambah' : 'Edit'} Domisili
 			</h3>
 			<form
-				on:submit|preventDefault={() => {
+				onsubmit={(e) => {
+					e.preventDefault();
+
 					const formData = {
 						nama_daerah:
 							modals.domisili.item?.nama_daerah ||
@@ -869,27 +757,29 @@
 			>
 				<div class="mb-4">
 					<label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-						>Nama Daerah</label
-					>
-					<input
-						id="domisili-nama_daerah"
-						type="text"
-						value={modals.domisili.item?.nama_daerah || ''}
-						required
-						class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-					/>
+						>Nama Daerah
+
+						<input
+							id="domisili-nama_daerah"
+							type="text"
+							value={modals.domisili.item?.nama_daerah || ''}
+							required
+							class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
+						/>
+					</label>
 				</div>
 				<div class="mb-4">
 					<label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-						>Provinsi</label
-					>
-					<input
-						id="domisili-provinsi"
-						type="text"
-						value={modals.domisili.item?.provinsi || ''}
-						required
-						class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-					/>
+						>Provinsi
+
+						<input
+							id="domisili-provinsi"
+							type="text"
+							value={modals.domisili.item?.provinsi || ''}
+							required
+							class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
+						/>
+					</label>
 				</div>
 				<div class="mb-4">
 					<label class="flex items-center gap-2">
@@ -905,7 +795,7 @@
 				<div class="flex justify-end gap-2">
 					<button
 						type="button"
-						on:click={() => closeModal('domisili')}
+						onclick={() => closeModal('domisili')}
 						class="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700"
 					>
 						Batal
@@ -930,7 +820,7 @@
 				{modals.pekerjaan.mode === 'create' ? 'Tambah' : 'Edit'} Pekerjaan
 			</h3>
 			<form
-				on:submit|preventDefault={() => {
+				onsubmit={() => {
 					const formData = {
 						nama_pekerjaan:
 							modals.pekerjaan.item?.nama_pekerjaan ||
@@ -942,15 +832,16 @@
 			>
 				<div class="mb-4">
 					<label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-						>Nama Pekerjaan</label
-					>
-					<input
-						id="pekerjaan-nama_pekerjaan"
-						type="text"
-						value={modals.pekerjaan.item?.nama_pekerjaan || ''}
-						required
-						class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-					/>
+						>Nama Pekerjaan
+
+						<input
+							id="pekerjaan-nama_pekerjaan"
+							type="text"
+							value={modals.pekerjaan.item?.nama_pekerjaan || ''}
+							required
+							class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
+						/>
+					</label>
 				</div>
 				<div class="mb-4">
 					<label class="flex items-center gap-2">
@@ -966,54 +857,7 @@
 				<div class="flex justify-end gap-2">
 					<button
 						type="button"
-						on:click={() => closeModal('pekerjaan')}
-						class="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700"
-					>
-						Batal
-					</button>
-					<button
-						type="submit"
-						class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-					>
-						Simpan
-					</button>
-				</div>
-			</form>
-		</div>
-	</div>
-{/if}
-
-<!-- Alasan Pengajuan Modal -->
-{#if modals.alasan.show}
-	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-		<div class="w-full max-w-md rounded-lg bg-white p-6 dark:bg-slate-800">
-			<h3 class="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
-				{modals.alasan.mode === 'create' ? 'Tambah' : 'Edit'} Alasan Pengajuan
-			</h3>
-			<form
-				on:submit|preventDefault={() => {
-					const formData = {
-						alasan: modals.alasan.item?.alasan || document.getElementById('alasan-alasan').value
-					};
-					handleSubmit('alasan', formData);
-				}}
-			>
-				<div class="mb-4">
-					<label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-						>Alasan</label
-					>
-					<input
-						id="alasan-alasan"
-						type="text"
-						value={modals.alasan.item?.alasan || ''}
-						required
-						class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-					/>
-				</div>
-				<div class="flex justify-end gap-2">
-					<button
-						type="button"
-						on:click={() => closeModal('alasan')}
+						onclick={() => closeModal('pekerjaan')}
 						class="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700"
 					>
 						Batal
@@ -1038,7 +882,7 @@
 				{modals.bentuk_informasi.mode === 'create' ? 'Tambah' : 'Edit'} Bentuk Informasi
 			</h3>
 			<form
-				on:submit|preventDefault={() => {
+				onsubmit={() => {
 					const formData = {
 						judul:
 							modals.bentuk_informasi.item?.judul ||
@@ -1049,20 +893,21 @@
 			>
 				<div class="mb-4">
 					<label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-						>Judul</label
-					>
-					<input
-						id="bentuk_informasi-judul"
-						type="text"
-						value={modals.bentuk_informasi.item?.judul || ''}
-						required
-						class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-					/>
+						>Judul
+
+						<input
+							id="bentuk_informasi-judul"
+							type="text"
+							value={modals.bentuk_informasi.item?.judul || ''}
+							required
+							class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
+						/>
+					</label>
 				</div>
 				<div class="flex justify-end gap-2">
 					<button
 						type="button"
-						on:click={() => closeModal('bentuk_informasi')}
+						onclick={() => closeModal('bentuk_informasi')}
 						class="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700"
 					>
 						Batal
@@ -1089,13 +934,13 @@
 			</p>
 			<div class="flex justify-end gap-2">
 				<button
-					on:click={() => (deleteConfirm = { show: false, type: '', id: null })}
+					onclick={() => (deleteConfirm = { show: false, type: '', id: null })}
 					class="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700"
 				>
 					Batal
 				</button>
 				<button
-					on:click={handleDelete}
+					onclick={handleDelete}
 					class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
 				>
 					Ya, Hapus

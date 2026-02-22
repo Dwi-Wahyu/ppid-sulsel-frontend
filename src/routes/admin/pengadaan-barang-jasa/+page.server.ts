@@ -1,5 +1,7 @@
 import type { PageServerLoad } from './$types';
 import { API_URL } from '$env/static/private';
+import type { Actions } from './$types';
+import { fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ fetch, cookies, url }) => {
 	const token = cookies.get('access_token');
@@ -56,5 +58,54 @@ export const load: PageServerLoad = async ({ fetch, cookies, url }) => {
 			startDate: '',
 			endDate: ''
 		};
+	}
+};
+
+export const actions: Actions = {
+	create: async ({ request, fetch }) => {
+		const formData = await request.formData();
+
+		const response = await fetch(`${API_URL}/admin/ikphn`, {
+			method: 'POST',
+			body: formData
+		});
+
+		const result = await response.json();
+		if (!response.ok)
+			return fail(response.status, { error: result.message, errors: result.errors });
+
+		return { success: true, message: result.message };
+	},
+
+	update: async ({ request, fetch }) => {
+		const formData = await request.formData();
+		const id = formData.get('id');
+
+		formData.append('_method', 'PUT');
+
+		const response = await fetch(`${API_URL}/admin/ikphn/${id}`, {
+			method: 'POST',
+			body: formData
+		});
+
+		const result = await response.json();
+		if (!response.ok)
+			return fail(response.status, { error: result.message, errors: result.errors });
+
+		return { success: true, message: result.message };
+	},
+
+	delete: async ({ request, fetch }) => {
+		const formData = await request.formData();
+		const id = formData.get('id');
+
+		const response = await fetch(`${API_URL}/admin/ikphn/${id}`, {
+			method: 'DELETE'
+		});
+
+		const result = await response.json();
+		if (!response.ok) return fail(response.status, { error: result.message });
+
+		return { success: true, message: result.message };
 	}
 };

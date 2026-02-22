@@ -1,5 +1,5 @@
 import { fail, redirect, isRedirect } from '@sveltejs/kit';
-import { superValidate } from 'sveltekit-superforms';
+import { superValidate, message } from 'sveltekit-superforms';
 import { yup } from 'sveltekit-superforms/adapters';
 import { object, string, boolean } from 'yup';
 import type { PageServerLoad, Actions } from './$types';
@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	// 	}
 	// }
 
-	return { form };
+	return { form, user: locals.user };
 };
 
 export const actions: Actions = {
@@ -90,6 +90,7 @@ export const actions: Actions = {
 			if (!loginRes.ok || !result.token) {
 				form.errors._errors = [result.message || 'Username atau password salah'];
 				form.data.password = '';
+				console.log(result);
 				return fail(401, { form });
 			}
 
@@ -123,12 +124,14 @@ export const actions: Actions = {
 				maxAge: 60 * 60 * 8
 			});
 
+			return message(form, user.id_skpd === null ? '/admin/dashboard' : '/opd/dashboard');
+
 			// Redirect berdasarkan Role
-			if (user.id_skpd === null) {
-				throw redirect(303, '/admin/dashboard');
-			} else {
-				throw redirect(303, '/opd/dashboard');
-			}
+			// if (user.id_skpd === null) {
+			// 	throw redirect(303, '/admin/dashboard');
+			// } else {
+			// 	throw redirect(303, '/opd/dashboard');
+			// }
 		} catch (error) {
 			if (isRedirect(error)) {
 				throw error;

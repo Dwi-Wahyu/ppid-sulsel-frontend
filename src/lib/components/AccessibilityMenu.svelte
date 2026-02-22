@@ -348,7 +348,7 @@
 
 	{#if isOpen}
 		<div
-			class="custom-scrollbar fixed z-9998 max-h-[90vh] w-96 overflow-hidden overflow-y-auto rounded-[24px] border border-access-border bg-access-bg shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
+			class={' custom-scrollbar fixed z-9998 max-h-[90vh] w-96 overflow-hidden overflow-y-auto rounded-3xl border border-access-border bg-access-bg shadow-[0_20px_50px_rgba(0,0,0,0.3)]'}
 			style="top: {pos.y > (browser ? window.innerHeight / 2 : 500)
 				? pos.y - 520
 				: pos.y + 70}px; left: {pos.x > (browser ? window.innerWidth / 2 : 500)
@@ -473,26 +473,6 @@
 									: 'bg-access-bg-gray text-access-text hover:bg-access-button-hover'}"
 							>
 								{level.toUpperCase()}
-							</button>
-						{/each}
-					</div>
-				</div>
-
-				<div>
-					<p class="mb-2 text-[10px] font-black tracking-widest text-access-text-muted uppercase">
-						Widget Position
-					</p>
-					<div class="grid grid-cols-3 gap-2">
-						{#each ['left', 'right', 'hidden'] as position}
-							<button
-								onclick={() => setWidgetPosition(position)}
-								aria-label="Widget position {position}"
-								class="rounded-lg px-3 py-2 text-xs font-bold transition-colors {settings.widgetPosition ===
-								position
-									? 'bg-access-primary text-white'
-									: 'bg-access-bg-gray text-access-text hover:bg-access-button-hover'}"
-							>
-								{position.toUpperCase()}
 							</button>
 						{/each}
 					</div>

@@ -16,7 +16,7 @@
 	let searchQuery = $state('');
 	let results = $state<SearchResult[]>([]);
 	let isLoading = $state(false);
-	let searchInputRef: HTMLInputElement | undefined;
+	let searchInputRef: HTMLInputElement | undefined = $state(undefined);
 	let debounceTimer: ReturnType<typeof setTimeout>;
 
 	const BACKEND_URL = env.PUBLIC_BACKEND_URL || 'http://localhost:8000';

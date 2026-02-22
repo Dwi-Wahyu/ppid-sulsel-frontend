@@ -4,6 +4,8 @@
 	import SidebarDropdown from './SidebarDropdown.svelte';
 	import SidebarDropdownLink from './SidebarDropdownLink.svelte';
 	import { sidebar } from '$lib/state/sidebar.svelte';
+	import { onMount } from 'svelte';
+	import { PUBLIC_API_URL } from '$env/static/public';
 
 	let activeDropdown = $state<string | null>(null);
 
@@ -37,21 +39,36 @@
 					]
 				},
 				{
-					type: 'link',
-					href: '/admin/faq',
-					label: 'FAQ (Tanya Jawab)',
-					icon: 'M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+					type: 'dropdown',
+					label: 'Konten',
+					icon: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2z M7 8h5 M7 12h10 M7 16h10',
+					links: [
+						{ href: '/admin/berita', label: 'Berita & Artikel' },
+						{ href: '/admin/data-sop', label: 'SOP' },
+						{
+							href: '/admin/faq',
+							label: 'FAQ'
+						},
+						{
+							href: '/admin/slide-banner',
+							label: 'Slide Banner'
+						},
+						{
+							href: '/admin/footer-settings',
+							label: 'Footer'
+						}
+					]
 				}
 			]
 		},
 		{
-			title: 'Manajemen Informasi',
+			title: 'Master Data',
 			items: [
 				{
-					type: 'link',
-					href: '/admin/daftar-informasi-publik',
-					label: 'Daftar Informasi Publik',
-					icon: 'M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9'
+					type: 'dropdown',
+					label: 'Informasi Publik',
+					icon: 'M12 21.5a9.5 9.5 0 1 0 0-19a9.5 9.5 0 0 0 0 19',
+					links: [{ href: '/admin/pengadaan-barang-jasa', label: 'Pengadaan Barang & Jasa' }]
 				},
 				{
 					type: 'dropdown',
@@ -61,18 +78,6 @@
 						{ href: '/admin/permohonan-informasi', label: 'Permohonan Informasi' },
 						{ href: '/admin/pengajuan-keberatan', label: 'Pengajuan Keberatan' }
 					]
-				},
-				{
-					type: 'dropdown',
-					label: 'Publikasi',
-					icon: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2z M7 8h5 M7 12h10 M7 16h10',
-					links: [
-						{ href: '/admin/dokumen-publik', label: 'Publikasi Dokumen' },
-						{ href: '/admin/pengadaan-barang-jasa', label: 'Pengadaan Barang & Jasa' },
-						{ href: '/admin/berita', label: 'Berita & Artikel' },
-						{ href: '/admin/galeri', label: 'Galeri & Video' },
-						{ href: '/admin/data-sop', label: 'SOP' }
-					]
 				}
 			]
 		},
@@ -81,25 +86,49 @@
 			items: [
 				{
 					type: 'link',
-					href: '/admin/users',
-					label: 'Manajemen User',
-					icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z'
-				},
-				{
-					type: 'link',
 					href: '/admin/skpd',
-					label: 'SKPD',
+					label: 'User SKPD',
 					icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4'
 				},
 				{
 					type: 'link',
 					href: '/admin/master-data',
-					label: 'Master Data',
+					label: 'Pengaturan Umum',
 					icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z'
 				}
 			]
 		}
 	];
+
+	onMount(async () => {
+		try {
+			const response = await fetch(`${PUBLIC_API_URL}/public/informasi/kategori`);
+			const result = await response.json();
+
+			if (result) {
+				const kategoriLinks = result.map((item: any) => ({
+					href: `/admin/informasi-publik/${item.slug}`,
+					label: item.name
+				}));
+
+				// 2. Cari grup "Master Data" dan dropdown "Informasi Publik"
+				const manajemenGroup = menuGroups.find((g) => g.title === 'Master Data');
+				if (manajemenGroup) {
+					const infoPublikDropdown = manajemenGroup.items.find(
+						(i) => i.type === 'dropdown' && i.label === 'Informasi Publik'
+					);
+
+					if (infoPublikDropdown && infoPublikDropdown.links) {
+						// 3. Masukkan kategori ke dalam list links
+						// Kita gunakan spread agar menu statis yang sudah ada tidak hilang
+						infoPublikDropdown.links = [...infoPublikDropdown.links, ...kategoriLinks];
+					}
+				}
+			}
+		} catch (error) {
+			console.error('Gagal memuat kategori:', error);
+		}
+	});
 </script>
 
 <Sidebar title="Admin Panel">

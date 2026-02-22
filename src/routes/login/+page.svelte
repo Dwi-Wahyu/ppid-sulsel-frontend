@@ -15,8 +15,22 @@
 	let recaptchaError = $state<string | null>(null);
 	let recaptchaLoaded = $state(false);
 
+	const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+	import toast, { Toaster } from 'svelte-5-french-toast';
+
 	// Setup Superforms
 	const { form, errors, enhance, delayed, message } = superForm(data.form, {
+		onUpdate: async ({ result }) => {
+			if (result.type === 'success') {
+				toast.success('Login Berhasil! Mengalihkan...');
+
+				await delay(2000);
+
+				location.href = result.data.form.message;
+			}
+		},
+
 		onSubmit: ({ cancel }) => {
 			recaptchaError = null;
 
@@ -43,6 +57,8 @@
 		}
 	});
 </script>
+
+<Toaster />
 
 <svelte:head>
 	<title>Login - PPID Sulsel</title>

@@ -48,6 +48,8 @@
 		"yup": "^1.7.1"
 	},
 	"dependencies": {
-		"@fontsource-variable/figtree": "^5.2.10"
+		"@fontsource-variable/figtree": "^5.2.10",
+		"svelte-5-french-toast": "^2.0.6",
+		"sveltekit-top-loader": "^0.1.0"
 	}
 }

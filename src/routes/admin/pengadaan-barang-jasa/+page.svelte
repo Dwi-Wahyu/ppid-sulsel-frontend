@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { PUBLIC_API_URL, PUBLIC_BACKEND_URL } from '$env/static/public';
 	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 	import FilePond from '$lib/components/FilePond.svelte';
+	import { api } from '$lib/api';
 
 	let { data } = $props();
 
@@ -58,7 +59,7 @@
 		sortFilter = '';
 		startDate = '';
 		endDate = '';
-		goto('/admin/ikphns', { noScroll: true });
+		goto('/admin/pengadaan-barang-jasa', { noScroll: true });
 	}
 
 	// Open create modal
@@ -102,12 +103,6 @@
 		return isValid;
 	}
 
-	function getCookie(name: string) {
-		const value = `; ${document.cookie}`;
-		const parts = value.split(`; ${name}=`);
-		if (parts.length === 2) return parts.pop()?.split(';').shift();
-	}
-
 	// Handle create
 	async function handleCreate() {
 		if (!validateForm()) return;
@@ -115,41 +110,15 @@
 		loading = true;
 
 		try {
-			const csrfRequest = await fetch(`${PUBLIC_API_URL}/sanctum/csrf-cookie`, {
-				method: 'GET',
-				credentials: 'include'
-			});
-
-			if (!csrfRequest.ok) {
-				throw new Error('Failed to retrieve CSRF cookie');
-			}
-
-			const csrfData = await csrfRequest.json();
-
-			console.log(csrfData);
-
-			const accessToken = getCookie('access_token');
-			const xsrfToken = getCookie('xsrf-token');
-
 			const formData = new FormData();
 			formData.append('nama_jabatan', namaJabatan);
 			if (uploadedFile) {
 				formData.append('file', uploadedFile);
 			}
 
-			const response = await fetch(`${PUBLIC_API_URL}/admin/ikphn`, {
-				method: 'POST',
-				headers: {
-					Authorization: `Bearer ${accessToken}`,
-					Accept: 'application/json',
-					'X-XSRF-TOKEN': decodeURIComponent(xsrfToken || '')
-				},
-				body: formData
-			});
+			const result = await api.post('/admin/ikphn', formData);
 
-			const result = await response.json();
-
-			if (response.ok && result.success) {
+			if (result.success) {
 				showNotification('success', result.message);
 				showCreateModal = false;
 				await invalidateAll();
@@ -171,10 +140,6 @@
 		if (!validateForm(true)) return;
 
 		loading = true;
-		const token = document.cookie
-			.split('; ')
-			.find((row) => row.startsWith('access_token='))
-			?.split('=')[1];
 
 		try {
 			const formData = new FormData();
@@ -184,18 +149,9 @@
 			}
 			formData.append('_method', 'PUT');
 
-			const response = await fetch(`${PUBLIC_API_URL}/admin/ikphn/${selectedItem.id}`, {
-				method: 'POST',
-				headers: {
-					Authorization: `Bearer ${token}`,
-					Accept: 'application/json'
-				},
-				body: formData
-			});
+			const result = await api.put(`/admin/ikphn/${selectedItem.id}`, formData);
 
-			const result = await response.json();
-
-			if (response.ok && result.success) {
+			if (result.success) {
 				showNotification('success', result.message);
 				showEditModal = false;
 				await invalidateAll();
@@ -215,23 +171,11 @@
 	// Handle delete
 	async function handleDelete() {
 		loading = true;
-		const token = document.cookie
-			.split('; ')
-			.find((row) => row.startsWith('access_token='))
-			?.split('=')[1];
 
 		try {
-			const response = await fetch(`${PUBLIC_API_URL}/admin/ikphn/${selectedItem.id}`, {
-				method: 'DELETE',
-				headers: {
-					Authorization: `Bearer ${token}`,
-					Accept: 'application/json'
-				}
-			});
+			const result = await api.delete(`/admin/ikphn/${selectedItem.id}`);
 
-			const result = await response.json();
-
-			if (response.ok && result.success) {
+			if (result.success) {
 				showNotification('success', result.message);
 				showDeleteModal = false;
 				await invalidateAll();
@@ -251,90 +195,50 @@
 		params.set('page', pageNum.toString());
 		goto(`?${params.toString()}`, { noScroll: true });
 	}
+
+	function getPaginationRange(current: number, last: number) {
+		const delta = 2;
+		const range = [];
+		const rangeWithDots = [];
+		let l;
+
+		for (let i = 1; i <= last; i++) {
+			if (i === 1 || i === last || (i >= current - delta && i <= current + delta)) {
+				range.push(i);
+			}
+		}
+
+		for (let i of range) {
+			if (l) {
+				if (i - l === 2) {
+					rangeWithDots.push(l + 1);
+				} else if (i - l !== 1) {
+					rangeWithDots.push('...');
+				}
+			}
+			rangeWithDots.push(i);
+			l = i;
+		}
+
+		return rangeWithDots;
+	}
 </script>
 
 <svelte:head>
 	<title>IKPHN - Admin PPID</title>
 </svelte:head>
 
-<div class="mb-6">
-	<h2 class="text-xl leading-tight font-semibold text-slate-800 dark:text-slate-100">
-		Informasi Keputusan Pejabat Hukum dan Nomenklatur
-	</h2>
-	<p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
-		Kelola data IKPHN yang tersedia untuk publik
-	</p>
-</div>
-
-<!-- Filters -->
-<div
-	class="mb-6 rounded-xl border border-slate-100 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800"
->
-	<div class="grid grid-cols-1 gap-4 md:grid-cols-4">
-		<div>
-			<label class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300"
-				>Pencarian</label
-			>
-			<input
-				type="text"
-				bind:value={searchQuery}
-				placeholder="Cari nama jabatan..."
-				class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-			/>
-		</div>
-		<div>
-			<label class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300"
-				>Urutkan</label
-			>
-			<select
-				bind:value={sortFilter}
-				class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-			>
-				<option value="">Terbaru</option>
-				<option value="oldest">Terlama</option>
-				<option value="title_asc">Nama A-Z</option>
-				<option value="title_desc">Nama Z-A</option>
-			</select>
-		</div>
-		<div>
-			<label class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300"
-				>Dari Tanggal</label
-			>
-			<input
-				type="date"
-				bind:value={startDate}
-				class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-			/>
-		</div>
-		<div>
-			<label class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300"
-				>Sampai Tanggal</label
-			>
-			<input
-				type="date"
-				bind:value={endDate}
-				class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-			/>
-		</div>
+<div class="mb-6 flex flex-col justify-between md:flex-row md:items-center">
+	<div>
+		<h2 class="text-xl leading-tight font-semibold text-slate-800 dark:text-slate-100">
+			Pengadaan Barang dan Jasa
+		</h2>
+		<p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
+			Informasi pengadaan barang dan jasa
+		</p>
 	</div>
-	<div class="mt-4 flex gap-2">
-		<button
-			onclick={applyFilters}
-			class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-		>
-			Terapkan Filter
-		</button>
-		<button
-			onclick={resetFilters}
-			class="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
-		>
-			Reset
-		</button>
-	</div>
-</div>
 
-<!-- Add Button -->
-<div class="mb-4">
+	<!-- Add Button -->
 	<button
 		onclick={openCreateModal}
 		class="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
@@ -345,6 +249,53 @@
 		</svg>
 		Tambah Data
 	</button>
+</div>
+
+<!-- Filters -->
+<div
+	class="mb-6 rounded-xl border border-slate-100 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+>
+	<div class="grid grid-cols-1 gap-4 md:grid-cols-4">
+		<div>
+			<label class="block text-sm font-medium text-slate-700 dark:text-slate-300"
+				>Pencarian
+
+				<input
+					type="text"
+					bind:value={searchQuery}
+					placeholder="Cari nama jabatan..."
+					class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
+				/>
+			</label>
+		</div>
+		<div>
+			<label class="block text-sm font-medium text-slate-700 dark:text-slate-300"
+				>Urutkan
+
+				<select
+					bind:value={sortFilter}
+					class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
+				>
+					<option value="">Terbaru</option>
+					<option value="oldest">Terlama</option>
+					<option value="title_asc">Nama A-Z</option>
+					<option value="title_desc">Nama Z-A</option>
+				</select>
+			</label>
+		</div>
+		<button
+			onclick={applyFilters}
+			class="h-fit self-end rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+		>
+			Terapkan Filter
+		</button>
+		<button
+			onclick={resetFilters}
+			class="h-fit self-end rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
+		>
+			Reset
+		</button>
+	</div>
 </div>
 
 <!-- Data Table -->
@@ -372,13 +323,10 @@
 						>Jumlah Download</th
 					>
 					<th
-						class="px-6 py-3 text-left text-xs font-medium text-slate-600 uppercase dark:text-slate-300"
-						>Tanggal</th
-					>
-					<th
 						class="px-6 py-3 text-center text-xs font-medium text-slate-600 uppercase dark:text-slate-300"
-						>Aksi</th
 					>
+						Aksi
+					</th>
 				</tr>
 			</thead>
 			<tbody class="divide-y divide-slate-200 dark:divide-slate-700">
@@ -393,7 +341,7 @@
 						<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
 							{#if item.file}
 								<a
-									href={`${PUBLIC_API_URL}/storage/${item.file}`}
+									href={`${PUBLIC_BACKEND_URL}/uploads/ikphn/${item.file}`}
 									target="_blank"
 									class="text-blue-600 hover:underline dark:text-blue-400"
 								>
@@ -406,9 +354,6 @@
 						<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400"
 							>{item.jumlah_download || 0}</td
 						>
-						<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
-							{new Date(item.created_at).toLocaleDateString('id-ID')}
-						</td>
 						<td class="px-6 py-4 text-center">
 							<div class="flex justify-center gap-2">
 								<button
@@ -462,7 +407,7 @@
 										d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
 									></path>
 								</svg>
-								<p>Tidak ada data IKPHN</p>
+								<p>Tidak ada data</p>
 							</div>
 						</td>
 					</tr>
@@ -482,30 +427,43 @@
 					)} dari {data.ikphns.total} data
 				</div>
 				<div class="flex gap-1">
-					<button
-						onclick={() => changePage(data.ikphns.current_page - 1)}
-						disabled={data.ikphns.current_page === 1}
-						class="rounded-lg border border-slate-300 px-3 py-1 text-sm disabled:opacity-50 dark:border-slate-600"
-					>
-						Previous
-					</button>
-					{#each Array.from({ length: data.ikphns.last_page }, (_, i) => i + 1) as pageNum}
+					<div class="flex gap-1">
 						<button
-							onclick={() => changePage(pageNum)}
-							class="rounded-lg border px-3 py-1 text-sm {pageNum === data.ikphns.current_page
-								? 'border-blue-600 bg-blue-600 text-white'
-								: 'border-slate-300 dark:border-slate-600'}"
+							onclick={() => changePage(data.ikphns.current_page - 1)}
+							disabled={data.ikphns.current_page === 1}
+							class="rounded-lg border border-slate-300 px-3 py-1 text-sm disabled:opacity-50 dark:border-slate-600"
 						>
-							{pageNum}
+							Prev
 						</button>
-					{/each}
-					<button
-						onclick={() => changePage(data.ikphns.current_page + 1)}
-						disabled={data.ikphns.current_page === data.ikphns.last_page}
-						class="rounded-lg border border-slate-300 px-3 py-1 text-sm disabled:opacity-50 dark:border-slate-600"
-					>
-						Next
-					</button>
+
+						{#each getPaginationRange(data.ikphns.current_page, data.ikphns.last_page) as pageNum}
+							{#if pageNum === '...'}
+								<span class="px-2 py-1 text-slate-400">...</span>
+							{:else}
+								<button
+									onclick={() => {
+										if (typeof pageNum === 'number') {
+											changePage(pageNum);
+										}
+									}}
+									class="rounded-lg border px-3 py-1 text-sm transition-colors {pageNum ===
+									data.ikphns.current_page
+										? 'border-blue-600 bg-blue-600 text-white'
+										: 'border-slate-300 hover:bg-slate-50 dark:border-slate-600 dark:hover:bg-slate-700'}"
+								>
+									{pageNum}
+								</button>
+							{/if}
+						{/each}
+
+						<button
+							onclick={() => changePage(data.ikphns.current_page + 1)}
+							disabled={data.ikphns.current_page === data.ikphns.last_page}
+							class="rounded-lg border border-slate-300 px-3 py-1 text-sm disabled:opacity-50 dark:border-slate-600"
+						>
+							Next
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -516,47 +474,48 @@
 {#if showCreateModal}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
 		<div class="w-full max-w-lg rounded-lg bg-white p-6 dark:bg-slate-800">
-			<h3 class="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
-				Tambah Data IKPHN
-			</h3>
+			<h3 class="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">Tambah Data</h3>
 			<div class="space-y-4">
 				<div>
-					<label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-						Nama Jabatan <span class="text-red-500">*</span>
+					<label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+						Judul <span class="text-red-500">*</span>
+
+						<input
+							type="text"
+							bind:value={namaJabatan}
+							class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 {errors.nama_jabatan
+								? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
+								: ''}"
+							placeholder="Masukkan judul"
+						/>
 					</label>
-					<input
-						type="text"
-						bind:value={namaJabatan}
-						class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 {errors.nama_jabatan
-							? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
-							: ''}"
-						placeholder="Masukkan nama jabatan"
-					/>
 					{#if errors.nama_jabatan}
 						<p class="mt-1 text-sm text-red-600 dark:text-red-400">{errors.nama_jabatan[0]}</p>
 					{/if}
 				</div>
 
 				<div>
-					<label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+					<label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
 						Upload File <span class="text-red-500">*</span>
+
+						<FilePond
+							name="file"
+							allowMultiple={false}
+							acceptedFileTypes={[
+								'application/pdf',
+								'application/msword',
+								'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+								'application/vnd.ms-excel',
+								'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+								'image/jpeg',
+								'image/jpg',
+								'image/png'
+							]}
+							bind:value={uploadedFile}
+							label={'Drag & Drop file atau <span class="filepond--label-action">Browse</span><br/><span class="text-xs text-slate-500">PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (Max 10MB)</span>'}
+						/>
 					</label>
-					<FilePond
-						name="file"
-						allowMultiple={false}
-						acceptedFileTypes={[
-							'application/pdf',
-							'application/msword',
-							'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-							'application/vnd.ms-excel',
-							'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-							'image/jpeg',
-							'image/jpg',
-							'image/png'
-						]}
-						bind:value={uploadedFile}
-						label={'Drag & Drop file atau <span class="filepond--label-action">Browse</span><br/><span class="text-xs text-slate-500">PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (Max 10MB)</span>'}
-					/>
+
 					{#if errors.file}
 						<p class="mt-1 text-sm text-red-600 dark:text-red-400">{errors.file[0]}</p>
 					{/if}
@@ -586,33 +545,52 @@
 {#if showEditModal && selectedItem}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
 		<div class="w-full max-w-lg rounded-lg bg-white p-6 dark:bg-slate-800">
-			<h3 class="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">Edit Data IKPHN</h3>
+			<h3 class="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">Edit Data</h3>
 			<div class="space-y-4">
 				<div>
-					<label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-						Nama Jabatan <span class="text-red-500">*</span>
+					<label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+						Judul <span class="text-red-500">*</span>
+
+						<input
+							type="text"
+							bind:value={namaJabatan}
+							class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 {errors.nama_jabatan
+								? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
+								: ''}"
+							placeholder="Masukkan judul"
+						/>
 					</label>
-					<input
-						type="text"
-						bind:value={namaJabatan}
-						class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 {errors.nama_jabatan
-							? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
-							: ''}"
-						placeholder="Masukkan nama jabatan"
-					/>
+
 					{#if errors.nama_jabatan}
 						<p class="mt-1 text-sm text-red-600 dark:text-red-400">{errors.nama_jabatan[0]}</p>
 					{/if}
 				</div>
 
 				<div>
-					<label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+					<label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
 						Upload File Baru (Opsional)
+
+						<FilePond
+							name="file"
+							allowMultiple={false}
+							acceptedFileTypes={[
+								'application/pdf',
+								'application/msword',
+								'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+								'application/vnd.ms-excel',
+								'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+								'image/jpeg',
+								'image/jpg',
+								'image/png'
+							]}
+							bind:value={editUploadedFile}
+							label={'Drag & Drop file atau <span class="filepond--label-action">Browse</span><br/><span class="text-xs text-slate-500">PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (Max 10MB)</span>'}
+						/>
 					</label>
 					{#if selectedItem.file}
 						<p class="mb-2 text-sm text-slate-600 dark:text-slate-400">
 							File saat ini: <a
-								href={`${PUBLIC_API_URL}/storage/${selectedItem.file}`}
+								href={`${PUBLIC_BACKEND_URL}/uploads/ikphn/${selectedItem.file}`}
 								target="_blank"
 								class="text-blue-600 hover:underline dark:text-blue-400"
 							>
@@ -620,22 +598,7 @@
 							</a>
 						</p>
 					{/if}
-					<FilePond
-						name="file"
-						allowMultiple={false}
-						acceptedFileTypes={[
-							'application/pdf',
-							'application/msword',
-							'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-							'application/vnd.ms-excel',
-							'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-							'image/jpeg',
-							'image/jpg',
-							'image/png'
-						]}
-						bind:value={editUploadedFile}
-						label={'Drag & Drop file atau <span class="filepond--label-action">Browse</span><br/><span class="text-xs text-slate-500">PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (Max 10MB)</span>'}
-					/>
+
 					{#if errors.file}
 						<p class="mt-1 text-sm text-red-600 dark:text-red-400">{errors.file[0]}</p>
 					{/if}
