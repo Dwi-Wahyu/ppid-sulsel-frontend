@@ -47,7 +47,7 @@
 	</div>
 </div>
 
-<main class="bg-gray-50 py-12 font-['Plus_Jakarta_Sans'] md:py-16 dark:bg-slate-900">
+<main class="bg-gray-50 pt-6 pb-12 font-['Plus_Jakarta_Sans'] md:py-16 dark:bg-slate-900">
 	<div class="container mx-auto px-4">
 		<div class="mx-auto max-w-5xl">
 			<div
@@ -63,7 +63,7 @@
 					<input type="text" name="website" class="hidden" bind:value={$form.website} />
 
 					<div
-						class="space-y-6 rounded-2xl border border-gray-100 bg-linear-to-br from-white to-gray-50/50 p-6 dark:border-slate-700 dark:from-slate-800 dark:to-slate-800/50"
+						class="space-y-6 rounded-2xl md:border md:border-gray-100 md:p-6 md:dark:border-slate-700"
 					>
 						<h3
 							class="flex items-center gap-3 border-b-2 border-ppid-primary/20 pb-4 text-xl font-bold text-ppid-primary dark:text-white"
@@ -74,7 +74,12 @@
 								1
 							</div>
 							<div class="flex-1">
-								{m['layanan_pages.personal_data']()}
+								<div>
+									{m['layanan_pages.personal_data']()}
+								</div>
+								<p class="mt-1 text-xs font-normal text-gray-500 dark:text-gray-400">
+									{m['layanan_pages.personal_data_desc']()}
+								</p>
 							</div>
 						</h3>
 
@@ -264,7 +269,7 @@
 					</div>
 
 					<div
-						class="space-y-6 rounded-2xl border border-gray-100 bg-linear-to-br from-white to-gray-50/50 p-6 dark:border-slate-700 dark:from-slate-800 dark:to-slate-800/50"
+						class="space-y-6 rounded-2xl md:border md:border-gray-100 md:p-6 md:dark:border-slate-700"
 					>
 						<h3
 							class="flex items-center gap-3 border-b-2 border-ppid-primary/20 pb-4 text-xl font-bold text-ppid-primary dark:text-white"
@@ -275,7 +280,12 @@
 								2
 							</div>
 							<div class="flex-1">
-								{m['layanan_pages.keberatan_detail']()}
+								<div>
+									{m['layanan_pages.keberatan_detail']()}
+								</div>
+								<p class="mt-1 text-xs font-normal text-gray-500 dark:text-gray-400">
+									{m['layanan_pages.keberatan_detail_desc']()}
+								</p>
 							</div>
 						</h3>
 

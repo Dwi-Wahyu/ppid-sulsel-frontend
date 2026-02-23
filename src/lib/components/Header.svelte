@@ -139,8 +139,10 @@
 		</a>
 
 		<div class="flex items-center gap-3 md:gap-4">
-			<!-- Search Trigger Button -->
-			<a href="/login" class="hidden text-sm font-medium text-gray-700 lg:block dark:text-white">
+			<a
+				href="/login"
+				class="hidden text-sm font-medium text-gray-700 capitalize lg:block dark:text-white"
+			>
 				Login
 			</a>
 
@@ -563,7 +565,7 @@
 						href="/login"
 						class="flex w-full items-center justify-between px-6 py-4 hover:text-ppid-accent lg:px-4"
 					>
-						<span>Login</span>
+						<span>LOGIN</span>
 					</a>
 				</li>
 			</ul>

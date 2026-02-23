@@ -265,14 +265,14 @@
 </div>
 
 <!-- Main Content -->
-<main class="bg-gray-50 py-12 font-['Plus_Jakarta_Sans'] md:py-16 dark:bg-slate-900">
+<main class="bg-gray-50 pt-6 pb-12 font-['Plus_Jakarta_Sans'] md:py-16 dark:bg-slate-900">
 	<div class="container mx-auto px-4">
 		<div class="mx-auto max-w-5xl">
 			<!-- Form Container -->
 			<div
 				class="relative rounded-2xl border border-gray-200 bg-white p-8 shadow-sm md:p-10 dark:border-slate-700 dark:bg-slate-800"
 			>
-				<div class="mb-10 text-center">
+				<div class="mb-10 hidden text-center md:block">
 					<div
 						class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-ppid-primary/5 text-ppid-primary dark:text-white"
 					>
@@ -312,7 +312,7 @@
 
 					<!-- Section 1: Data Pribadi -->
 					<div
-						class="space-y-6 rounded-2xl border border-gray-100 bg-linear-to-br from-white to-gray-50/50 p-6 dark:border-slate-700 dark:from-slate-800 dark:to-slate-800/50"
+						class="space-y-6 rounded-2xl md:border md:border-gray-100 md:p-6 md:dark:border-slate-700"
 					>
 						<h3
 							class="flex items-center gap-3 border-b-2 border-ppid-primary/20 pb-4 text-xl font-bold text-ppid-primary dark:text-white"
@@ -323,21 +323,7 @@
 								1
 							</div>
 							<div class="flex-1">
-								<div class="flex items-center gap-2">
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										width="20"
-										height="20"
-										viewBox="0 0 24 24"
-										fill="none"
-										stroke="currentColor"
-										stroke-width="2"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-									>
-										<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-										<circle cx="12" cy="7" r="4"></circle>
-									</svg>
+								<div>
 									{m['layanan_pages.personal_data']()}
 								</div>
 								<p class="mt-1 text-xs font-normal text-gray-500 dark:text-gray-400">
@@ -356,7 +342,7 @@
 										type="text"
 										bind:value={formData.nama}
 										placeholder={m['form.fullname_placeholder']()}
-										class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+										class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 										required
 									/>
 								</label>
@@ -372,7 +358,7 @@
 										oninput={validateNik}
 										placeholder={m['form.nik_placeholder']()}
 										maxlength="16"
-										class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+										class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 										required
 									/>
 								</label>
@@ -390,7 +376,7 @@
 										type="email"
 										bind:value={formData.email}
 										placeholder="contoh@email.com"
-										class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+										class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 										required
 									/>
 								</label>
@@ -404,7 +390,7 @@
 										type="text"
 										bind:value={formData.no_hp}
 										placeholder="08xxxxxxxxxx"
-										class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+										class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 										required
 									/>
 								</label>
@@ -456,7 +442,7 @@
 									type="text"
 									bind:value={formData.alamat}
 									placeholder={m['form.address_placeholder']()}
-									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+									class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 									required
 								/>
 							</label>
@@ -471,7 +457,7 @@
 									type="file"
 									onchange={(e) => handleFileUpload(e, 'foto_ktp')}
 									accept="image/jpeg,image/jpg,image/png"
-									class="block w-full cursor-pointer rounded-lg border border-gray-300 bg-white text-sm text-gray-700 file:mr-4 file:border-0 file:bg-ppid-primary file:px-6 file:py-3 file:text-sm file:font-semibold file:text-white hover:file:bg-ppid-primary/90 focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800 dark:text-gray-300"
+									class="mt-1 block w-full cursor-pointer rounded-lg border border-gray-300 bg-white text-sm text-gray-700 file:mr-4 file:border-0 file:bg-ppid-primary file:px-6 file:py-3 file:text-sm file:font-semibold file:text-white hover:file:bg-ppid-primary/90 focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800 dark:text-gray-300"
 									required
 								/>
 							</label>
@@ -491,7 +477,7 @@
 									type="file"
 									onchange={(e) => handleFileUpload(e, 'dokumen_pendukung')}
 									accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-									class="block w-full cursor-pointer rounded-lg border border-gray-300 bg-white text-sm text-gray-700 file:mr-4 file:border-0 file:bg-linear-to-r file:from-ppid-primary/90 file:to-ppid-primary file:px-6 file:py-3 file:text-sm file:font-semibold file:text-white hover:file:from-ppid-primary hover:file:to-ppid-primary/90 focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800 dark:text-gray-300"
+									class="mt-1 block w-full cursor-pointer rounded-lg border border-gray-300 bg-white text-sm text-gray-700 file:mr-4 file:border-0 file:bg-linear-to-r file:from-ppid-primary/90 file:to-ppid-primary file:px-6 file:py-3 file:text-sm file:font-semibold file:text-white hover:file:from-ppid-primary hover:file:to-ppid-primary/90 focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800 dark:text-gray-300"
 								/>
 							</label>
 
@@ -539,7 +525,7 @@
 										bind:value={formData.nmr_pengesahan}
 										placeholder={m['form.agency_number_placeholder']()}
 										required={isInstansi}
-										class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+										class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 									/>
 								</label>
 								<p class="mt-1 text-xs text-gray-500">
@@ -551,7 +537,7 @@
 
 					<!-- Section 2: Detail Informasi -->
 					<div
-						class="space-y-6 rounded-2xl border border-gray-100 bg-linear-to-br from-white to-gray-50/50 p-6 dark:border-slate-700 dark:from-slate-800 dark:to-slate-800/50"
+						class="space-y-6 rounded-2xl md:border md:border-gray-100 md:p-6 md:dark:border-slate-700"
 					>
 						<h3
 							class="flex items-center gap-3 border-b-2 border-ppid-primary/20 pb-4 text-xl font-bold text-ppid-primary dark:text-white"
@@ -562,22 +548,7 @@
 								2
 							</div>
 							<div class="flex-1">
-								<div class="flex items-center gap-2">
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										width="20"
-										height="20"
-										viewBox="0 0 24 24"
-										fill="none"
-										stroke="currentColor"
-										stroke-width="2"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-									>
-										<circle cx="12" cy="12" r="10"></circle>
-										<line x1="12" y1="16" x2="12" y2="12"></line>
-										<line x1="12" y1="8" x2="12.01" y2="8"></line>
-									</svg>
+								<div>
 									{m['layanan_pages.detail_info']()}
 								</div>
 								<p class="mt-1 text-xs font-normal text-gray-500 dark:text-gray-400">
@@ -595,7 +566,7 @@
 									type="text"
 									bind:value={formData.tujuan}
 									placeholder={m['form.purpose_placeholder']()}
-									class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+									class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 									required
 								/>
 							</label>
@@ -610,7 +581,7 @@
 									bind:value={formData.rincian}
 									rows="5"
 									placeholder={m['form.details_placeholder']()}
-									class="w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+									class="mt-1 w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 									required
 								></textarea>
 							</label>
@@ -627,7 +598,7 @@
 
 									<select
 										bind:value={formData.id_bentuk_informasi}
-										class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+										class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 										required
 									>
 										<option value="">{m['form.format_placeholder']()}</option>
@@ -646,7 +617,7 @@
 										type="text"
 										bind:value={formData.contoh_informasi}
 										placeholder="https://contoh-link-informasi.com"
-										class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
+										class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
 									/>
 								</label>
 								<p class="mt-1 text-xs text-gray-500">
@@ -657,63 +628,61 @@
 					</div>
 
 					<!-- Submit Buttons -->
-					<div class="mt-2 pt-8">
-						<div class="flex flex-col justify-end gap-4 sm:flex-row">
-							<button
-								type="reset"
-								onclick={resetForm}
-								class="flex items-center justify-center gap-2 rounded-lg bg-gray-100 px-6 py-3 font-semibold text-gray-700 transition-all hover:bg-gray-200"
-								disabled={isSubmitting}
-							>
-								<i class="fas fa-redo"></i>
-								{m['form.reset']()}
-							</button>
-							<button
-								type="submit"
-								class="flex transform items-center justify-center gap-2 rounded-lg bg-ppid-primary px-8 py-3.5 font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-ppid-primary/90 hover:shadow-xl disabled:cursor-not-allowed disabled:bg-gray-400 disabled:hover:translate-y-0"
-								disabled={isSubmitting}
-							>
-								{#if isSubmitting}
-									<svg
-										class="mr-2 h-5 w-5 animate-spin text-white"
-										xmlns="http://www.w3.org/2000/svg"
-										fill="none"
-										viewBox="0 0 24 24"
-									>
-										<circle
-											class="opacity-25"
-											cx="12"
-											cy="12"
-											r="10"
-											stroke="currentColor"
-											stroke-width="4"
-										></circle>
-										<path
-											class="opacity-75"
-											fill="currentColor"
-											d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-										></path>
-									</svg>
-									{m['form.submitting']()}
-								{:else}
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										width="20"
-										height="20"
-										viewBox="0 0 24 24"
-										fill="none"
+					<div class="flex flex-col justify-end gap-4 sm:flex-row">
+						<button
+							type="reset"
+							onclick={resetForm}
+							class="flex items-center justify-center gap-2 rounded-lg bg-gray-100 px-6 py-3 font-semibold text-gray-700 transition-all hover:bg-gray-200"
+							disabled={isSubmitting}
+						>
+							<i class="fas fa-redo"></i>
+							{m['form.reset']()}
+						</button>
+						<button
+							type="submit"
+							class="flex transform items-center justify-center gap-2 rounded-lg bg-ppid-primary px-8 py-3.5 font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-ppid-primary/90 hover:shadow-xl disabled:cursor-not-allowed disabled:bg-gray-400 disabled:hover:translate-y-0"
+							disabled={isSubmitting}
+						>
+							{#if isSubmitting}
+								<svg
+									class="mr-2 h-5 w-5 animate-spin text-white"
+									xmlns="http://www.w3.org/2000/svg"
+									fill="none"
+									viewBox="0 0 24 24"
+								>
+									<circle
+										class="opacity-25"
+										cx="12"
+										cy="12"
+										r="10"
 										stroke="currentColor"
-										stroke-width="2"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-									>
-										<line x1="22" x2="11" y1="2" y2="13" />
-										<polygon points="22 2 15 22 11 13 2 9 22 2" />
-									</svg>
-									{m['form.submit']()}
-								{/if}
-							</button>
-						</div>
+										stroke-width="4"
+									></circle>
+									<path
+										class="opacity-75"
+										fill="currentColor"
+										d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+									></path>
+								</svg>
+								{m['form.submitting']()}
+							{:else}
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="20"
+									height="20"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<line x1="22" x2="11" y1="2" y2="13" />
+									<polygon points="22 2 15 22 11 13 2 9 22 2" />
+								</svg>
+								{m['form.submit']()}
+							{/if}
+						</button>
 					</div>
 				</form>
 			</div>

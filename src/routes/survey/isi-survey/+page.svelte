@@ -197,7 +197,7 @@
 </div>
 
 <!-- Main Content -->
-<main class="bg-gray-50 py-12 font-['Plus_Jakarta_Sans'] md:py-16 dark:bg-slate-900">
+<main class="bg-gray-50 pt-6 pb-12 font-['Plus_Jakarta_Sans'] md:py-16 dark:bg-slate-900">
 	<div class="container mx-auto px-4">
 		<div class="mx-auto max-w-4xl">
 			<div
@@ -259,7 +259,7 @@
 
 						<!-- Section 1: Data Responden -->
 						<div
-							class="rounded-2xl border-2 border-gray-200 bg-linear-to-br from-blue-50 to-white p-8 shadow-sm dark:border-slate-700 dark:from-slate-900 dark:to-slate-800"
+							class="md:rounded-2xl md:border-2 md:border-gray-200 md:bg-linear-to-br md:from-blue-50 md:to-white md:p-8 md:shadow-sm md:dark:border-slate-700 md:dark:from-slate-900 md:dark:to-slate-800"
 						>
 							<div class="mb-6 flex items-center gap-3">
 								<div
@@ -288,77 +288,82 @@
 								<div class="space-y-2">
 									<label class="block text-base font-semibold text-gray-800 dark:text-gray-200">
 										Email <span class="text-red-500">*</span>
+
+										<input
+											type="email"
+											bind:value={formData.email}
+											placeholder="contoh@email.com"
+											required
+											class="mt-1 w-full rounded-xl border-2 border-gray-300 bg-white px-5 py-3.5 text-base transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+										/>
 									</label>
-									<input
-										type="email"
-										bind:value={formData.email}
-										placeholder="contoh@email.com"
-										required
-										class="w-full rounded-xl border-2 border-gray-300 bg-white px-5 py-3.5 text-base transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-									/>
 								</div>
 
 								<!-- Nama -->
 								<div class="space-y-2">
 									<label class="block text-base font-semibold text-gray-800 dark:text-gray-200">
 										Nama Lengkap <span class="text-red-500">*</span>
+
+										<input
+											type="text"
+											bind:value={formData.nama}
+											placeholder="Nama Lengkap Anda"
+											required
+											class="mt-1 w-full rounded-xl border-2 border-gray-300 bg-white px-5 py-3.5 text-base transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+										/>
 									</label>
-									<input
-										type="text"
-										bind:value={formData.nama}
-										placeholder="Nama Lengkap Anda"
-										required
-										class="w-full rounded-xl border-2 border-gray-300 bg-white px-5 py-3.5 text-base transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-									/>
 								</div>
 
 								<!-- Lembaga -->
 								<div class="space-y-2">
 									<label class="block text-base font-semibold text-gray-800 dark:text-gray-200">
 										Instansi / Lembaga / Umum <span class="text-red-500">*</span>
+
+										<input
+											type="text"
+											bind:value={formData.lembaga}
+											placeholder="Nama Instansi/Lembaga atau 'Umum'"
+											required
+											class="mt-1 w-full rounded-xl border-2 border-gray-300 bg-white px-5 py-3.5 text-base transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+										/>
 									</label>
-									<input
-										type="text"
-										bind:value={formData.lembaga}
-										placeholder="Nama Instansi/Lembaga atau 'Umum'"
-										required
-										class="w-full rounded-xl border-2 border-gray-300 bg-white px-5 py-3.5 text-base transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-									/>
 								</div>
 
 								<!-- Alamat -->
 								<div class="space-y-2">
 									<label class="block text-base font-semibold text-gray-800 dark:text-gray-200">
 										Alamat <span class="text-red-500">*</span>
+
+										<textarea
+											bind:value={formData.alamat}
+											rows="3"
+											placeholder="Alamat Lengkap"
+											required
+											class="mt-1 w-full resize-none rounded-xl border-2 border-gray-300 bg-white px-5 py-3.5 text-base transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+										></textarea>
 									</label>
-									<textarea
-										bind:value={formData.alamat}
-										rows="3"
-										placeholder="Alamat Lengkap"
-										required
-										class="w-full resize-none rounded-xl border-2 border-gray-300 bg-white px-5 py-3.5 text-base transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-									></textarea>
 								</div>
 
 								<!-- Tanggal -->
 								<div class="space-y-2">
 									<label class="block text-base font-semibold text-gray-800 dark:text-gray-200">
 										Tanggal <span class="text-red-500">*</span>
+
+										<input
+											type="date"
+											bind:value={formData.tanggal}
+											required
+											disabled
+											class="mt-1 w-full rounded-xl border-2 border-gray-300 bg-white px-5 py-3.5 text-base transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+										/>
 									</label>
-									<input
-										type="date"
-										bind:value={formData.tanggal}
-										required
-										disabled
-										class="w-full rounded-xl border-2 border-gray-300 bg-white px-5 py-3.5 text-base transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:border-slate-600 dark:bg-slate-800 dark:text-white"
-									/>
 								</div>
 							</div>
 						</div>
 
 						<!-- Section 2: Penilaian -->
 						<div
-							class="rounded-2xl border-2 border-gray-200 bg-linear-to-br from-amber-50 to-white p-8 shadow-sm dark:border-slate-700 dark:from-slate-900 dark:to-slate-800"
+							class="md:rounded-2xl md:border-2 md:border-gray-200 md:bg-linear-to-br md:from-amber-50 md:to-white md:p-8 md:shadow-sm md:dark:border-slate-700 md:dark:from-slate-900 md:dark:to-slate-800"
 						>
 							<div class="mb-6 flex items-center gap-3">
 								<div
@@ -387,14 +392,14 @@
 							<div class="space-y-8">
 								{#each questions as question, index (question.id)}
 									<div
-										class="rounded-xl border border-gray-200 bg-white p-6 transition-shadow hover:shadow-md dark:border-slate-700 dark:bg-slate-800"
+										class="md:rounded-xl md:border md:border-gray-200 md:bg-white md:p-6 md:transition-shadow md:hover:shadow-md md:dark:border-slate-700 md:dark:bg-slate-800"
 										id={`question-${question.id}`}
 									>
 										<p
 											class="mb-5 text-base leading-relaxed font-semibold text-gray-900 dark:text-white"
 										>
 											<span
-												class="mr-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-ppid-primary text-sm font-bold text-white"
+												class="mr-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-ppid-primary text-sm font-bold text-white"
 											>
 												{index + 1}
 											</span>

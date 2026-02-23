@@ -63,7 +63,7 @@
 >
 	<div class="relative z-10 container mx-auto px-4 sm:px-6">
 		<div
-			class="mx-auto flex w-full justify-center gap-6 px-4 pb-4 md:grid md:max-w-4xl md:grid-cols-2 md:gap-12 md:px-0 md:pb-0"
+			class="mx-auto flex w-full flex-col justify-center gap-6 px-4 pb-4 md:grid md:max-w-4xl md:grid-cols-2 md:flex-row md:gap-12 md:px-0 md:pb-0"
 		>
 			{#if isLoading}
 				<div class="h-96 w-full animate-pulse rounded-[3rem] bg-slate-200 dark:bg-slate-800"></div>

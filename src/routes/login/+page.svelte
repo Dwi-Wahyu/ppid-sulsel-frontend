@@ -66,7 +66,7 @@
 	<script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad" async defer></script>
 </svelte:head>
 
-<div class="relative flex min-h-screen items-center justify-center p-4 font-sans lg:p-0">
+<div class="relative flex min-h-svh items-center justify-center p-4 font-sans lg:p-0">
 	<div class="absolute inset-0 z-0">
 		<img
 			src="/images/kantor.jpeg"
