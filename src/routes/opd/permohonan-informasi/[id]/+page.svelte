@@ -2,6 +2,7 @@
 	import { invalidateAll } from '$app/navigation';
 	import type { PageData } from './$types';
 	import { api } from '$lib/api';
+	import { PUBLIC_API_URL } from '$env/static/public';
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 	import SuccessModal from '$lib/components/SuccessModal.svelte';
 
@@ -293,19 +294,25 @@
 								<p class="text-slate-800">{respon.pesan}</p>
 								{#if respon.file}
 									<a
-										href={`/uploads/${respon.file}`}
+										href={`${PUBLIC_API_URL}/storage/${respon.file}`}
 										target="_blank"
-										class="mt-2 inline-flex items-center text-sm text-blue-600 hover:underline"
+										rel="noopener noreferrer"
+										class="mt-2 inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline"
 									>
-										<svg class="mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+										<svg
+											class="h-4 w-4"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+											aria-hidden="true"
 											><path
 												stroke-linecap="round"
 												stroke-linejoin="round"
 												stroke-width="2"
-												d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+												d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
 											/></svg
 										>
-										Lihat File Lampiran
+										Unduh File Lampiran
 									</a>
 								{/if}
 							</div>

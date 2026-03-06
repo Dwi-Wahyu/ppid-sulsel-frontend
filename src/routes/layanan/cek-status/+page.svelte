@@ -234,12 +234,24 @@
 							{#if item.file}
 								<div class="mt-4 border-t border-slate-200 pt-4 dark:border-slate-600">
 									<a
-										href="{PUBLIC_API_URL}/public/informasi/download/{isPermohonan(item)
-											? item.id_permohonan
-											: item.id_pengajuan}"
+										href={item.file}
 										target="_blank"
+										rel="noopener noreferrer"
 										class="inline-flex items-center gap-2 rounded-xl bg-ppid-primary px-5 py-2.5 text-sm font-bold text-white hover:bg-ppid-primary-dark"
 									>
+										<svg
+											class="h-4 w-4"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+											aria-hidden="true"
+											><path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+											/></svg
+										>
 										Unduh Lampiran Jawaban
 									</a>
 								</div>
