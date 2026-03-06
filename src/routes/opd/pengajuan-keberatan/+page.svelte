@@ -169,7 +169,7 @@
 								<td class="px-6 py-4 text-right">
 									<div class="flex items-center justify-end space-x-2">
 										<a
-											href={`/admin/pengajuan-keberatan/${item.id_pengajuan}`}
+											href={`/opd/pengajuan-keberatan/${item.id_pengajuan}`}
 											class="text-slate-400 transition-colors hover:text-ppid-primary dark:text-slate-500 dark:hover:text-ppid-primary"
 											title="Lihat detail pengajuan"
 											aria-label="Lihat detail pengajuan {item.nama_pemohon}"
