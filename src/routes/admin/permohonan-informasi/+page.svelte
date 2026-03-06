@@ -130,7 +130,7 @@
 
 <div class="mb-4 flex items-center justify-between">
 	<h2 class="text-xl leading-tight font-semibold text-slate-800 dark:text-slate-100">
-		Permohonan Informasi
+		Daftar Permohonan Informasi
 	</h2>
 </div>
 
@@ -138,15 +138,6 @@
 	<div
 		class="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
 	>
-		<!-- Header -->
-		<div
-			class="flex flex-col justify-between gap-4 border-b border-slate-100 p-6 sm:flex-row sm:items-center dark:border-slate-700"
-		>
-			<h3 class="text-lg font-bold text-[#1A305E] dark:text-slate-100">
-				Daftar Permohonan Informasi
-			</h3>
-		</div>
-
 		<!-- Search/Filter -->
 		<div
 			class="border-b border-slate-100 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-700/30"

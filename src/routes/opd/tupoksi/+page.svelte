@@ -13,10 +13,10 @@
 	let fetching = $state(true);
 	let nm_skpd = $state('');
 
-	let visimisiType = $state<'file' | 'text'>('file');
-	let visimisi_text = $state('');
-	let uploadedVisimisi: any = $state(null);
-	let currentVisimisi = $state(''); // The raw value from DB
+	let tupoksiType = $state<'file' | 'text'>('file');
+	let tupoksi_text = $state('');
+	let uploadedTupoksi: any = $state(null);
+	let currentTupoksi = $state(''); // The raw value from DB
 
 	let notification = $state({
 		show: false,
@@ -32,23 +32,23 @@
 		notification.show = true;
 	}
 
-	async function loadVisiMisi() {
+	async function loadTupoksi() {
 		fetching = true;
 		try {
-			const response = await api.get(`/admin/skpd/${data.user?.id_skpd}/visi-misi`);
+			const response = await api.get(`/admin/skpd/${data.user?.id_skpd}/tupoksi`);
 			if (response.success) {
-				currentVisimisi = response.data.visimisi || '';
+				currentTupoksi = response.data.tupoksi || '';
 				nm_skpd = response.data.nm_skpd || '';
 
-				if (currentVisimisi && !currentVisimisi.toLowerCase().endsWith('.pdf')) {
-					visimisiType = 'text';
-					visimisi_text = currentVisimisi;
+				if (currentTupoksi && !currentTupoksi.toLowerCase().endsWith('.pdf')) {
+					tupoksiType = 'text';
+					tupoksi_text = currentTupoksi;
 				} else {
-					visimisiType = 'file';
+					tupoksiType = 'file';
 				}
 			}
 		} catch (error: any) {
-			triggerNotify('error', 'Gagal Memuat', error.message || 'Data visi misi tidak dapat diambil');
+			triggerNotify('error', 'Gagal Memuat', error.message || 'Data tupoksi tidak dapat diambil');
 		} finally {
 			fetching = false;
 		}
@@ -59,27 +59,28 @@
 		try {
 			const submitFormData = new FormData();
 
-			if (visimisiType === 'file') {
-				if (uploadedVisimisi) {
-					const file = Array.isArray(uploadedVisimisi) ? uploadedVisimisi[0] : uploadedVisimisi;
-					submitFormData.append('visimisi', file.file || file);
+			if (tupoksiType === 'file') {
+				if (uploadedTupoksi) {
+					const file = Array.isArray(uploadedTupoksi) ? uploadedTupoksi[0] : uploadedTupoksi;
+					submitFormData.append('tupoksi', file.file || file);
 				}
 			} else {
-				submitFormData.append('visimisi', visimisi_text);
+				submitFormData.append('tupoksi', tupoksi_text);
 			}
 
 			submitFormData.append('_method', 'PUT');
 
-			const result = await api.post(`/admin/skpd/${data.user?.id_skpd}/visi-misi`, submitFormData);
+			const result = await api.post(`/admin/skpd/${data.user?.id_skpd}/tupoksi`, submitFormData);
 
 			if (result.success) {
 				triggerNotify(
 					'success',
 					'Berhasil Diperbarui',
-					result.message || 'Konten visi misi telah disimpan.'
+					result.message || 'Konten tupoksi telah disimpan.'
 				);
-				currentVisimisi = result.data.visimisi || '';
-				uploadedVisimisi = null; // reset filepond
+				// Update current reference to uploaded file/text to reflect changes
+				currentTupoksi = result.data.tupoksi || '';
+				uploadedTupoksi = null; // reset filepond
 				await invalidateAll();
 			}
 		} catch (error: any) {
@@ -94,12 +95,12 @@
 	}
 
 	$effect(() => {
-		loadVisiMisi();
+		loadTupoksi();
 	});
 </script>
 
 <svelte:head>
-	<title>Update Visi Misi - {nm_skpd || 'SKPD'}</title>
+	<title>Update Tugas Pokok & Fungsi - {nm_skpd || 'SKPD'}</title>
 </svelte:head>
 
 <NotificationDialog
@@ -112,9 +113,9 @@
 />
 
 <div class="mb-6">
-	<h2 class="text-xl font-semibold text-slate-800 dark:text-slate-100">Visi & Misi</h2>
+	<h2 class="text-xl font-semibold text-slate-800 dark:text-slate-100">Tugas Pokok & Fungsi</h2>
 	<p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
-		Sesuaikan visi dan misi untuk SKPD <strong>{nm_skpd}</strong>
+		Sesuaikan tugas pokok dan fungsi untuk SKPD <strong>{nm_skpd}</strong>
 	</p>
 </div>
 
@@ -136,44 +137,42 @@
 					<div class="flex rounded-lg bg-slate-100 p-1 dark:bg-slate-900">
 						<button
 							type="button"
-							class="rounded-md px-3 py-1 text-[10px] font-bold transition-all {visimisiType ===
+							class="rounded-md px-3 py-1 text-[10px] font-bold transition-all {tupoksiType ===
 							'file'
 								? 'bg-white text-blue-600 shadow-sm'
 								: 'text-slate-500'}"
-							onclick={() => (visimisiType = 'file')}>FILE PDF</button
+							onclick={() => (tupoksiType = 'file')}>FILE PDF</button
 						>
 						<button
 							type="button"
-							class="rounded-md px-3 py-1 text-[10px] font-bold transition-all {visimisiType ===
+							class="rounded-md px-3 py-1 text-[10px] font-bold transition-all {tupoksiType ===
 							'text'
 								? 'bg-white text-blue-600 shadow-sm'
 								: 'text-slate-500'}"
-							onclick={() => (visimisiType = 'text')}>TEKS HTML</button
+							onclick={() => (tupoksiType = 'text')}>TEKS HTML</button
 						>
 					</div>
 				</div>
 
-				{#if visimisiType === 'file'}
+				{#if tupoksiType === 'file'}
 					<FilePond
-						name="visimisi"
+						name="tupoksi"
 						allowMultiple={false}
 						acceptedFileTypes={['application/pdf']}
-						bind:value={uploadedVisimisi}
-						label={'Seret PDF visi misi atau <span class="filepond--label-action">Telusuri</span>'}
+						bind:value={uploadedTupoksi}
+						label={'Seret PDF tupoksi atau <span class="filepond--label-action">Telusuri</span>'}
 					/>
-					{#if currentVisimisi && currentVisimisi
-							.toLowerCase()
-							.endsWith('.pdf') && !uploadedVisimisi}
+					{#if currentTupoksi && currentTupoksi.toLowerCase().endsWith('.pdf') && !uploadedTupoksi}
 						<p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
 							<a
-								href="{PUBLIC_BACKEND_URL}/uploads/{currentVisimisi}"
+								href="{PUBLIC_BACKEND_URL}/uploads/{currentTupoksi}"
 								target="_blank"
 								class="text-blue-600 hover:underline">Lihat PDF saat ini</a
 							>
 						</p>
 					{/if}
 				{:else}
-					<TinyMCE bind:value={visimisi_text} height={500} />
+					<TinyMCE bind:value={tupoksi_text} height={500} />
 				{/if}
 			</div>
 

@@ -173,7 +173,7 @@
 	</div>
 </div>
 
-<main class="bg-gray-50 py-10 font-['Plus_Jakarta_Sans'] md:py-16 dark:bg-slate-900">
+<main class="bg-gray-50 py-10 font-['Plus_Jakarta_Sans'] dark:bg-slate-900">
 	<div class="container mx-auto px-4">
 		<div class="mx-auto max-w-7xl">
 			<div class="mb-8 flex flex-col gap-4 lg:flex-row">

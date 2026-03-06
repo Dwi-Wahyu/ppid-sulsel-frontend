@@ -15,13 +15,20 @@
 	let isLoadingData = $state(true);
 
 	// Get user dari data load
-	const user = data.user;
-	const isAdmin = user && user.id_skpd === null;
+	const user = $derived(data.user);
+	const isAdmin = $derived(user && user.id_skpd === null);
 
 	// Form state
 	let judul = $state('');
 	let id_kat_info = $state('');
-	let id_skpd = $state(user?.id_skpd || '');
+	let id_skpd = $state('');
+
+	$effect(() => {
+		if (user && user.id_skpd) {
+			id_skpd = user.id_skpd;
+		}
+	});
+
 	let ket = $state('');
 	let verify = $state('n');
 	let uploadedFile: any = $state(null);
@@ -45,11 +52,13 @@
 	onMount(async () => {
 		try {
 			const [resKat, resSkpd] = await Promise.all([
-				api.get('/admin/master-data/kategori-informasi'),
+				api.get('/public/informasi/kategori'),
 				api.get('/admin/skpd')
 			]);
 
-			if (resKat.success) {
+			if (Array.isArray(resKat)) {
+				kategoriList = resKat;
+			} else if (resKat.success) {
 				kategoriList = resKat.data?.data || resKat.data || [];
 			}
 			if (resSkpd.success) {
@@ -83,7 +92,7 @@
 
 			if (result.success) {
 				triggerNotify('success', 'Berhasil!', 'Dokumen publik berhasil disimpan.');
-				setTimeout(() => goto('/admin/dokumen-publik'), 1500);
+				setTimeout(() => goto('/opd/dokumen-publik'), 1500);
 			}
 		} catch (error: any) {
 			if (error.errors) {
@@ -105,7 +114,7 @@
 <div class="mb-6">
 	<div class="mb-2 flex items-center gap-3">
 		<a
-			href="/admin/dokumen-publik"
+			href="/opd/dokumen-publik"
 			class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 dark:hover:bg-slate-700"
 			aria-label="Kembali ke daftar dokumen"
 		>
@@ -234,7 +243,7 @@
 			class="flex items-center justify-end gap-3 border-t border-slate-100 pt-6 dark:border-slate-700"
 		>
 			<a
-				href="/admin/dokumen-publik"
+				href="/opd/dokumen-publik"
 				class="rounded-lg px-6 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700"
 			>
 				Batal

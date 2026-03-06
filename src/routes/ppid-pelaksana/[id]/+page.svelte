@@ -276,11 +276,46 @@
 							</h3>
 						</div>
 
-						<div class="prose prose-lg max-w-none prose-slate dark:prose-invert">
-							<div class="text-base leading-relaxed text-gray-700 md:text-lg dark:text-gray-200">
-								{@html data.skpd.visimisi}
+						{#if data.skpd.visimisi.toLowerCase().endsWith('.pdf')}
+							<div
+								class="w-full overflow-hidden rounded-xl border border-gray-200 dark:border-slate-600"
+							>
+								<iframe
+									src={`${PUBLIC_BACKEND_URL}/uploads/${data.skpd.visimisi}`}
+									title="Dokumen Visi Misi"
+									class="h-150 w-full bg-gray-50"
+								></iframe>
 							</div>
-						</div>
+							<div class="mt-4 text-right">
+								<a
+									href={`${PUBLIC_BACKEND_URL}/uploads/${data.skpd.visimisi}`}
+									target="_blank"
+									class="inline-flex items-center gap-2 text-sm font-medium text-ppid-primary hover:text-ppid-accent dark:text-gray-300"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										width="16"
+										height="16"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline
+											points="7 10 12 15 17 10"
+										/><line x1="12" x2="12" y1="15" y2="3" /></svg
+									>
+									{m['ppid_pel.open_full_file']()}
+								</a>
+							</div>
+						{:else}
+							<div class="prose prose-lg max-w-none prose-slate dark:prose-invert">
+								<div class="text-base leading-relaxed text-gray-700 md:text-lg dark:text-gray-200">
+									{@html data.skpd.visimisi}
+								</div>
+							</div>
+						{/if}
 					</section>
 				{/if}
 

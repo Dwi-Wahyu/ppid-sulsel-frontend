@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import { goto, invalidateAll } from '$app/navigation';
-	import { page } from '$app/stores';
 
 	let { data } = $props();
 
@@ -37,11 +36,24 @@
 		goto(`/admin/skpd/${id}`);
 	}
 
-	// Open delete modal
-	function openDeleteModal(skpd: any) {
-		selectedSkpd = skpd;
-		showDeleteModal = true;
-	}
+	const formatTanggalIndo = (dateString: string) => {
+		if (!dateString || dateString === '-') {
+			return dateString;
+		}
+
+		const date = new Date(dateString);
+
+		// Menggunakan Intl.DateTimeFormat untuk locale Indonesia
+		return new Intl.DateTimeFormat('id-ID', {
+			day: 'numeric',
+			month: 'long',
+			year: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit',
+			second: '2-digit',
+			hour12: false // Menggunakan format 24 jam
+		}).format(date);
+	};
 
 	// Handle delete
 	async function handleDelete() {
@@ -78,16 +90,12 @@
 </script>
 
 <svelte:head>
-	<title>Manajemen SKPD - Admin PPID</title>
+	<title>User SKPD - Admin PPID</title>
 </svelte:head>
 
 <div class="mb-6">
-	<h2 class="text-xl leading-tight font-semibold text-slate-800 dark:text-slate-100">
-		Manajemen SKPD
-	</h2>
-	<p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
-		Kelola data Satuan Kerja Perangkat Daerah
-	</p>
+	<h2 class="text-xl leading-tight font-semibold text-slate-800 dark:text-slate-100">User SKPD</h2>
+	<p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Kelola data User SKPD</p>
 </div>
 
 <!-- Search -->
@@ -130,11 +138,9 @@
 				class="border-b border-slate-100 bg-slate-50 text-xs text-slate-500 uppercase dark:border-slate-700 dark:bg-slate-700/50 dark:text-slate-400"
 			>
 				<tr>
-					<th scope="col" class="px-6 py-3">Nama SKPD</th>
+					<th scope="col" class="px-6 py-3">SKPD</th>
 					<th scope="col" class="px-6 py-3">Username</th>
-					<th scope="col" class="px-6 py-3">Email</th>
-					<th scope="col" class="px-6 py-3">Jenis</th>
-					<th scope="col" class="px-6 py-3">Status</th>
+					<th scope="col" class="px-6 py-3">Terakhir Login</th>
 					<th scope="col" class="px-6 py-3 text-right">Aksi</th>
 				</tr>
 			</thead>
@@ -144,40 +150,12 @@
 						class="border-b border-slate-100 bg-white transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700/30"
 					>
 						<td class="px-6 py-4 font-medium text-slate-900 dark:text-slate-100">{skpd.nm_skpd}</td>
-						<td class="px-6 py-4 font-medium text-slate-900 dark:text-slate-100">{skpd.nm_skpd}</td>
-						<td class="px-6 py-4">{skpd.email || '-'}</td>
-						<td class="px-6 py-4">
-							{#if skpd.jenis === 'opd'}
-								<span
-									class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
-								>
-									OPD
-								</span>
-							{:else if skpd.jenis === 'kab'}
-								<span
-									class="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800 dark:bg-purple-900/30 dark:text-purple-400"
-								>
-									Kabupaten
-								</span>
-							{:else}
-								<span class="text-slate-400">-</span>
-							{/if}
+						<td class="px-6 py-4 font-medium text-slate-900 dark:text-slate-100">{skpd.username}</td
+						>
+						<td class="px-6 py-4 text-slate-600 dark:text-slate-400">
+							{formatTanggalIndo(skpd.last_login)}
 						</td>
-						<td class="px-6 py-4">
-							{#if skpd.is_active === '1'}
-								<span
-									class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900/30 dark:text-green-400"
-								>
-									Aktif
-								</span>
-							{:else}
-								<span
-									class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-900/30 dark:text-red-400"
-								>
-									Tidak Aktif
-								</span>
-							{/if}
-						</td>
+
 						<td class="px-6 py-4 text-right">
 							<div class="flex items-center justify-end gap-2">
 								<button

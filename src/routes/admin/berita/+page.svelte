@@ -99,7 +99,7 @@
 				label: 'Terverifikasi',
 				class: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
 			};
-		if (val === 'n')
+		if (val === 't')
 			return {
 				label: 'Ditolak',
 				class: 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'

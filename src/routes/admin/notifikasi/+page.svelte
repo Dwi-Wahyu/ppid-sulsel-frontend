@@ -4,6 +4,7 @@
 	import type { Notification, NotificationResponse } from '$lib/types/notification';
 	import { fade } from 'svelte/transition';
 	import { api } from '$lib/api';
+	import { browser } from '$app/environment';
 
 	// State menggunakan Svelte 5 Runes
 	let notifications = $state<Notification[]>([]);
@@ -54,13 +55,19 @@
 	}
 
 	onMount(() => fetchNotifications());
+
+	function goBack() {
+		if (browser) {
+			window.history.back();
+		}
+	}
 </script>
 
 <div class="mx-auto max-w-4xl space-y-6 pb-10 font-sans">
 	<nav class="flex items-center gap-2 text-sm" aria-label="Breadcrumb">
-		<a
-			title="Kembali ke dashboard"
-			href="/admin/dashboard"
+		<button
+			title="Kembali"
+			onclick={goBack}
 			class="text-slate-500 transition-colors hover:text-blue-600"
 		>
 			<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -71,7 +78,7 @@
 					d="M10 19l-7-7m0 0l7-7m-7 7h18"
 				/>
 			</svg>
-		</a>
+		</button>
 		<span class="text-slate-300" aria-hidden="true">/</span>
 		<span class="text-slate-700 dark:text-slate-300">Semua Notifikasi</span>
 	</nav>

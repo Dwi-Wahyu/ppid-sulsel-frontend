@@ -3,6 +3,7 @@
 	import TrackingCardPengajuan from '$lib/components/TrackingCardPengajuan.svelte';
 	import { invalidateAll } from '$app/navigation';
 	import { api } from '$lib/api.js';
+	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 
 	let { data } = $props();
 	const pengajuan = $derived(data.pengajuan);
@@ -12,10 +13,18 @@
 	let showResponseModal = $state(false);
 	let showDisposisiModal = $state(false);
 	let feedbackText = $state('');
-	let selectedSkpd = $state<string[]>([]);
+
+	// Perbaikan: Inisialisasi dengan existing_skpd_ids agar otomatis tercentang
+	let selectedSkpd = $state<string[]>(data.extra.existing_skpd_ids || []);
+
 	let catatanDisposisi = $state('');
 	let searchSkpd = $state('');
 	let isSubmitting = $state(false);
+
+	// Notification State
+	let showNotification = $state(false);
+	let notificationType = $state<'success' | 'error'>('success');
+	let notificationMessage = $state('');
 
 	const filteredSkpd = $derived(
 		all_skpd.filter((s: { nm_skpd: string }) =>
@@ -23,47 +32,52 @@
 		)
 	);
 
-	// Fungsi untuk mengirim Disposisi ke banyak OPD
+	// Fungsi untuk mengirim Disposisi
 	async function handleDisposisi() {
 		if (selectedSkpd.length === 0) return alert('Pilih minimal satu OPD');
-
 		isSubmitting = true;
 		try {
 			await api.post(`/admin/pengajuan-keberatan/${pengajuan.id_pengajuan}/disposisi`, {
 				skpd_ids: selectedSkpd,
-				catatan: 'Mohon tindak lanjuti pengajuan keberatan ini.'
+				catatan: catatanDisposisi || 'Mohon tindak lanjuti pengajuan keberatan ini.'
 			});
 
-			alert('Disposisi berhasil dikirim');
 			showDisposisiModal = false;
 			catatanDisposisi = '';
-			selectedSkpd = [];
-			await invalidateAll(); // Refresh data halaman
+			// Tidak perlu mengosongkan selectedSkpd agar tetap sinkron dengan data terbaru setelah invalidate
+			await invalidateAll();
+
+			notificationType = 'success';
+			notificationMessage = 'Sukses mengirim disposisi';
+			showNotification = true;
 		} catch (err: any) {
-			alert(err.message || 'Gagal mengirim disposisi');
+			notificationType = 'error';
+			notificationMessage = 'Gagal mengirim disposisi';
+			showNotification = true;
 		} finally {
 			isSubmitting = false;
 		}
 	}
 
-	// Fungsi untuk memberikan Tanggapan/Feedback akhir kepada pemohon
 	async function handleFeedback(e: Event) {
 		e.preventDefault();
 		if (!feedbackText) return alert('Isi pesan tanggapan');
-
 		isSubmitting = true;
 		try {
 			await api.post(`/admin/pengajuan-keberatan/${pengajuan.id_pengajuan}/feedback`, {
 				feedback: feedbackText
 			});
-
-			alert('Tanggapan berhasil dikirim ke pemohon');
 			showResponseModal = false;
-			catatanDisposisi = '';
 			feedbackText = '';
 			await invalidateAll();
+
+			notificationType = 'success';
+			notificationMessage = 'Sukses mengirim tanggapan';
+			showNotification = true;
 		} catch (err: any) {
-			alert(err.message || 'Gagal mengirim tanggapan');
+			notificationType = 'error';
+			notificationMessage = 'Gagal mengirim tanggapan';
+			showNotification = true;
 		} finally {
 			isSubmitting = false;
 		}
@@ -75,6 +89,10 @@
 				return 'bg-amber-100 text-amber-800 border-amber-200';
 			case 'y':
 				return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+			case 'd':
+				return 'bg-purple-100 text-purple-800 border-purple-200';
+			case 'a':
+				return 'bg-blue-100 text-blue-800 border-blue-200';
 			default:
 				return 'bg-slate-100 text-slate-800 border-slate-200';
 		}
@@ -82,17 +100,17 @@
 </script>
 
 <svelte:head>
-	<title>Detail Pengajuan Keberatan - {pengajuan.no_pendaftaran}</title>
+	<title>Detail Pengajuan - {pengajuan.no_pendaftaran}</title>
 </svelte:head>
 
-<main class="min-h-screen">
+<main class="min-h-screen p-4 md:p-8">
 	<div class="mx-auto max-w-6xl">
 		<header class="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center">
 			<div class="flex items-center gap-4">
 				<a
+					title="Kembali"
 					href="/admin/pengajuan-keberatan"
-					class="rounded-xl border border-slate-200 bg-white p-2 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800"
-					aria-label="Kembali ke daftar"
+					class="rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-800"
 				>
 					<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -114,26 +132,28 @@
 			<div class="flex gap-2">
 				<button
 					onclick={() => (showDisposisiModal = true)}
-					class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold transition-all hover:shadow-md active:scale-95 dark:border-slate-700 dark:bg-slate-800"
+					class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-800"
 				>
-					Disposisi ke OPD
+					{pengajuan.disposisi.length > 0 ? 'Tambah Disposisi' : 'Disposisi ke OPD'}
 				</button>
-				<button
-					onclick={() => (showResponseModal = true)}
-					class="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-blue-700 active:scale-95"
-				>
-					Beri Tanggapan
-				</button>
+
+				{#if pengajuan.status !== 'd' && pengajuan.status !== 'a'}
+					<button
+						onclick={() => (showResponseModal = true)}
+						class="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-blue-700"
+					>
+						Beri Tanggapan
+					</button>
+				{/if}
 			</div>
 		</header>
 
 		<div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
 			<div class="space-y-8 lg:col-span-2">
 				<section
-					aria-labelledby="applicant-info"
 					class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
 				>
-					<h2 id="applicant-info" class="mb-6 flex items-center gap-2 text-lg font-bold">
+					<h2 class="mb-6 flex items-center gap-2 text-lg font-bold">
 						<span class="h-6 w-1.5 rounded-full bg-blue-600"></span>
 						Informasi Pemohon
 					</h2>
@@ -154,10 +174,10 @@
 						</div>
 						<div>
 							<span class="text-xs font-bold tracking-widest text-slate-400 uppercase"
-								>No. Telepon</span
+								>Pekerjaan</span
 							>
 							<p class="mt-1 font-semibold text-slate-900 dark:text-white">
-								{pengajuan.no_telp_pemohon}
+								{pengajuan.pekerjaan.nama_pekerjaan}
 							</p>
 						</div>
 						<div>
@@ -165,15 +185,8 @@
 								>Domisili</span
 							>
 							<p class="mt-1 font-semibold text-slate-900 dark:text-white">
-								{pengajuan.domisili_pemohon.nama_daerah} - {pengajuan.domisili_pemohon.provinsi}
-							</p>
-						</div>
-						<div>
-							<span class="text-xs font-bold tracking-widest text-slate-400 uppercase"
-								>Pekerjaan</span
-							>
-							<p class="mt-1 font-semibold text-slate-900 dark:text-white">
-								{pengajuan.pekerjaan.nama_pekerjaan}
+								{pengajuan.domisili_pemohon?.nama_daerah || '-'}, {pengajuan.domisili_pemohon
+									?.provinsi || '-'}
 							</p>
 						</div>
 						<div class="md:col-span-2">
@@ -185,53 +198,56 @@
 					</div>
 				</section>
 
-				<!-- <section
-					aria-labelledby="applicant-proxy"
-					class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
-				>
-					<h2 id="applicant-proxy" class="mb-6 flex items-center gap-2 text-lg font-bold">
-						<span class="h-6 w-1.5 rounded-full bg-blue-600"></span>
-						Informasi Kuasa Pemohon
-					</h2>
-					<div class="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
-						<div>
-							<span class="text-xs font-bold tracking-widest text-slate-400 uppercase"
-								>Nama Lengkap</span
-							>
-							<p class="mt-1 font-semibold text-slate-900 dark:text-white">
-								{pengajuan.nama_kuasa}
-							</p>
+				{#if pengajuan.nama_kuasa}
+					<section
+						class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+					>
+						<h2 class="mb-6 flex items-center gap-2 text-lg font-bold">
+							<span class="h-6 w-1.5 rounded-full bg-amber-500"></span>
+							Informasi Kuasa
+						</h2>
+						<div class="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
+							<div>
+								<span class="text-xs font-bold tracking-widest text-slate-400 uppercase"
+									>Nama Kuasa</span
+								>
+								<p class="mt-1 font-semibold text-slate-900 dark:text-white">
+									{pengajuan.nama_kuasa}
+								</p>
+							</div>
+							<div>
+								<span class="text-xs font-bold tracking-widest text-slate-400 uppercase"
+									>No. Telp Kuasa</span
+								>
+								<p class="mt-1 font-semibold text-slate-900 dark:text-white">
+									{pengajuan.no_telp_kuasa || '-'}
+								</p>
+							</div>
+							<div>
+								<span class="text-xs font-bold tracking-widest text-slate-400 uppercase"
+									>Domisili Kuasa</span
+								>
+								<p class="mt-1 font-semibold text-slate-900 dark:text-white">
+									{pengajuan.domisili_kuasa?.nama_daerah || '-'}, {pengajuan.domisili_kuasa
+										?.provinsi || '-'}
+								</p>
+							</div>
+							<div class="md:col-span-2">
+								<span class="text-xs font-bold tracking-widest text-slate-400 uppercase"
+									>Alamat Kuasa</span
+								>
+								<p class="mt-1 font-semibold text-slate-900 dark:text-white">
+									{pengajuan.alamat_kuasa}
+								</p>
+							</div>
 						</div>
-						<div>
-							<span class="text-xs font-bold tracking-widest text-slate-400 uppercase">Email</span>
-							<p class="mt-1 font-semibold text-slate-900 dark:text-white">
-								{pengajuan.email_kuasa}
-							</p>
-						</div>
-						<div>
-							<span class="text-xs font-bold tracking-widest text-slate-400 uppercase"
-								>No. Telepon</span
-							>
-							<p class="mt-1 font-semibold text-slate-900 dark:text-white">
-								{pengajuan.no_telp_kuasa}
-							</p>
-						</div>
-						<div>
-							<span class="text-xs font-bold tracking-widest text-slate-400 uppercase"
-								>Domisili</span
-							>
-							<p class="mt-1 font-semibold text-slate-900 dark:text-white">
-								{pengajuan.domisili_kuasa.nama_daerah} - {pengajuan.domisili_kuasa.provinsi}
-							</p>
-						</div>
-					</div>
-				</section> -->
+					</section>
+				{/if}
 
 				<section
-					aria-labelledby="objection-content"
 					class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
 				>
-					<h2 id="objection-content" class="mb-6 flex items-center gap-2 text-lg font-bold">
+					<h2 class="mb-6 flex items-center gap-2 text-lg font-bold">
 						<span class="h-6 w-1.5 rounded-full bg-red-600"></span>
 						Detail Keberatan
 					</h2>
@@ -265,16 +281,10 @@
 								>Kasus Posisi</span
 							>
 							<div
-								class="prose mt-2 max-w-none rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm prose-slate dark:border-slate-700 dark:bg-slate-900 dark:prose-invert"
+								class="prose mt-2 max-w-none rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white"
 							>
 								{pengajuan.kasus}
 							</div>
-						</div>
-						<div>
-							<span class="text-xs font-bold tracking-widest text-slate-400 uppercase"
-								>Tujuan Penggunaan</span
-							>
-							<p class="mt-1 text-sm text-slate-700 dark:text-slate-300">{pengajuan.tujuan}</p>
 						</div>
 					</div>
 				</section>
@@ -292,6 +302,27 @@
 					>
 						{pengajuan.status_label}
 					</div>
+
+					{#if pengajuan.disposisi.length > 0}
+						<div class="mt-6 border-t border-slate-100 pt-6 dark:border-slate-700">
+							<span class="mb-3 block text-xs font-bold tracking-widest text-slate-400 uppercase"
+								>Didisposisikan Ke:</span
+							>
+							<div class="space-y-2">
+								{#each pengajuan.disposisi as d}
+									<div
+										class="flex items-center gap-2 rounded-lg bg-slate-50 p-3 text-xs font-semibold dark:bg-slate-900"
+									>
+										<div class="h-2 w-2 rounded-full bg-purple-500"></div>
+										<span class="text-slate-700 dark:text-slate-300"
+											>{d.skpd?.nm_skpd || 'OPD Terkait'}</span
+										>
+									</div>
+								{/each}
+							</div>
+						</div>
+					{/if}
+
 					<div class="mt-6 space-y-4">
 						<div class="flex justify-between text-sm">
 							<span class="text-slate-500">Dikirim Pada</span>
@@ -317,30 +348,28 @@
 <PengajuanDialog bind:open={showResponseModal} title="Berikan Tanggapan">
 	<form onsubmit={handleFeedback} class="space-y-4">
 		<div>
-			<label for="feedback" class="mb-2 block text-sm font-bold text-slate-700 dark:text-slate-300">
-				Pesan Tanggapan
-			</label>
+			<label for="feedback" class="mb-2 block text-sm font-bold text-slate-700 dark:text-slate-300"
+				>Pesan Tanggapan</label
+			>
 			<textarea
 				id="feedback"
 				bind:value={feedbackText}
 				rows="5"
 				required
-				placeholder="Tulis alasan diterima atau ditolaknya keberatan ini..."
-				class="w-full rounded-xl border-slate-200 focus:border-blue-600 focus:ring-blue-600 dark:border-slate-700 dark:bg-slate-900"
+				placeholder="Tulis alasan..."
+				class="w-full rounded-xl border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
 			></textarea>
 		</div>
 		<div class="flex justify-end gap-2">
 			<button
 				type="button"
 				onclick={() => (showResponseModal = false)}
-				class="px-4 py-2 text-sm font-bold text-slate-500"
+				class="px-4 py-2 text-sm font-bold text-slate-500">Batal</button
 			>
-				Batal
-			</button>
 			<button
 				type="submit"
 				disabled={isSubmitting}
-				class="rounded-lg bg-blue-600 px-6 py-2 text-sm font-bold text-white shadow-lg shadow-blue-500/20 disabled:opacity-50"
+				class="rounded-lg bg-blue-600 px-6 py-2 text-sm font-bold text-white shadow-lg disabled:opacity-50"
 			>
 				{isSubmitting ? 'Mengirim...' : 'Kirim Tanggapan'}
 			</button>
@@ -351,18 +380,11 @@
 <PengajuanDialog bind:open={showDisposisiModal} title="Disposisi ke OPD">
 	<div class="space-y-4">
 		<div class="relative">
-			<span
-				class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"
-			>
-				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-					><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg
-				>
-			</span>
 			<input
 				type="text"
 				bind:value={searchSkpd}
 				placeholder="Cari OPD..."
-				class="w-full rounded-xl border-slate-200 pl-10 text-sm dark:border-slate-700 dark:bg-slate-900"
+				class="w-full rounded-xl border-slate-200 pl-4 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white"
 			/>
 		</div>
 		<div
@@ -370,15 +392,15 @@
 		>
 			{#each filteredSkpd as skpd}
 				<label
-					class="flex cursor-pointer items-center gap-3 rounded-lg p-3 transition-colors hover:bg-slate-50 dark:hover:bg-slate-700/50"
+					class="flex cursor-pointer items-center gap-3 rounded-lg p-3 hover:bg-slate-50 dark:hover:bg-slate-700/50"
 				>
 					<input
 						type="checkbox"
 						value={skpd.id_skpd}
 						bind:group={selectedSkpd}
-						class="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+						class="rounded text-blue-600"
 					/>
-					<span class="text-sm font-medium">{skpd.nm_skpd}</span>
+					<span class="text-sm font-medium dark:text-slate-300">{skpd.nm_skpd}</span>
 				</label>
 			{/each}
 		</div>
@@ -390,8 +412,7 @@
 				id="catatan"
 				bind:value={catatanDisposisi}
 				rows="3"
-				placeholder="Tambahkan instruksi khusus untuk OPD..."
-				class="w-full rounded-xl border-slate-200 text-sm focus:border-blue-600 focus:ring-blue-600 dark:border-slate-700 dark:bg-slate-900"
+				class="w-full rounded-xl border-slate-200 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white"
 			></textarea>
 		</div>
 		<div class="flex items-center justify-between pt-2">
@@ -404,7 +425,7 @@
 				>
 				<button
 					type="button"
-					class="rounded-lg bg-blue-600 px-6 py-2 text-sm font-bold text-white shadow-lg shadow-blue-500/20"
+					class="rounded-lg bg-blue-600 px-6 py-2 text-sm font-bold text-white shadow-lg"
 					onclick={handleDisposisi}
 					disabled={isSubmitting || selectedSkpd.length === 0}
 				>
@@ -414,3 +435,10 @@
 		</div>
 	</div>
 </PengajuanDialog>
+
+<NotificationDialog
+	bind:show={showNotification}
+	theme={notificationType}
+	title={notificationType === 'success' ? 'BERHASIL' : 'GAGAL'}
+	description={notificationMessage}
+/>

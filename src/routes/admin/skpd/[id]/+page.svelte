@@ -1,106 +1,87 @@
 <script lang="ts">
 	import { PUBLIC_API_URL } from '$env/static/public';
-	import { goto, invalidateAll } from '$app/navigation';
-	import FilePond from '$lib/components/FilePond.svelte';
-	import TinyMCE from '$lib/components/TinyMCE.svelte';
+	import { goto } from '$app/navigation';
+	import { enhance } from '$app/forms';
+	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
+	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 
-	let { data } = $props();
+	let { data, form } = $props();
 
-	// State management
-	let loading = $state(false);
+	// State
+	let showPasswordDialog = $state(false);
+	let selectedUser = $state<any>(null);
 
-	// Form data
-	let formData = $state({
-		nm_skpd: data.skpd?.nm_skpd || '',
-		alamat: data.skpd?.alamat || '',
-		email: data.skpd?.email || '',
-		no_tlp: data.skpd?.no_tlp || '',
-		website: data.skpd?.website || '',
-		kadis: data.skpd?.kadis || '',
-		sek: data.skpd?.sek || '',
-		jenis: data.skpd?.jenis || '',
-		is_active: data.skpd?.is_active || '1',
-		visimisi: data.skpd?.visimisi || '',
-		tupoksi: data.skpd?.tupoksi || ''
-	});
-
-	let uploadedLogo: File | null = $state(null);
-
-	// Validation errors
-	let errors = $state<Record<string, string[]>>({});
-
-	// Notification
-	let notification = $state({
+	// Notification State
+	let notificationState = $state<{
+		show: boolean;
+		title: string;
+		message: string;
+		type: 'success' | 'error' | 'warning' | 'info';
+	}>({
 		show: false,
-		type: 'success' as 'success' | 'error',
-		message: ''
+		title: '',
+		message: '',
+		type: 'success'
 	});
 
-	function showNotification(type: 'success' | 'error', message: string) {
-		notification = { show: true, type, message };
-		setTimeout(() => {
-			notification = { show: false, type: 'success', message: '' };
-		}, 5000);
-	}
+	// Form values for client logic
+	let oldPassword = $state('');
+	let newPassword = $state('');
+	let confirmPassword = $state('');
+	let clientError = $state('');
+	let submitting = $state(false);
 
-	// Handle update
-	async function handleUpdate() {
-		loading = true;
-		errors = {};
-
-		const token = document.cookie
-			.split('; ')
-			.find((row) => row.startsWith('access_token='))
-			?.split('=')[1];
-
-		try {
-			const submitFormData = new FormData();
-
-			// Append all form fields
-			Object.entries(formData).forEach(([key, value]) => {
-				if (value !== null && value !== undefined) {
-					submitFormData.append(key, value);
+	$effect(() => {
+		if (form) {
+			submitting = false;
+			if (form.success) {
+				showPasswordDialog = false;
+				notificationState = {
+					show: true,
+					title: 'Berhasil',
+					message: form.message as string,
+					type: 'success'
+				};
+				// Reset form
+				oldPassword = '';
+				newPassword = '';
+				confirmPassword = '';
+				clientError = '';
+			} else if (form.error) {
+				clientError = (form.message as string) || 'Terjadi kesalahan.';
+				if (form.errors) {
+					// Extract first error message
+					const firstError = Object.values(form.errors)[0] as string[];
+					if (firstError && firstError.length > 0) {
+						clientError = firstError[0];
+					}
 				}
-			});
-
-			// Append logo if uploaded
-			if (uploadedLogo) {
-				submitFormData.append('logo', uploadedLogo);
 			}
-
-			// Add _method for Laravel PUT simulation
-			submitFormData.append('_method', 'PUT');
-
-			const response = await fetch(`${PUBLIC_API_URL}/admin/skpd/${data.skpd?.id_skpd}`, {
-				method: 'POST',
-				headers: {
-					Authorization: `Bearer ${token}`,
-					Accept: 'application/json'
-				},
-				body: submitFormData
-			});
-
-			const result = await response.json();
-
-			if (response.ok && result.success) {
-				showNotification('success', result.message || 'SKPD berhasil diperbarui');
-				await invalidateAll();
-			} else {
-				if (result.errors) {
-					errors = result.errors;
-				}
-				showNotification('error', result.message || 'Gagal memperbarui SKPD');
-			}
-		} catch (error) {
-			showNotification('error', 'Terjadi kesalahan pada server');
-		} finally {
-			loading = false;
 		}
-	}
+	});
 
-	// Navigate back to list
 	function goBack() {
 		goto('/admin/skpd');
+	}
+
+	function openPasswordDialog(user: any) {
+		selectedUser = user;
+		oldPassword = '';
+		newPassword = '';
+		confirmPassword = '';
+		clientError = '';
+		showPasswordDialog = true;
+	}
+
+	function formatLastLogin(dateString: string | undefined) {
+		if (!dateString) return '-';
+		return new Date(dateString).toLocaleString('id-ID', {
+			day: '2-digit',
+			month: 'long',
+			year: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit'
+		});
 	}
 </script>
 
@@ -108,311 +89,252 @@
 	<title>Detail SKPD - Admin PPID</title>
 </svelte:head>
 
-<div class="mb-6 flex items-center gap-3">
-	<button
-		onclick={goBack}
-		class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-300"
-		title="Kembali"
+<div class="space-y-6">
+	<!-- Section 1: SKPD Info -->
+	<div
+		class="rounded-xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
 	>
-		<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-			<path
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				stroke-width="2"
-				d="M10 19l-7-7m0 0l7-7m-7 7h18"
-			></path>
-		</svg>
-	</button>
-	<div>
-		<h2 class="text-xl leading-tight font-semibold text-slate-800 dark:text-slate-100">
-			Detail SKPD
-		</h2>
-		<p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Kelola informasi SKPD</p>
-	</div>
-</div>
-
-<div
-	class="rounded-xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
->
-	<h3 class="mb-6 text-lg font-bold text-blue-600 dark:text-blue-400">
-		{data.skpd.nm_skpd}
-	</h3>
-
-	<form
-		onsubmit={(e) => {
-			e.preventDefault();
-			handleUpdate();
-		}}
-	>
-		<div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-			<!-- Logo -->
-			<div>
-				<label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-					Logo SKPD
-				</label>
-				<FilePond
-					name="logo"
-					allowMultiple={false}
-					acceptedFileTypes={['image/png', 'image/jpeg', 'image/jpg']}
-					bind:value={uploadedLogo}
-					label={'Seret & Letakkan file atau <span class="filepond--label-action">Telusuri</span>'}
+		<div class="mb-6 flex items-center justify-between">
+			<div class="flex items-center gap-4">
+				<img
+					src={data.skpd.logo
+						? `${PUBLIC_API_URL}/storage/logo-skpd/${data.skpd.logo}`
+						: '/images/logo-sulsel.png'}
+					alt="Logo {data.skpd.nm_skpd}"
+					class="h-16 w-16 object-contain"
 				/>
-				{#if data.skpd.logo && !uploadedLogo}
-					<p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
-						Logo saat ini:
-						<a
-							href={`${PUBLIC_API_URL}/storage/${data.skpd.logo}`}
-							target="_blank"
-							class="text-blue-600 hover:underline dark:text-blue-400"
-						>
-							Lihat logo
-						</a>
+				<div>
+					<h2 class="text-xl font-bold text-slate-800 dark:text-white">{data.skpd.nm_skpd}</h2>
+					<p class="text-sm text-slate-500 dark:text-slate-400">
+						{data.skpd.jenis?.toUpperCase() || '-'}
 					</p>
-				{/if}
-				{#if errors.logo}
-					<p class="mt-1 text-sm text-red-600 dark:text-red-400">{errors.logo[0]}</p>
-				{/if}
+				</div>
 			</div>
-
-			<!-- Nama SKPD -->
-			<div class="col-span-1 md:col-span-2">
-				<label
-					for="nm_skpd"
-					class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-				>
-					Nama SKPD <span class="text-red-500">*</span>
-				</label>
-				<input
-					id="nm_skpd"
-					type="text"
-					bind:value={formData.nm_skpd}
-					required
-					class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-				/>
-				{#if errors.nm_skpd}
-					<p class="mt-1 text-sm text-red-600 dark:text-red-400">{errors.nm_skpd[0]}</p>
-				{/if}
-			</div>
-
-			<!-- Alamat -->
-			<div class="col-span-1 md:col-span-2">
-				<label
-					for="alamat"
-					class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-				>
-					Alamat
-				</label>
-				<input
-					id="alamat"
-					type="text"
-					bind:value={formData.alamat}
-					class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-				/>
-				{#if errors.alamat}
-					<p class="mt-1 text-sm text-red-600 dark:text-red-400">{errors.alamat[0]}</p>
-				{/if}
-			</div>
-
-			<!-- Email -->
-			<div>
-				<label
-					for="email"
-					class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-				>
-					Email
-				</label>
-				<input
-					id="email"
-					type="email"
-					bind:value={formData.email}
-					class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-				/>
-				{#if errors.email}
-					<p class="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email[0]}</p>
-				{/if}
-			</div>
-
-			<!-- No Telepon -->
-			<div>
-				<label
-					for="no_tlp"
-					class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-				>
-					No Telepon
-				</label>
-				<input
-					id="no_tlp"
-					type="text"
-					bind:value={formData.no_tlp}
-					class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-				/>
-				{#if errors.no_tlp}
-					<p class="mt-1 text-sm text-red-600 dark:text-red-400">{errors.no_tlp[0]}</p>
-				{/if}
-			</div>
-
-			<!-- Website -->
-			<div>
-				<label
-					for="website"
-					class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-				>
-					Website
-				</label>
-				<input
-					id="website"
-					type="url"
-					bind:value={formData.website}
-					class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-				/>
-				{#if errors.website}
-					<p class="mt-1 text-sm text-red-600 dark:text-red-400">{errors.website[0]}</p>
-				{/if}
-			</div>
-
-			<!-- Jenis -->
-			<div>
-				<label
-					for="jenis"
-					class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-				>
-					Jenis
-				</label>
-				<select
-					id="jenis"
-					bind:value={formData.jenis}
-					class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-				>
-					<option value="">-- Pilih Jenis --</option>
-					<option value="opd">OPD</option>
-					<option value="kab">Kabupaten</option>
-				</select>
-				{#if errors.jenis}
-					<p class="mt-1 text-sm text-red-600 dark:text-red-400">{errors.jenis[0]}</p>
-				{/if}
-			</div>
-
-			<!-- Kepala Dinas -->
-			<div>
-				<label
-					for="kadis"
-					class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-				>
-					Kepala Dinas
-				</label>
-				<input
-					id="kadis"
-					type="text"
-					bind:value={formData.kadis}
-					class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-				/>
-				{#if errors.kadis}
-					<p class="mt-1 text-sm text-red-600 dark:text-red-400">{errors.kadis[0]}</p>
-				{/if}
-			</div>
-
-			<!-- Sekretaris -->
-			<div>
-				<label for="sek" class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-					Sekretaris
-				</label>
-				<input
-					id="sek"
-					type="text"
-					bind:value={formData.sek}
-					class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-				/>
-				{#if errors.sek}
-					<p class="mt-1 text-sm text-red-600 dark:text-red-400">{errors.sek[0]}</p>
-				{/if}
-			</div>
-
-			<!-- Status Aktif -->
-			<div>
-				<label
-					for="is_active"
-					class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-				>
-					Status Aktif
-				</label>
-				<select
-					id="is_active"
-					bind:value={formData.is_active}
-					class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-				>
-					<option value="1">Aktif</option>
-					<option value="0">Tidak Aktif</option>
-				</select>
-				{#if errors.is_active}
-					<p class="mt-1 text-sm text-red-600 dark:text-red-400">{errors.is_active[0]}</p>
-				{/if}
-			</div>
-		</div>
-
-		<div class="mb-6 space-y-6">
-			<!-- Visi Misi -->
-			<div>
-				<label
-					for="visimisi"
-					class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-				>
-					Visi Misi
-				</label>
-				<TinyMCE bind:value={formData.visimisi} id="visimisi" height={400} />
-				{#if errors.visimisi}
-					<p class="mt-1 text-sm text-red-600 dark:text-red-400">{errors.visimisi[0]}</p>
-				{/if}
-			</div>
-
-			<!-- Tupoksi -->
-			<div>
-				<label
-					for="tupoksi"
-					class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
-				>
-					Tupoksi
-				</label>
-				<TinyMCE bind:value={formData.tupoksi} id="tupoksi" height={400} />
-				{#if errors.tupoksi}
-					<p class="mt-1 text-sm text-red-600 dark:text-red-400">{errors.tupoksi[0]}</p>
-				{/if}
-			</div>
-		</div>
-
-		<div class="flex items-center justify-end gap-4">
 			<button
 				type="button"
 				onclick={goBack}
 				class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600"
 			>
-				Batal
-			</button>
-			<button
-				type="submit"
-				disabled={loading}
-				class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:bg-slate-400 dark:bg-blue-600 dark:hover:bg-blue-700"
-			>
-				{loading ? 'Menyimpan...' : 'Simpan Perubahan'}
+				Kembali
 			</button>
 		</div>
-	</form>
+
+		<dl class="grid grid-cols-1 gap-6 md:grid-cols-2">
+			<div class="col-span-1 md:col-span-2">
+				<dt class="text-sm font-medium text-slate-500 dark:text-slate-400">Alamat</dt>
+				<dd class="mt-1 text-sm text-slate-900 dark:text-slate-100">
+					{data.skpd.alamat || '-'}
+				</dd>
+			</div>
+			<div>
+				<dt class="text-sm font-medium text-slate-500 dark:text-slate-400">Email</dt>
+				<dd class="mt-1 text-sm text-slate-900 dark:text-slate-100">{data.skpd.email || '-'}</dd>
+			</div>
+			<div>
+				<dt class="text-sm font-medium text-slate-500 dark:text-slate-400">No Telepon</dt>
+				<dd class="mt-1 text-sm text-slate-900 dark:text-slate-100">{data.skpd.no_tlp || '-'}</dd>
+			</div>
+			<div>
+				<dt class="text-sm font-medium text-slate-500 dark:text-slate-400">Website</dt>
+				<dd class="mt-1 text-sm text-slate-900 dark:text-slate-100">
+					{#if data.skpd.website}
+						<a
+							href={data.skpd.website}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="text-blue-600 hover:underline dark:text-blue-400"
+						>
+							{data.skpd.website}
+						</a>
+					{:else}
+						-
+					{/if}
+				</dd>
+			</div>
+			<div>
+				<dt class="text-sm font-medium text-slate-500 dark:text-slate-400">Status Aktif</dt>
+				<dd class="mt-1">
+					<span
+						class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {data
+							.skpd.is_active == 1
+							? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+							: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}"
+					>
+						{data.skpd.is_active == 1 ? 'Aktif' : 'Tidak Aktif'}
+					</span>
+				</dd>
+			</div>
+			<div>
+				<dt class="text-sm font-medium text-slate-500 dark:text-slate-400">Kepala Dinas</dt>
+				<dd class="mt-1 text-sm text-slate-900 dark:text-slate-100">{data.skpd.kadis || '-'}</dd>
+			</div>
+			<div>
+				<dt class="text-sm font-medium text-slate-500 dark:text-slate-400">Sekretaris</dt>
+				<dd class="mt-1 text-sm text-slate-900 dark:text-slate-100">{data.skpd.sek || '-'}</dd>
+			</div>
+		</dl>
+
+		<div class="mt-8 space-y-8">
+			<div>
+				<dt class="mb-2 text-sm font-medium text-slate-500 dark:text-slate-400">Visi Misi</dt>
+				<dd class="prose prose-sm max-w-none text-slate-900 dark:text-slate-100 dark:prose-invert">
+					{#if data.skpd.visimisi}
+						{@html data.skpd.visimisi}
+					{:else}
+						<p class="text-slate-400 italic">Belum ada visi misi.</p>
+					{/if}
+				</dd>
+			</div>
+			<div>
+				<dt class="mb-2 text-sm font-medium text-slate-500 dark:text-slate-400">Tupoksi</dt>
+				<dd class="prose prose-sm max-w-none text-slate-900 dark:text-slate-100 dark:prose-invert">
+					{#if data.skpd.tupoksi}
+						{@html data.skpd.tupoksi}
+					{:else}
+						<p class="text-slate-400 italic">Belum ada tupoksi.</p>
+					{/if}
+				</dd>
+			</div>
+		</div>
+	</div>
+
+	<!-- Section 2: User List -->
+	<div
+		class="rounded-xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+	>
+		<h3 class="mb-4 text-lg font-bold text-slate-800 dark:text-white">Pengguna SKPD</h3>
+		<div class="overflow-x-auto">
+			<table class="w-full text-left text-sm text-slate-500 dark:text-slate-400">
+				<thead
+					class="bg-slate-50 text-xs text-slate-700 uppercase dark:bg-slate-700/50 dark:text-slate-300"
+				>
+					<tr>
+						<th scope="col" class="px-6 py-3">Nama</th>
+						<th scope="col" class="px-6 py-3">Username</th>
+						<th scope="col" class="px-6 py-3">Email</th>
+						<th scope="col" class="px-6 py-3">Terakhir Login</th>
+						<th scope="col" class="px-6 py-3 text-right">Aksi</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#if data.skpd.user}
+						<tr class="border-b bg-white dark:border-slate-700 dark:bg-slate-800">
+							<td class="px-6 py-4 font-medium text-slate-900 dark:text-white">
+								{data.skpd.user.name || '-'}
+							</td>
+							<td class="px-6 py-4">{data.skpd.user.username || '-'}</td>
+							<td class="px-6 py-4">{data.skpd.user.email || '-'}</td>
+							<td class="px-6 py-4">
+								{formatLastLogin(data.skpd.user.last_login?.created_at)}
+							</td>
+							<td class="px-6 py-4 text-right">
+								<button
+									type="button"
+									onclick={() => openPasswordDialog(data.skpd.user)}
+									class="inline-flex items-center gap-2 rounded-lg bg-yellow-100 px-3 py-2 text-xs font-medium text-yellow-700 transition-colors hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:hover:bg-yellow-900/50"
+								>
+									Ubah Password
+								</button>
+							</td>
+						</tr>
+					{:else}
+						<tr>
+							<td colspan="5" class="px-6 py-8 text-center text-slate-500">
+								Tidak ada pengguna untuk SKPD ini.
+							</td>
+						</tr>
+					{/if}
+				</tbody>
+			</table>
+		</div>
+	</div>
 </div>
 
-<!-- Notification -->
-{#if notification.show}
-	<div
-		class="fixed right-4 bottom-4 z-50 max-w-sm rounded-lg p-4 shadow-lg {notification.type ===
-		'success'
-			? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-			: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}"
-	>
-		<p class="font-medium">{notification.message}</p>
-	</div>
-{/if}
+<!-- Password Change Dialog -->
+<ConfirmationDialog
+	bind:show={showPasswordDialog}
+	title="Ubah Password Pengguna"
+	theme="primary"
+	confirmText={submitting ? 'Menyimpan...' : 'Simpan Password'}
+	cancelText="Batal"
+	onConfirm={() => {
+		// Client logic handled by form submission inside the slot, but we can trigger it
+		const formEl = document.getElementById('changePasswordForm') as HTMLFormElement;
+		if (formEl) formEl.requestSubmit();
+	}}
+>
+	<form
+		id="changePasswordForm"
+		method="POST"
+		action="?/changePassword"
+		use:enhance={() => {
+			clientError = '';
+			if (newPassword === oldPassword) {
+				clientError = 'Password baru tidak boleh sama dengan password lama.';
+				return ({ update }) => update();
+			}
+			if (newPassword !== confirmPassword) {
+				clientError = 'Konfirmasi password baru tidak cocok.';
+				return ({ update }) => update();
+			}
+			submitting = true;
 
-<!-- Loading Overlay -->
-{#if loading}
-	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-		<div class="h-12 w-12 animate-spin rounded-full border-b-2 border-white"></div>
-	</div>
-{/if}
+			return async ({ update }) => {
+				await update();
+			};
+		}}
+		class="mt-4 space-y-4 text-left"
+	>
+		<input type="hidden" name="user_id" value={selectedUser?.id} />
+
+		<div>
+			<label
+				for="new_password"
+				class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
+			>
+				Password Baru (Min. 8 karakter)
+			</label>
+			<input
+				type="password"
+				id="new_password"
+				name="new_password"
+				bind:value={newPassword}
+				required
+				minlength="8"
+				autocomplete="new-password"
+				class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+			/>
+		</div>
+
+		<div>
+			<label
+				for="new_password_confirmation"
+				class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300"
+			>
+				Konfirmasi Password Baru
+			</label>
+			<input
+				type="password"
+				id="new_password_confirmation"
+				name="new_password_confirmation"
+				bind:value={confirmPassword}
+				required
+				minlength="8"
+				autocomplete="new-password"
+				class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+			/>
+		</div>
+
+		{#if clientError}
+			<p class="text-sm font-medium text-red-600 dark:text-red-400">{clientError}</p>
+		{/if}
+	</form>
+</ConfirmationDialog>
+
+<!-- Global Notification -->
+<NotificationDialog
+	bind:show={notificationState.show}
+	title={notificationState.title}
+	message={notificationState.message}
+	theme={notificationState.type}
+/>

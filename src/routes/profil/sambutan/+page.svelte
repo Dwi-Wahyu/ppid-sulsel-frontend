@@ -75,10 +75,6 @@
 
 					<!-- Closing -->
 					<div class="mt-8 border-t border-gray-200 pt-6 dark:border-slate-700">
-						<p class="mb-6 font-medium text-gray-900 dark:text-white">
-							{m['profile.closing_greeting']()}
-						</p>
-
 						<div class="flex items-start gap-4">
 							<div class="h-20 w-1 rounded-full bg-ppid-accent"></div>
 							<div>

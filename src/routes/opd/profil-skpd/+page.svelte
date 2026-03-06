@@ -11,9 +11,6 @@
 	let loading = $state(false);
 	let skpd = $state<any>(null);
 
-	// State untuk menentukan tipe input tupoksi (file atau teks)
-	let tupoksiType = $state<'file' | 'text'>('file');
-
 	let formData = $state({
 		nm_skpd: '',
 		alamat: '',
@@ -24,12 +21,10 @@
 		sek: '',
 		jenis: '',
 		visimisi: '',
-		tupoksi_text: '', // State khusus untuk editor TinyMCE
 		is_active: '1'
 	});
 
 	let uploadedLogo: any = $state(null);
-	let uploadedTupoksi: any = $state(null);
 	let errors = $state<Record<string, string[]>>({});
 
 	let notification = $state({
@@ -62,17 +57,8 @@
 					sek: skpd.sek || '',
 					jenis: skpd.jenis || '',
 					visimisi: skpd.visimisi || '',
-					tupoksi_text: '',
 					is_active: String(skpd.is_active || '1')
 				};
-
-				// Logika deteksi: Jika string tupoksi tidak berakhiran .pdf, anggap itu teks HTML
-				if (skpd.tupoksi && !skpd.tupoksi.toLowerCase().endsWith('.pdf')) {
-					tupoksiType = 'text';
-					formData.tupoksi_text = skpd.tupoksi;
-				} else {
-					tupoksiType = 'file';
-				}
 			}
 		} catch (error: any) {
 			triggerNotify('error', 'Gagal Memuat', error.message || 'Gagal memuat data');
@@ -93,7 +79,7 @@
 
 			// Tambahkan field dasar ke FormData
 			Object.entries(formData).forEach(([key, value]) => {
-				if (key !== 'tupoksi_text' && value !== null) {
+				if (value !== null) {
 					submitFormData.append(key, value);
 				}
 			});
@@ -102,17 +88,6 @@
 			if (uploadedLogo) {
 				const file = Array.isArray(uploadedLogo) ? uploadedLogo[0] : uploadedLogo;
 				submitFormData.append('logo', file.file || file);
-			}
-
-			// Handle Tupoksi berdasarkan pilihan user
-			if (tupoksiType === 'file') {
-				if (uploadedTupoksi) {
-					const file = Array.isArray(uploadedTupoksi) ? uploadedTupoksi[0] : uploadedTupoksi;
-					submitFormData.append('tupoksi', file.file || file);
-				}
-			} else {
-				// Kirim konten TinyMCE sebagai string ke field 'tupoksi'
-				submitFormData.append('tupoksi', formData.tupoksi_text);
 			}
 
 			submitFormData.append('_method', 'PUT');
@@ -275,53 +250,6 @@
 						class="w-full rounded-lg border border-slate-300 px-4 py-2 dark:bg-slate-700 dark:text-white"
 					/>
 				</div>
-			</div>
-
-			<div class="space-y-4">
-				<div class="flex items-center justify-between">
-					<h1 class="text-sm font-medium text-slate-700 dark:text-slate-300">
-						Tugas Pokok & Fungsi
-					</h1>
-					<div class="flex rounded-lg bg-slate-100 p-1 dark:bg-slate-900">
-						<button
-							type="button"
-							class="rounded-md px-3 py-1 text-[10px] font-bold transition-all {tupoksiType ===
-							'file'
-								? 'bg-white text-blue-600 shadow-sm'
-								: 'text-slate-500'}"
-							onclick={() => (tupoksiType = 'file')}>FILE PDF</button
-						>
-						<button
-							type="button"
-							class="rounded-md px-3 py-1 text-[10px] font-bold transition-all {tupoksiType ===
-							'text'
-								? 'bg-white text-blue-600 shadow-sm'
-								: 'text-slate-500'}"
-							onclick={() => (tupoksiType = 'text')}>TEKS HTML</button
-						>
-					</div>
-				</div>
-
-				{#if tupoksiType === 'file'}
-					<FilePond
-						name="tupoksi"
-						allowMultiple={false}
-						acceptedFileTypes={['application/pdf']}
-						bind:value={uploadedTupoksi}
-						label={'Seret PDF tupoksi atau <span class="filepond--label-action">Telusuri</span>'}
-					/>
-					{#if skpd.tupoksi && skpd.tupoksi.toLowerCase().endsWith('.pdf') && !uploadedTupoksi}
-						<p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
-							<a
-								href="{PUBLIC_BACKEND_URL}/uploads/{skpd.tupoksi}"
-								target="_blank"
-								class="text-blue-600 hover:underline">Lihat PDF saat ini</a
-							>
-						</p>
-					{/if}
-				{:else}
-					<TinyMCE bind:value={formData.tupoksi_text} height={200} />
-				{/if}
 			</div>
 
 			<div class="flex items-center justify-end gap-4">

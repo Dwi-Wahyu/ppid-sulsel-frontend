@@ -190,7 +190,7 @@
 							</div>
 						</div>
 
-						<div class="mt-2 border-t-2 border-gray-100 pt-6 pb-2 dark:border-slate-700">
+						<div class="mt-2 border-gray-100 pt-6 pb-2 dark:border-slate-700">
 							<div
 								class="rounded-xl border border-blue-100 bg-blue-50 p-4 dark:border-slate-600 dark:bg-slate-700/30"
 							>
@@ -361,7 +361,7 @@
 						</div>
 					</div>
 
-					<div class="mt-2 pt-8">
+					<div class="pt-6">
 						<div class="flex flex-col justify-end gap-4 sm:flex-row">
 							<button
 								type="submit"

@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import { fly } from 'svelte/transition';
 	import { onMount } from 'svelte';
 	import { sidebar } from '$lib/state/sidebar.svelte';
 	import { theme } from '$lib/state/theme.svelte';
 	import { api } from '$lib/api';
+	import { page } from '$app/state';
 
 	interface Notification {
 		id_notification: string;
@@ -31,13 +31,13 @@
 	let unreadCount = $state(0);
 
 	// --- Derived State ---
-	const user = $derived($page.data.user);
+	const user = $derived(page.data.user);
 
 	// --- Logic ---
 	async function fetchNotifications() {
 		try {
 			// Menggunakan api.ts yang secara otomatis menangani proxy dan JSON parsing
-			const result = (await api.get('/admin/notifications')) as ApiResponse<Notification>;
+			const result = (await api.get('/admin/notifikasi')) as ApiResponse<Notification>;
 
 			if (result.success) {
 				// Ambil 5 terbaru untuk preview dropdown
@@ -161,7 +161,7 @@
 					>
 						<h3 class="font-bold text-slate-800 dark:text-white">Notifikasi</h3>
 						<a
-							href="/admin/notifications"
+							href="/admin/notifikasi"
 							onclick={closeMenus}
 							class="text-xs font-semibold text-blue-600 hover:underline">Lihat Semua</a
 						>
@@ -204,14 +204,11 @@
 				<div
 					class="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-blue-600 font-bold text-white"
 				>
-					{user?.name?.charAt(0).toUpperCase() || 'A'}
+					{user.name?.charAt(0).toUpperCase() || 'A'}
 				</div>
 				<div class="hidden text-start md:block">
 					<div class="text-sm font-semibold text-slate-700 dark:text-slate-200">
-						{user?.name || 'Admin'}
-					</div>
-					<div class="text-xs text-slate-500 dark:text-slate-400">
-						{user?.email || 'admin@sulselprov.go.id'}
+						{user.username || 'Admin'}
 					</div>
 				</div>
 			</button>
@@ -225,12 +222,12 @@
 					<div class="border-b border-slate-100 p-4 dark:border-slate-700">
 						<p class="text-xs text-slate-400">Masuk sebagai</p>
 						<p class="truncate text-sm font-bold text-slate-800 dark:text-white">
-							{user?.email || 'admin@sulselprov.go.id'}
+							{user.name || 'admin@sulselprov.go.id'}
 						</p>
 					</div>
 					<div class="p-2">
 						<a
-							href="/admin/profile"
+							href="/opd/profil"
 							onclick={closeMenus}
 							class="flex items-center rounded-lg px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700"
 							role="menuitem"
@@ -242,21 +239,6 @@
 								/>
 							</svg>
 							Profil Saya
-						</a>
-						<a
-							href="/admin/settings"
-							onclick={closeMenus}
-							class="flex items-center rounded-lg px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700"
-							role="menuitem"
-						>
-							<svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path
-									d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-									stroke-width="2"
-								/>
-								<circle cx="12" cy="12" r="3" stroke-width="2" />
-							</svg>
-							Pengaturan
 						</a>
 						<div class="my-1 border-t border-slate-100 dark:border-slate-700"></div>
 						<form action="/logout" method="POST">

@@ -91,7 +91,7 @@
 		let isValid = true;
 
 		if (!namaJabatan.trim()) {
-			errors.nama_jabatan = ['Nama jabatan harus diisi'];
+			errors.nama_jabatan = ['Judul harus diisi'];
 			isValid = false;
 		}
 
@@ -256,31 +256,16 @@
 	class="mb-6 rounded-xl border border-slate-100 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800"
 >
 	<div class="grid grid-cols-1 gap-4 md:grid-cols-4">
-		<div>
+		<div class="md:col-span-2">
 			<label class="block text-sm font-medium text-slate-700 dark:text-slate-300"
 				>Pencarian
 
 				<input
 					type="text"
 					bind:value={searchQuery}
-					placeholder="Cari nama jabatan..."
+					placeholder="Cari Judul..."
 					class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
 				/>
-			</label>
-		</div>
-		<div>
-			<label class="block text-sm font-medium text-slate-700 dark:text-slate-300"
-				>Urutkan
-
-				<select
-					bind:value={sortFilter}
-					class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-				>
-					<option value="">Terbaru</option>
-					<option value="oldest">Terlama</option>
-					<option value="title_asc">Nama A-Z</option>
-					<option value="title_desc">Nama Z-A</option>
-				</select>
 			</label>
 		</div>
 		<button
@@ -312,7 +297,7 @@
 					>
 					<th
 						class="px-6 py-3 text-left text-xs font-medium text-slate-600 uppercase dark:text-slate-300"
-						>Nama Jabatan</th
+						>Judul</th
 					>
 					<th
 						class="px-6 py-3 text-left text-xs font-medium text-slate-600 uppercase dark:text-slate-300"

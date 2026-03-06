@@ -25,12 +25,6 @@
 			const response = await fetch(`${env.PUBLIC_API_URL}/public/berita/latest`);
 			const result = await response.json();
 
-			console.log('Data diterima:', result);
-
-			/** * PERBAIKAN:
-			 * Contoh output Anda tidak memiliki properti 'success'.
-			 * Langsung cek keberadaan 'result.data'
-			 */
 			if (result && result.data) {
 				news = result.data;
 			}

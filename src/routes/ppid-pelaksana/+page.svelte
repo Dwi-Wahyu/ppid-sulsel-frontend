@@ -33,7 +33,11 @@
 	<div class="container mx-auto px-4 py-8">
 		<!-- Breadcrumb -->
 		<div class="mb-4 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-			<a href="/" class="transition-colors hover:text-ppid-primary dark:hover:text-white">
+			<a
+				title="Kembali ke beranda"
+				href="/"
+				class="transition-colors hover:text-ppid-primary dark:hover:text-white"
+			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					width="16"

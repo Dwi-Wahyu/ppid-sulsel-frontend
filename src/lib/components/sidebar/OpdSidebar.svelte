@@ -35,12 +35,14 @@
 					label: 'Visi Misi',
 					icon: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2z M7 8h5 M7 12h10 M7 16h10',
 					links: []
-				}
-			]
-		},
-		{
-			title: 'Manajemen Informasi',
-			items: [
+				},
+				{
+					type: 'link',
+					href: '/opd/tupoksi',
+					label: 'Tugas Pokok & Fungsi',
+					icon: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2z M7 8h5 M7 12h10 M7 16h10',
+					links: []
+				},
 				{
 					type: 'dropdown',
 					label: 'Layanan',
@@ -50,16 +52,23 @@
 						{ href: '/opd/permohonan-informasi', label: 'Permohonan Informasi' },
 						{ href: '/opd/pengajuan-keberatan', label: 'Pengajuan Keberatan' }
 					]
+				}
+			]
+		},
+		{
+			title: 'Manajemen Informasi',
+			items: [
+				{
+					type: 'link',
+					label: 'Berita & Artikel',
+					href: '/opd/berita',
+					icon: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2z M7 8h5 M7 12h10 M7 16h10'
 				},
 				{
-					type: 'dropdown',
-					label: 'Publikasi',
-					href: '',
-					icon: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2z M7 8h5 M7 12h10 M7 16h10',
-					links: [
-						{ href: '/opd/dokumen-publik', label: 'Publikasi Dokumen' },
-						{ href: '/opd/berita', label: 'Berita & Artikel' }
-					]
+					type: 'link',
+					label: 'Dokumen Publik',
+					href: '/opd/dokumen-publik',
+					icon: 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2z M7 8h5 M7 12h10 M7 16h10'
 				}
 			]
 		}

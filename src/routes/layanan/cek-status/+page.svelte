@@ -3,13 +3,6 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { PUBLIC_API_URL } from '$env/static/public';
 
-	interface BaseResponse<T> {
-		success: boolean;
-		type: 'permohonan' | 'keberatan';
-		data: T[];
-		message?: string;
-	}
-
 	interface PermohonanData {
 		id_permohonan: number;
 		no_pendaftaran: string | null;

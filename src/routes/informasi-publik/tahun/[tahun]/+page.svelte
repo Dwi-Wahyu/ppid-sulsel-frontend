@@ -2,23 +2,40 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import * as m from '$lib/paraglide/messages.js';
+	import { env } from '$env/dynamic/public';
 
-	// Mengambil props data dari SvelteKit
 	let { data } = $props();
 
-	// State untuk input pencarian
+	const API_BASE = env.PUBLIC_API_URL || 'http://localhost:8000/api';
+	const FILE_BASE = API_BASE.replace('/api', '');
+
 	let searchQuery = $state('');
 
-	// Sinkronisasi searchQuery dengan data dari URL (prop data)
-	// Ini memastikan jika user klik "Back" atau "Clear", input ikut ter-update
 	$effect(() => {
-		searchQuery = data.matriksData.filters.search || '';
+		searchQuery = data.filters.search || '';
 	});
 
-	// Derived stores untuk mempermudah akses data
-	let matriks = $derived(data.matriksData.data.data);
-	let pagination = $derived(data.matriksData.data);
-	let filters = $derived(data.matriksData.filters);
+	let informasi = $derived(data.informasiData.data.data);
+	let pagination = $derived(data.informasiData.data);
+
+	function getFileUrl(file: string) {
+		if (!file) return null;
+		return `${FILE_BASE}/storage/informasi/${encodeURIComponent(file)}`;
+	}
+
+	function getFileExt(file: string) {
+		if (!file) return '-';
+		return file.split('.').pop()?.toUpperCase() ?? '-';
+	}
+
+	function formatDate(dateStr: string) {
+		if (!dateStr) return '-';
+		return new Date(dateStr).toLocaleDateString('id-ID', {
+			day: '2-digit',
+			month: 'long',
+			year: 'numeric'
+		});
+	}
 
 	async function handleSearch(e: SubmitEvent) {
 		e.preventDefault();
@@ -29,15 +46,13 @@
 			params.delete('search');
 		}
 		params.set('page', '1');
-
 		await goto(`?${params.toString()}`, { keepFocus: true, noScroll: true });
 	}
 
-	function handlePageChange(url: string | null) {
-		if (!url) return;
-		const targetUrl = new URL(url);
+	function handlePageChange(pageNum: number | null) {
+		if (!pageNum) return;
 		const params = new URLSearchParams(page.url.searchParams);
-		params.set('page', targetUrl.searchParams.get('page') || '1');
+		params.set('page', String(pageNum));
 		goto(`?${params.toString()}`);
 	}
 </script>
@@ -83,7 +98,9 @@
 			>
 				<path d="m9 18 6-6-6-6" />
 			</svg>
-			<span class="font-medium text-ppid-primary dark:text-white">{m['public_info.title']()}</span>
+			<span class="font-medium text-ppid-primary dark:text-white">
+				{m['header.public_info_year']({ year: page.params.tahun })}
+			</span>
 		</nav>
 
 		<div class="flex items-end justify-between">
@@ -102,7 +119,7 @@
 	</div>
 </div>
 
-<main class="bg-gray-50 py-10 font-['Plus_Jakarta_Sans'] md:py-16 dark:bg-slate-900">
+<main class="bg-gray-50 py-10 font-['Plus_Jakarta_Sans'] dark:bg-slate-900">
 	<div class="container mx-auto px-4">
 		<div class="mx-auto max-w-7xl">
 			<form onsubmit={handleSearch} class="mb-6 flex gap-4">
@@ -135,7 +152,7 @@
 					>
 						{m['public_info.search_btn']()}
 					</button>
-					{#if filters.search}
+					{#if data.filters.search}
 						<a
 							href={page.url.pathname}
 							class="flex items-center justify-center rounded-lg bg-gray-200 px-6 py-2 font-medium text-gray-700 transition-colors hover:bg-gray-300 dark:bg-slate-700 dark:text-gray-200"
@@ -153,51 +170,60 @@
 					<table class="w-full border-collapse text-left">
 						<thead class="bg-ppid-primary text-white">
 							<tr>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase">No</th>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase">Judul</th>
 								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
-									>{m['public_info.table.no']()}</th
+									>Nama OPD / SKPD</th
 								>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase">Kategori</th>
 								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
-									>{m['public_info.table.info']()}</th
+									>Tanggal Upload</th
 								>
-								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
-									>{m['public_info.table.summary']()}</th
-								>
-								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
-									>{m['public_info.table.official']()}</th
-								>
-								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
-									>{m['public_info.table.format']()}</th
-								>
-								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
-									>{m['public_info.table.action']()}</th
-								>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase">Format</th>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase">Aksi</th>
 							</tr>
 						</thead>
 						<tbody class="divide-y divide-gray-100 dark:divide-slate-700">
-							{#each matriks as item, i (item.id)}
+							{#each informasi as item, i (item.id_informasi)}
 								<tr class="transition-colors hover:bg-ppid-primary/5 dark:hover:bg-slate-700/50">
-									<td class="px-4 py-4 text-sm font-medium">
+									<td class="px-4 py-4 text-sm font-medium text-gray-600 dark:text-gray-300">
 										{(pagination.current_page - 1) * pagination.per_page + i + 1}
 									</td>
-									<td class="min-w-[200px] px-4 py-4 text-sm leading-relaxed">{item.a}</td>
-									<td class="min-w-[250px] px-4 py-4 text-sm text-gray-600 dark:text-gray-300"
-										>{item.b}</td
+									<td
+										class="min-w-50 px-4 py-4 text-sm leading-relaxed text-gray-800 dark:text-gray-200"
 									>
-									<td class="px-4 py-4 text-sm">{item.c}</td>
-									<td class="px-4 py-4 text-sm whitespace-nowrap">{item.f}</td>
+										{item.judul}
+									</td>
+									<td class="min-w-62 px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
+										{item.skpd?.nm_skpd ?? '-'}
+									</td>
+									<td class="px-4 py-4 text-sm whitespace-nowrap text-gray-600 dark:text-gray-300">
+										{item.kategori?.nm_kat_info ?? '-'}
+									</td>
+									<td class="px-4 py-4 text-sm whitespace-nowrap text-gray-600 dark:text-gray-300">
+										{formatDate(item.tgl_upload)}
+									</td>
+									<td class="px-4 py-4 text-sm whitespace-nowrap text-gray-600 dark:text-gray-300">
+										{getFileExt(item.file)}
+									</td>
 									<td class="px-4 py-4 text-sm">
-										<a
-											href={item.h}
-											target="_blank"
-											class="font-medium text-ppid-primary hover:underline dark:text-blue-400"
-										>
-											{m['public_info.view']()}
-										</a>
+										{#if item.file && getFileUrl(item.file)}
+											<a
+												href={getFileUrl(item.file)}
+												target="_blank"
+												rel="noopener noreferrer"
+												class="font-medium text-ppid-primary hover:underline dark:text-blue-400"
+											>
+												{m['public_info.view']()}
+											</a>
+										{:else}
+											<span class="text-gray-400 italic">Tidak tersedia</span>
+										{/if}
 									</td>
 								</tr>
 							{:else}
 								<tr>
-									<td colspan="6" class="py-20 text-center text-gray-500">
+									<td colspan="7" class="py-20 text-center text-gray-500">
 										{m['public_info.no_data']()}
 									</td>
 								</tr>
@@ -212,7 +238,7 @@
 					<div class="flex flex-wrap justify-center gap-2">
 						{#each pagination.links as link}
 							<button
-								onclick={() => handlePageChange(link.url)}
+								onclick={() => handlePageChange(link.page ?? null)}
 								disabled={!link.url || link.active}
 								class="rounded-md border px-4 py-1.5 text-sm font-medium transition-all
 								{link.active

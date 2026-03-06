@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { PUBLIC_API_URL, PUBLIC_BACKEND_URL } from '$env/static/public';
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 	import type { PageData } from './$types';
@@ -24,33 +24,8 @@
 	let notificationDescription = $state('');
 
 	// Get user from page data (passed down from layout)
-	const user = $derived($page.data.user);
+	const user = $derived(page.data.user);
 	const isAdmin = $derived(user && user.id_skpd === null);
-
-	// Computed: Check if all items on current page are selected
-	const allSelected = $derived(
-		data.informasi.data.length > 0 &&
-			selectedIds.length === data.informasi.data.length &&
-			data.informasi.data.every((item) => selectedIds.includes(item.id_informasi))
-	);
-
-	// Toggle all checkboxes
-	function toggleAll() {
-		if (allSelected) {
-			selectedIds = [];
-		} else {
-			selectedIds = data.informasi.data.map((item) => item.id_informasi);
-		}
-	}
-
-	// Toggle individual checkbox
-	function toggleItem(id: number) {
-		if (selectedIds.includes(id)) {
-			selectedIds = selectedIds.filter((i) => i !== id);
-		} else {
-			selectedIds = [...selectedIds, id];
-		}
-	}
 
 	// Confirm delete single item
 	function confirmDelete(id: number) {
@@ -260,9 +235,22 @@
 	}
 
 	// Handle page navigation
-	function navigateToPage(url: string | null) {
-		if (url) {
-			goto(url.replace(PUBLIC_API_URL, ''));
+	function navigateToPage(apiUrl: string | null) {
+		if (apiUrl) {
+			// Ambil angka page dari URL API
+			const apiSearchParams = new URL(apiUrl).searchParams;
+			const pageNumber = apiSearchParams.get('page');
+
+			if (pageNumber) {
+				// 2. Gunakan URL browser saat ini sebagai basis
+				const currentUrl = new URL(window.location.href);
+
+				// 3. Set parameter 'page' saja, tanpa mengubah path-nya
+				currentUrl.searchParams.set('page', pageNumber);
+
+				// 4. Navigasi ke URL baru (Path tetap, query params terupdate)
+				goto(currentUrl.pathname + currentUrl.search);
+			}
 		}
 	}
 
@@ -280,11 +268,23 @@
 			data.filters.start_date ||
 			data.filters.end_date
 	);
+
+	const lastSegment = $derived(page.url.pathname.split('/').pop() || '');
+
+	const formatTitle = (slug: string) => {
+		return slug
+			.replace(/-/g, ' ')
+			.split(' ')
+			.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+			.join(' ');
+	};
+
+	const displayTitle = $derived(formatTitle(lastSegment));
 </script>
 
 <div class="mb-4 flex items-center justify-between">
 	<h2 class="text-xl leading-tight font-semibold text-slate-800 dark:text-slate-100">
-		Daftar Informasi Publik
+		Informasi {displayTitle}
 	</h2>
 	<a
 		href="/admin/dokumen-publik/create"
@@ -562,7 +562,7 @@
 								<td class="px-6 py-4">
 									<div class="font-medium text-slate-900 dark:text-slate-100">{info.judul}</div>
 									<div class="mt-1 text-xs text-slate-500 dark:text-slate-400">
-										Uploaded: {formatDate(info.tgl_upload)}
+										Diupload: {formatDate(info.tgl_upload)}
 									</div>
 								</td>
 								<td class="px-6 py-4">
@@ -593,7 +593,7 @@
 								<td class="px-6 py-4">
 									{#if info.file}
 										<a
-											href="{PUBLIC_API_URL}/storage/{info.file}"
+											href="{PUBLIC_BACKEND_URL}/uploads/{info.file}"
 											target="_blank"
 											class="flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
 										>
@@ -663,7 +663,7 @@
 											d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
 										></path>
 									</svg>
-									<p>Belum ada data informasi publik</p>
+									<p>Belum ada data informasi</p>
 								</div>
 							</td>
 						</tr>

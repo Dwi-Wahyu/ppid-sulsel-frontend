@@ -214,7 +214,7 @@
 										{item.kasus}
 									</div>
 								</td>
-								<td class="px-6 py-4">{item.skpd?.nm_skpd || 'Tidak Ada SKPD'}</td>
+								<td class="px-6 py-4">{item.skpd?.nm_skpd || '-'}</td>
 								<td class="px-6 py-4">
 									<span
 										class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold {getStatusBadgeClass(
