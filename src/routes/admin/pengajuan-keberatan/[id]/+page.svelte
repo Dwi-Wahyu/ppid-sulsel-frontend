@@ -124,7 +124,7 @@
 				<div>
 					<h1 class="text-2xl font-black text-slate-900 dark:text-white">Detail Pengajuan</h1>
 					<p class="font-mono text-sm tracking-wider text-slate-500 uppercase">
-						Ref: {pengajuan.no_pendaftaran}
+						{pengajuan.no_pendaftaran}
 					</p>
 				</div>
 			</div>

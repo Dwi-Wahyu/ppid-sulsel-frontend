@@ -37,7 +37,7 @@
 	async function fetchNotifications() {
 		try {
 			// Menggunakan api.ts yang secara otomatis menangani proxy dan JSON parsing
-			const result = (await api.get('/admin/notifikasi')) as ApiResponse<Notification>;
+			const result = (await api.get('/admin/notifications')) as ApiResponse<Notification>;
 
 			if (result.success) {
 				// Ambil 5 terbaru untuk preview dropdown

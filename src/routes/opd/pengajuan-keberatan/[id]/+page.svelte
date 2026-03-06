@@ -1,47 +1,40 @@
 <script lang="ts">
 	import PengajuanDialog from '$lib/components/PengajuanDialog.svelte';
+	import TrackingCardPengajuan from '$lib/components/TrackingCardPengajuan.svelte';
+	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 	import { invalidateAll } from '$app/navigation';
 	import { api } from '$lib/api.js';
-	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
-	import TrackingCardPengajuan from '$lib/components/TrackingCardPengajuan.svelte';
-	import { PUBLIC_API_URL, PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
 	let { data } = $props();
 	const pengajuan = $derived(data.pengajuan);
 
-	// Form States
-	let isSubmitting = $state(false);
-
-	// Tambahkan state baru di bagian Form States
+	// Form States untuk Respon OPD
 	let showOpdResponseModal = $state(false);
 	let opdResponseText = $state('');
 	let opdStatus = $state('selesai');
 	let opdFile = $state<File | null>(null);
+	let isSubmitting = $state(false);
 
 	// Notification State
 	let showNotification = $state(false);
 	let notificationType = $state<'success' | 'error'>('success');
 	let notificationMessage = $state('');
 
-	const disposisi = $derived(
+	// Mencari data disposisi yang spesifik untuk SKPD user saat ini
+	const userDisposisi = $derived(
 		pengajuan.disposisi.find((d: any) => d.id_skpd === data.user?.id_skpd)
 	);
 
+	// Fungsi untuk mengirim respon ke backend [cite: 7, 9]
 	async function handleOpdResponse(e: Event) {
 		e.preventDefault();
 		if (!opdResponseText) return alert('Isi pesan respon terlebih dahulu');
-
-		// Cari ID disposisi yang ditujukan untuk SKPD user saat ini
-		// data.user.id_skpd diasumsikan berasal dari data session user
-		const userDisposisi = pengajuan.disposisi.find(
-			(d: any) => d.id_skpd === data.user?.id_skpd && d.status !== 'selesai'
-		);
-
-		if (!userDisposisi) return alert('Data disposisi tidak ditemukan atau sudah selesai.');
+		if (!userDisposisi) return alert('Data disposisi tidak ditemukan.');
 
 		isSubmitting = true;
 
-		// Menggunakan FormData untuk mendukung pengiriman file
+		// Menggunakan FormData karena terdapat upload file [cite: 9]
 		const formData = new FormData();
 		formData.append('respon', opdResponseText);
 		formData.append('status', opdStatus);
@@ -50,7 +43,7 @@
 		}
 
 		try {
-			// Gunakan ID disposisi yang ditemukan pada endpoint
+			// Endpoint sesuai dengan PengajuanKeberatanController.php @responStore [cite: 10]
 			await api.post(
 				`/admin/pengajuan-keberatan/disposisi/${userDisposisi.id_disposisi}/respon`,
 				formData
@@ -58,17 +51,19 @@
 
 			showOpdResponseModal = false;
 			opdResponseText = '';
-			opdFile = null; // Reset file
+			opdFile = null;
+
 			notificationType = 'success';
-			notificationMessage = 'Respon berhasil dikirim';
+			notificationMessage = 'Respon/Jawaban berhasil dikirim ke Admin Utama';
 			showNotification = true;
+
 			await invalidateAll();
 		} catch (err: any) {
 			notificationType = 'error';
 			notificationMessage = err.message || 'Gagal mengirim respon';
 			showNotification = true;
 		} finally {
-			isSubmitting = false; //
+			isSubmitting = false;
 		}
 	}
 
@@ -78,6 +73,10 @@
 				return 'bg-amber-100 text-amber-800 border-amber-200';
 			case 'y':
 				return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+			case 'd':
+				return 'bg-purple-100 text-purple-800 border-purple-200';
+			case 'a':
+				return 'bg-blue-100 text-blue-800 border-blue-200';
 			default:
 				return 'bg-slate-100 text-slate-800 border-slate-200';
 		}
@@ -85,17 +84,17 @@
 </script>
 
 <svelte:head>
-	<title>Detail Pengajuan Keberatan - {pengajuan.no_pendaftaran}</title>
+	<title>Detail Pengajuan - OPD Response</title>
 </svelte:head>
 
-<main class="min-h-screen">
+<main class="min-h-screen p-4 md:p-8">
 	<div class="mx-auto max-w-6xl">
 		<header class="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center">
 			<div class="flex items-center gap-4">
 				<a
 					href="/admin/pengajuan-keberatan"
-					class="rounded-xl border border-slate-200 bg-white p-2 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800"
-					aria-label="Kembali ke daftar"
+					title="Kembali"
+					class="rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-800"
 				>
 					<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
 						><path
@@ -108,38 +107,34 @@
 				</a>
 				<div>
 					<h1 class="text-2xl font-black text-slate-900 dark:text-white">Detail Pengajuan</h1>
-					<p class="font-mono text-sm tracking-wider text-slate-500 uppercase">
-						Ref: {pengajuan.no_pendaftaran}
-					</p>
 				</div>
 			</div>
 
-			{#if !disposisi.respon}
-				<div class="flex gap-2">
+			<div class="flex gap-2">
+				{#if userDisposisi && userDisposisi.status !== 'selesai'}
 					<button
 						onclick={() => (showOpdResponseModal = true)}
-						class="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-700 active:scale-95"
+						class="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-700"
 					>
 						Kirim Jawaban OPD
 					</button>
-				</div>
-			{/if}
+				{/if}
+			</div>
 		</header>
 
 		<div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
 			<div class="space-y-8 lg:col-span-2">
 				<section
-					aria-labelledby="applicant-info"
 					class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
 				>
-					<h2 id="applicant-info" class="mb-6 flex items-center gap-2 text-lg font-bold">
+					<h2 class="mb-6 flex items-center gap-2 text-lg font-bold">
 						<span class="h-6 w-1.5 rounded-full bg-blue-600"></span>
 						Informasi Pemohon
 					</h2>
 					<div class="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
 						<div>
 							<span class="text-xs font-bold tracking-widest text-slate-400 uppercase"
-								>Nama Lengkap</span
+								>Nama Pemohon</span
 							>
 							<p class="mt-1 font-semibold text-slate-900 dark:text-white">
 								{pengajuan.nama_pemohon}
@@ -148,23 +143,7 @@
 						<div>
 							<span class="text-xs font-bold tracking-widest text-slate-400 uppercase">Email</span>
 							<p class="mt-1 font-semibold text-slate-900 dark:text-white">
-								{pengajuan.email_pemohon}
-							</p>
-						</div>
-						<div>
-							<span class="text-xs font-bold tracking-widest text-slate-400 uppercase"
-								>No. Telepon</span
-							>
-							<p class="mt-1 font-semibold text-slate-900 dark:text-white">
-								{pengajuan.no_telp_pemohon}
-							</p>
-						</div>
-						<div>
-							<span class="text-xs font-bold tracking-widest text-slate-400 uppercase"
-								>Domisili</span
-							>
-							<p class="mt-1 font-semibold text-slate-900 dark:text-white">
-								{pengajuan.domisili_pemohon.nama_daerah} - {pengajuan.domisili_pemohon.provinsi}
+								{pengajuan.email}
 							</p>
 						</div>
 						<div>
@@ -172,7 +151,7 @@
 								>Pekerjaan</span
 							>
 							<p class="mt-1 font-semibold text-slate-900 dark:text-white">
-								{pengajuan.pekerjaan.nama_pekerjaan}
+								{pengajuan.pekerjaan?.nama_pekerjaan || '-'}
 							</p>
 						</div>
 						<div class="md:col-span-2">
@@ -184,96 +163,37 @@
 					</div>
 				</section>
 
-				<!-- <section
-					aria-labelledby="applicant-proxy"
-					class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
-				>
-					<h2 id="applicant-proxy" class="mb-6 flex items-center gap-2 text-lg font-bold">
-						<span class="h-6 w-1.5 rounded-full bg-blue-600"></span>
-						Informasi Kuasa Pemohon
-					</h2>
-					<div class="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
-						<div>
-							<span class="text-xs font-bold tracking-widest text-slate-400 uppercase"
-								>Nama Lengkap</span
-							>
-							<p class="mt-1 font-semibold text-slate-900 dark:text-white">
-								{pengajuan.nama_kuasa}
-							</p>
-						</div>
-						<div>
-							<span class="text-xs font-bold tracking-widest text-slate-400 uppercase">Email</span>
-							<p class="mt-1 font-semibold text-slate-900 dark:text-white">
-								{pengajuan.email_kuasa}
-							</p>
-						</div>
-						<div>
-							<span class="text-xs font-bold tracking-widest text-slate-400 uppercase"
-								>No. Telepon</span
-							>
-							<p class="mt-1 font-semibold text-slate-900 dark:text-white">
-								{pengajuan.no_telp_kuasa}
-							</p>
-						</div>
-						<div>
-							<span class="text-xs font-bold tracking-widest text-slate-400 uppercase"
-								>Domisili</span
-							>
-							<p class="mt-1 font-semibold text-slate-900 dark:text-white">
-								{pengajuan.domisili_kuasa.nama_daerah} - {pengajuan.domisili_kuasa.provinsi}
-							</p>
-						</div>
-					</div>
-				</section> -->
-
 				<section
-					aria-labelledby="objection-content"
 					class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
 				>
-					<h2 id="objection-content" class="mb-6 flex items-center gap-2 text-lg font-bold">
+					<h2 class="mb-6 flex items-center gap-2 text-lg font-bold">
 						<span class="h-6 w-1.5 rounded-full bg-red-600"></span>
-						Detail Keberatan
+						Isi Keberatan
 					</h2>
 					<div class="space-y-6">
-						<div>
-							<span class="text-xs font-bold tracking-widest text-slate-400 uppercase"
-								>Alasan Pengajuan</span
-							>
-							<ul class="mt-2 space-y-2">
-								{#each pengajuan.alasan_pengajuan as alasan}
-									<li class="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-300">
-										<svg
-											class="mt-0.5 h-5 w-5 text-red-500"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-											><path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-											/></svg
-										>
-										{alasan.alasan}
-									</li>
-								{/each}
-							</ul>
-						</div>
 						<div>
 							<span class="text-xs font-bold tracking-widest text-slate-400 uppercase"
 								>Kasus Posisi</span
 							>
 							<div
-								class="prose mt-2 max-w-none rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm prose-slate dark:border-slate-700 dark:bg-slate-900 dark:prose-invert"
+								class="prose mt-2 max-w-none rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white"
 							>
 								{pengajuan.kasus}
 							</div>
 						</div>
 						<div>
 							<span class="text-xs font-bold tracking-widest text-slate-400 uppercase"
-								>Tujuan Penggunaan</span
+								>Alasan Keberatan</span
 							>
-							<p class="mt-1 text-sm text-slate-700 dark:text-slate-300">{pengajuan.tujuan}</p>
+							<ul class="mt-2 space-y-2">
+								{#each pengajuan.alasan_pengajuan as alasan}
+									<li
+										class="flex items-center gap-2 text-sm text-slate-700 italic dark:text-slate-300"
+									>
+										• {alasan.alasan}
+									</li>
+								{/each}
+							</ul>
 						</div>
 					</div>
 				</section>
@@ -284,143 +204,120 @@
 					class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
 				>
 					<span class="mb-4 block text-xs font-bold tracking-widest text-slate-400 uppercase"
-						>Status Pengajuan</span
+						>Status Global</span
 					>
 					<div
 						class={`rounded-xl border-2 py-4 text-center text-lg font-black ${getStatusClass(pengajuan.status)}`}
 					>
 						{pengajuan.status_label}
 					</div>
-					<div class="mt-6 space-y-4">
-						<div class="flex justify-between text-sm">
-							<span class="text-slate-500">Dikirim Pada</span>
-							<span class="font-semibold"
-								>{new Date(pengajuan.created_at).toLocaleDateString('id-ID', {
-									dateStyle: 'long'
-								})}</span
-							>
-						</div>
-						<div class="flex justify-between text-sm">
-							<span class="text-slate-500">Metode Respon</span>
-							<span class="font-semibold capitalize">{pengajuan.metode_respon}</span>
-						</div>
-					</div>
 				</div>
 
-				{#if disposisi}
+				{#if userDisposisi && userDisposisi.respon && userDisposisi.respon.length > 0}
 					<div
-						class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+						class="rounded-2xl border border-emerald-100 bg-emerald-50/30 p-6 shadow-sm dark:border-emerald-900/50 dark:bg-slate-800"
 					>
-						<span class="mb-4 block text-xs font-bold tracking-widest text-slate-400 uppercase">
-							Respon Anda
-						</span>
-
-						{#if disposisi.respon[0]}
-							<div>
-								<h1>
-									{disposisi.respon[0].isi_respon}
-								</h1>
-
-								{#if disposisi.respon[0].file}
-									<a
-										href={`${PUBLIC_BACKEND_URL}/uploads/${disposisi.respon[0].file}`}
-										target="_blank"
-										class="mt-2 inline-flex items-center gap-1 text-sm text-blue-600 hover:underline"
+						<h3
+							class="mb-4 text-sm font-bold tracking-wider text-emerald-700 uppercase dark:text-emerald-400"
+						>
+							Jawaban Unit Anda
+						</h3>
+						<div class="space-y-4">
+							<p class="text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+								{userDisposisi.respon[0].isi_respon}
+							</p>
+							{#if userDisposisi.respon[0].file}
+								<a
+									href="{PUBLIC_BACKEND_URL}/storage/{userDisposisi.respon[0].file}"
+									target="_blank"
+									class="flex items-center gap-2 text-xs font-bold text-blue-600 hover:underline"
+								>
+									<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+										><path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+										/></svg
 									>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											width="16"
-											height="16"
-											viewBox="0 0 24 24"
-											><g fill="none"
-												><path
-													d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"
-												/><path
-													fill="currentColor"
-													d="M13.586 2a2 2 0 0 1 1.284.467l.13.119L19.414 7a2 2 0 0 1 .578 1.238l.008.176V20a2 2 0 0 1-1.85 1.995L18 22H6a2 2 0 0 1-1.995-1.85L4 20V4a2 2 0 0 1 1.85-1.995L6 2zM12 4H6v16h12V10h-4.5A1.5 1.5 0 0 1 12 8.5zm2 .414V8h3.586z"
-												/></g
-											></svg
-										>
-										Lihat File Dilampirkan
-									</a>
-								{/if}
+									Lihat Dokumen Lampiran
+								</a>
+							{/if}
+							<div class="border-t border-emerald-100 pt-4 dark:border-emerald-900/30">
+								<span class="text-[10px] text-slate-400">STATUS TINDAK LANJUT:</span>
+								<span class="ml-1 text-xs font-black text-emerald-600 uppercase"
+									>{userDisposisi.status}</span
+								>
 							</div>
-						{/if}
+						</div>
 					</div>
 				{/if}
+
+				<TrackingCardPengajuan disposisi={pengajuan.disposisi} />
 			</div>
 		</div>
 	</div>
 </main>
 
-<PengajuanDialog bind:open={showOpdResponseModal} title="Kirim Jawaban OPD">
-	<form onsubmit={handleOpdResponse} class="space-y-4">
+<PengajuanDialog bind:open={showOpdResponseModal} title="Kirim Jawaban/Respon">
+	<form onsubmit={handleOpdResponse} class="space-y-5">
 		<div>
-			<label
-				for="opd-status"
-				class="mb-2 block text-sm font-bold text-slate-700 dark:text-slate-300"
+			<label for="opd-status" class="mb-2 block text-xs font-bold text-slate-500 uppercase"
+				>Status Penyelesaian</label
 			>
-				Status Tindak Lanjut
-			</label>
 			<select
 				id="opd-status"
 				bind:value={opdStatus}
-				class="w-full rounded-xl border-slate-200 focus:border-emerald-600 focus:ring-emerald-600 dark:border-slate-700 dark:bg-slate-900"
+				class="w-full rounded-xl border-slate-200 bg-white p-3 text-sm focus:border-emerald-600 focus:ring-emerald-600 dark:border-slate-700 dark:bg-slate-900"
 			>
 				<option value="selesai">Selesai / Sudah Dijawab</option>
-				<option value="diproses">Sedang Diproses</option>
-				<option value="ditolak">Ditolak / Bukan Kewenangan</option>
+				<option value="diproses">Masih Dalam Proses</option>
+				<option value="ditolak">Bukan Kewenangan Kami</option>
 			</select>
 		</div>
 
 		<div>
-			<label
-				for="opd-feedback"
-				class="mb-2 block text-sm font-bold text-slate-700 dark:text-slate-300"
+			<label for="opd-feedback" class="mb-2 block text-xs font-bold text-slate-500 uppercase"
+				>Isi Tanggapan Resmi</label
 			>
-				Isi Jawaban/Respon
-			</label>
 			<textarea
 				id="opd-feedback"
 				bind:value={opdResponseText}
-				rows="5"
+				rows="6"
 				required
-				placeholder="Tuliskan detail jawaban atau tindak lanjut dari OPD Anda..."
-				class="w-full rounded-xl border-slate-200 focus:border-emerald-600 focus:ring-emerald-600 dark:border-slate-700 dark:bg-slate-900"
+				placeholder="Berikan penjelasan detail terkait tindak lanjut keberatan ini..."
+				class="w-full rounded-xl border-slate-200 p-3 text-sm focus:border-emerald-600 focus:ring-emerald-600 dark:border-slate-700 dark:bg-slate-900"
 			></textarea>
 		</div>
 
 		<div>
-			<label
-				for="file-upload"
-				class="mb-2 block text-sm font-bold text-slate-700 dark:text-slate-300"
+			<label for="file-upload" class="mb-2 block text-xs font-bold text-slate-500 uppercase"
+				>Unggah Bukti/Dokumen (Opsional)</label
 			>
-				Lampiran File (Opsional)
-			</label>
 			<input
 				id="file-upload"
 				type="file"
 				accept=".pdf,.doc,.docx,.jpg,.png"
 				onchange={(e) => (opdFile = e.currentTarget.files?.[0] || null)}
-				class="w-full text-sm text-slate-500 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-slate-700 dark:file:text-slate-200"
+				class="w-full text-sm text-slate-500 file:mr-4 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-xs file:font-bold file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-slate-800 dark:file:text-slate-300"
 			/>
-			<p class="mt-1 text-xs text-slate-500">Maksimal 5MB (PDF, DOC, JPG, PNG)</p>
+			<p class="mt-2 text-[10px] text-slate-400 italic">
+				Maksimal 5MB. Format: PDF, DOC, JPG, atau PNG.
+			</p>
 		</div>
 
-		<div class="flex justify-end gap-2">
+		<div class="flex justify-end gap-3 border-t border-slate-100 pt-4 dark:border-slate-800">
 			<button
 				type="button"
 				onclick={() => (showOpdResponseModal = false)}
-				class="px-4 py-2 text-sm font-bold text-slate-500"
+				class="text-sm font-bold text-slate-400 hover:text-slate-600">Batal</button
 			>
-				Batal
-			</button>
 			<button
 				type="submit"
 				disabled={isSubmitting}
-				class="rounded-lg bg-emerald-600 px-6 py-2 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 disabled:opacity-50"
+				class="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-700 disabled:opacity-50"
 			>
-				{isSubmitting ? 'Mengirim...' : 'Kirim Jawaban'}
+				{isSubmitting ? 'Sedang Mengirim...' : 'Kirim Jawaban'}
 			</button>
 		</div>
 	</form>

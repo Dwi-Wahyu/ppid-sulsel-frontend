@@ -34,8 +34,6 @@ export const load: PageServerLoad = async ({ fetch, cookies, url }) => {
 
 		const result: PengajuanKeberatanApiResponse = await response.json();
 
-		console.log(result);
-
 		return {
 			pengajuan: result.data,
 			filters: {
