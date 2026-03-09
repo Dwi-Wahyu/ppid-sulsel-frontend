@@ -5,6 +5,7 @@
 	import { env } from '$env/dynamic/public';
 	import SearchModal from './SearchModal.svelte';
 	import { PUBLIC_API_URL, PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { api } from '$lib/api';
 
 	// Define types based on Laravel API contract
 	interface SlideBanner {
@@ -35,8 +36,7 @@
 	// Fetch banners from API
 	async function fetchBanners() {
 		try {
-			const [res] = await Promise.all([fetch(`${PUBLIC_API_URL}/public/slide-banner`)]);
-			const json: ApiResponse = await res.json();
+			const json: ApiResponse = await api.get(`/public/slide-banner`);
 
 			if (json.success && json.data) {
 				// Filter active and sort by order
@@ -166,19 +166,6 @@
 						out:fade={{ duration: 300 }}
 						class="mx-auto flex max-w-6xl flex-col items-center justify-center gap-4 md:gap-6 lg:gap-12"
 					>
-						<div class="hidden items-center justify-center gap-6 md:flex">
-							<img
-								src="/images/logo-sulsel.png"
-								alt="Logo Sulawesi Selatan"
-								class="h-12 w-12 object-contain drop-shadow-2xl sm:h-16 sm:w-16"
-							/>
-							<img
-								src="/images/ppid-3.png"
-								alt="Logo PPID"
-								class="h-12 w-12 object-contain drop-shadow-2xl sm:h-16 sm:w-16"
-							/>
-						</div>
-
 						<div class="hidden w-full flex-row items-center justify-center gap-8 md:flex lg:gap-12">
 							<div class="shrink-0">
 								<img

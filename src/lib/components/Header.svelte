@@ -8,6 +8,7 @@
 	import { theme } from '$lib/state/theme.svelte';
 	import { afterNavigate } from '$app/navigation';
 	import { PUBLIC_API_URL } from '$env/static/public';
+	import { api } from '$lib/api';
 
 	// State
 	let mobileMenu = $state(false);
@@ -74,13 +75,10 @@
 				return; // Jangan fetch jika sudah ada di memory
 			}
 
-			const [resKategori, resTahun] = await Promise.all([
-				fetch(`${PUBLIC_API_URL}/public/informasi/kategori`),
-				fetch(`${PUBLIC_API_URL}/public/informasi/tahun`)
+			const [resultKat, resultThn] = await Promise.all([
+				api.get('/public/informasi/kategori'),
+				api.get('/public/informasi/tahun')
 			]);
-
-			const resultKat = await resKategori.json();
-			const resultThn = await resTahun.json();
 
 			if (resultKat) {
 				kategoriInformasi = resultKat;

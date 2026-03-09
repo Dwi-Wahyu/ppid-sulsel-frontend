@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { slide } from 'svelte/transition';
 	import { onMount } from 'svelte';
-	import { env } from '$env/dynamic/public';
+	import { api } from '$lib/api';
 	import * as m from '$lib/paraglide/messages.js';
 
 	// Types untuk data FAQ
@@ -29,8 +29,7 @@
 	// Fetch Data dari API
 	async function fetchFaqs() {
 		try {
-			const response = await fetch(`${env.PUBLIC_API_URL}/public/faq`);
-			const result: ApiResponse = await response.json();
+			const result: ApiResponse = await api.get('/public/faq');
 			// Mengambil data dari nested object sesuai struktur Laravel pagination
 			faqs = result.data.data;
 		} catch (error) {

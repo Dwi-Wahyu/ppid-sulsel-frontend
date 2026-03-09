@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { env } from '$env/dynamic/public';
 	import type { SosmedItem, SosmedResponse } from '$lib/types/sosmed';
+	import { api } from '$lib/api';
 
 	// State menggunakan Svelte 5 Runes
 	let socialLinks = $state<SosmedItem[]>([]);
@@ -9,8 +10,7 @@
 
 	async function fetchSosmed() {
 		try {
-			const response = await fetch(`${env.PUBLIC_API_URL}/public/sosmed`);
-			const result: SosmedResponse = await response.json();
+			const result: SosmedResponse = await api.get('/public/sosmed');
 			socialLinks = result.data.sort((a, b) => a.urutan - b.urutan);
 		} catch (error) {
 			console.error('Gagal mengambil data sosmed:', error);

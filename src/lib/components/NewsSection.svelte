@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { env } from '$env/dynamic/public';
 	import * as m from '$lib/paraglide/messages.js';
 	import { fade } from 'svelte/transition';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { api } from '$lib/api';
 
 	// Types
 	interface NewsItem {
@@ -25,7 +25,7 @@
 	// Fetch Data
 	async function fetchLatestNews() {
 		try {
-			const response = await fetch(`${env.PUBLIC_API_URL}/public/berita/latest`);
+			const response = await api.get(`/public/berita/latest`);
 			const result = await response.json();
 
 			if (result && result.data) {

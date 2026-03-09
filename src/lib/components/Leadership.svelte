@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import * as m from '$lib/paraglide/messages.js';
-	import { getImageUrl } from '$lib/get-image-url';
+	import { api } from '$lib/api';
 
 	interface Leader {
 		name: string;
@@ -23,8 +23,7 @@
 
 	async function fetchLeaders() {
 		try {
-			const response = await fetch(`${PUBLIC_API_URL}/public/profil-pemprov`);
-			const result = await response.json();
+			const result = await api.get(`/public/profil-pemprov`);
 
 			if (result && result.data) {
 				const d = result.data;
