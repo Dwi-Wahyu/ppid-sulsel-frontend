@@ -5,6 +5,7 @@
 	import { theme } from '$lib/state/theme.svelte';
 	import { api } from '$lib/api';
 	import { page } from '$app/state';
+	import { derived } from 'svelte/store';
 
 	interface Notification {
 		id_notification: string;
@@ -60,6 +61,8 @@
 		const interval = setInterval(fetchNotifications, 120000);
 		return () => clearInterval(interval);
 	});
+
+	const isAdmin = $derived(user?.name === 'adminppid');
 </script>
 
 <header
@@ -227,7 +230,7 @@
 					</div>
 					<div class="p-2">
 						<a
-							href="/opd/profil"
+							href={isAdmin ? '/admin/profil' : '/opd/profil'}
 							onclick={closeMenus}
 							class="flex items-center rounded-lg px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700"
 							role="menuitem"

@@ -27,6 +27,7 @@
 		!page.url.pathname.startsWith('/admin') &&
 			!page.url.pathname.startsWith('/opd') &&
 			!page.url.pathname.startsWith('/notifikasi') &&
+			!page.url.pathname.startsWith('/profil/account') &&
 			!page.url.pathname.startsWith('/login')
 	);
 

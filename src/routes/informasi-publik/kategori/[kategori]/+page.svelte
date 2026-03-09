@@ -201,13 +201,15 @@
 						<tbody class="divide-y divide-gray-100 dark:divide-slate-700">
 							{#each informasi as item, i}
 								<tr class="transition-colors hover:bg-ppid-primary/5 dark:hover:bg-slate-700/50">
-									<td class="px-4 py-4 text-sm">{(pagination.current_page - 1) * 10 + i + 1}</td>
+									<td class="px-4 py-4 text-sm text-gray-900 dark:text-white"
+										>{(pagination.current_page - 1) * 10 + i + 1}</td
+									>
 									<td
 										class="px-4 py-4 text-sm leading-relaxed font-medium text-gray-900 dark:text-white"
 									>
 										{item.judul}
 									</td>
-									<td class="px-4 py-4 text-sm">
+									<td class="px-4 py-4 text-sm text-gray-900 dark:text-white">
 										{item.tgl_upload ? new Date(item.tgl_upload).getFullYear() : '-'}
 									</td>
 									<td class="px-4 py-4 text-sm text-gray-600 dark:text-gray-300">

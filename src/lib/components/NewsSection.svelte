@@ -12,7 +12,10 @@
 		image: string | null;
 		slug: string;
 		date: string;
-		category: string | null;
+		category: {
+			id: string;
+			name: string;
+		} | null;
 	}
 
 	// State (Svelte 5 Runes)
@@ -90,15 +93,6 @@
 								alt={item.title}
 								class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
 							/>
-							{#if item.category}
-								<div class="absolute top-4 left-4">
-									<span
-										class="rounded-xl bg-blue-700/90 px-4 py-1.5 text-[10px] font-black tracking-widest text-white uppercase shadow-lg backdrop-blur-sm"
-									>
-										{item.category}
-									</span>
-								</div>
-							{/if}
 						</div>
 
 						<div class="flex flex-1 flex-col p-8">
@@ -106,10 +100,15 @@
 								{formatDate(item.date)}
 							</time>
 							<h3
-								class="mb-6 line-clamp-2 text-xl font-black tracking-tight text-slate-800 transition-colors group-hover:text-blue-700 dark:text-white dark:group-hover:text-blue-400"
+								class="mb-1 line-clamp-2 text-xl font-black tracking-tight text-slate-800 dark:text-white"
 							>
 								<a href="/berita/{item.slug}">{item.title}</a>
 							</h3>
+							{#if item.category}
+								<h4 class="mb-6 text-slate-800 dark:text-white">
+									{item.category.name}
+								</h4>
+							{/if}
 
 							<div class="mt-auto">
 								<a

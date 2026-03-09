@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { page } from '$app/state'; // Menggunakan state di Svelte 5
+	import { page } from '$app/state';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import Footer from '$lib/components/Footer.svelte';
+	import { getImageUrl } from '$lib/get-image-url';
 	import * as m from '$lib/paraglide/messages.js';
 
 	// --- Type Definitions ---
@@ -92,7 +92,7 @@
 			>
 			<span class="text-slate-400" aria-hidden="true">/</span>
 			<span
-				class="max-w-[200px] truncate font-semibold text-ppid-primary md:max-w-none dark:text-ppid-accent"
+				class="max-w-50 truncate font-semibold text-ppid-primary md:max-w-none dark:text-ppid-accent"
 				aria-current="page"
 			>
 				{news?.title || 'Loading...'}
@@ -170,7 +170,11 @@
 								class="mb-8 overflow-hidden rounded-2xl shadow-xl shadow-slate-200/50 dark:shadow-none"
 							>
 								{#if news.image}
-									<img src={news.image} class="aspect-video w-full object-cover" alt={news.title} />
+									<img
+										src={getImageUrl(`berita/${news.image}`)}
+										class="aspect-video w-full object-cover"
+										alt={news.title}
+									/>
 								{:else}
 									<div
 										class="flex aspect-video w-full items-center justify-center bg-slate-200 dark:bg-slate-800"

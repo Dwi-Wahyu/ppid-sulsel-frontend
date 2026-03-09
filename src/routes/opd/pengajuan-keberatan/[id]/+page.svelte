@@ -92,7 +92,7 @@
 		<header class="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center">
 			<div class="flex items-center gap-4">
 				<a
-					href="/admin/pengajuan-keberatan"
+					href="/opd/pengajuan-keberatan"
 					title="Kembali"
 					class="rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-800"
 				>
@@ -106,7 +106,9 @@
 					>
 				</a>
 				<div>
-					<h1 class="text-2xl font-black text-slate-900 dark:text-white">Detail Pengajuan</h1>
+					<h1 class="text-2xl font-black text-slate-900 dark:text-white">
+						Detail Pengajuan Keberatan
+					</h1>
 				</div>
 			</div>
 
@@ -143,7 +145,7 @@
 						<div>
 							<span class="text-xs font-bold tracking-widest text-slate-400 uppercase">Email</span>
 							<p class="mt-1 font-semibold text-slate-900 dark:text-white">
-								{pengajuan.email}
+								{pengajuan.email_pemohon}
 							</p>
 						</div>
 						<div>
@@ -203,9 +205,7 @@
 				<div
 					class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
 				>
-					<span class="mb-4 block text-xs font-bold tracking-widest text-slate-400 uppercase"
-						>Status Global</span
-					>
+					<span class="mb-4 block text-xs font-bold tracking-widest text-slate-400">Status</span>
 					<div
 						class={`rounded-xl border-2 py-4 text-center text-lg font-black ${getStatusClass(pengajuan.status)}`}
 					>
@@ -253,7 +253,7 @@
 					</div>
 				{/if}
 
-				<TrackingCardPengajuan disposisi={pengajuan.disposisi} />
+				<TrackingCardPengajuan disposisi={pengajuan.disposisi} id_skpd={data.user?.id_skpd} />
 			</div>
 		</div>
 	</div>

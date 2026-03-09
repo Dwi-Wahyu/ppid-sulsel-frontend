@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
+	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import type { PageData, ActionData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -218,7 +219,7 @@
 					<div class="mt-4">
 						<dt class="mb-2 text-sm font-semibold text-slate-600 dark:text-slate-400">Foto KTP</dt>
 						<a
-							href="/uploads/{data.permohonan.foto_ktp}"
+							href={PUBLIC_BACKEND_URL + `permohonan/ktp/${data.permohonan.foto_ktp}`}
 							target="_blank"
 							rel="noopener noreferrer"
 							class="inline-flex items-center gap-2 text-sm text-ppid-primary hover:text-ppid-accent dark:text-blue-400 dark:hover:text-blue-300"

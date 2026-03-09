@@ -4,6 +4,7 @@
 	import { api } from '$lib/api';
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 	import SuccessModal from '$lib/components/SuccessModal.svelte';
+	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
 	let { data }: { data: PageData } = $props();
 
@@ -194,9 +195,9 @@
 						</dd>
 					</div>
 					<div>
-						<dt class="text-sm font-semibold text-slate-600 dark:text-slate-400">Kategori</dt>
+						<dt class="text-sm font-semibold text-slate-600 dark:text-slate-400">Email</dt>
 						<dd class="mt-1 text-base text-slate-900 dark:text-slate-100">
-							{data.permohonan.kategori || '-'}
+							{data.permohonan.email}
 						</dd>
 					</div>
 				</dl>
@@ -286,14 +287,14 @@
 					{#each myDisposition.respon as respon, i}
 						<div class="relative border-l-2 border-slate-200 pb-4 pl-6 last:border-0 last:pb-0">
 							<div
-								class="absolute top-0 -left-[9px] h-4 w-4 rounded-full border-2 border-white bg-ppid-primary"
+								class="absolute top-0 -left-2.25 h-4 w-4 rounded-full border-2 border-white bg-ppid-primary"
 							></div>
 							<div class="mb-1 text-sm text-slate-500">{formatDate(respon.created_at)}</div>
 							<div class="rounded-lg border border-slate-200 bg-slate-50 p-3">
 								<p class="text-slate-800">{respon.pesan}</p>
 								{#if respon.file}
 									<a
-										href={`/uploads/${respon.file}`}
+										href={`${PUBLIC_BACKEND_URL}/uploads/respon-disposisi/${respon.file}`}
 										target="_blank"
 										class="mt-2 inline-flex items-center text-sm text-blue-600 hover:underline"
 									>

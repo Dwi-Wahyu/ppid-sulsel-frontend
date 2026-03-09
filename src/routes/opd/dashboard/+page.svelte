@@ -181,8 +181,9 @@
 
 			<div class="grid grid-cols-1 gap-4">
 				{#each notifications as notif}
-					<div
-						class="group rounded-2xl border p-4 shadow-sm transition-all hover:shadow-md {notif.read_at
+					<a
+						href={notif.url}
+						class="group block rounded-2xl border p-4 shadow-sm transition-all hover:shadow-md {notif.read_at
 							? 'border-slate-100 bg-white dark:border-slate-700 dark:bg-slate-800'
 							: 'border-blue-200 bg-blue-50/30 dark:border-blue-500/50 dark:bg-blue-900/10'}"
 					>
@@ -254,7 +255,7 @@
 								</p>
 							</div>
 						</div>
-					</div>
+					</a>
 				{:else}
 					<div
 						class="rounded-2xl border border-slate-100 bg-white py-12 text-center dark:border-slate-700 dark:bg-slate-800"

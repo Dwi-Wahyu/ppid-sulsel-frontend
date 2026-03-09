@@ -144,11 +144,11 @@
 						<h3 class="text-lg font-bold text-slate-800 dark:text-white">Statistik Layanan</h3>
 						<p class="text-xs text-slate-500">Tren Permohonan vs Keberatan (12 Bulan Terakhir)</p>
 					</div>
-					<div class="flex gap-4 text-xs font-semibold">
-						<div class="flex items-center gap-2">
+					<div class="flex gap-4 text-xs">
+						<div class="flex items-center gap-2 dark:text-slate-500">
 							<span class="h-3 w-3 rounded-full bg-blue-600"></span> Permohonan
 						</div>
-						<div class="flex items-center gap-2">
+						<div class="flex items-center gap-2 dark:text-slate-500">
 							<span class="h-3 w-3 rounded-full bg-red-500"></span> Keberatan
 						</div>
 					</div>
@@ -190,9 +190,27 @@
 			>
 				<div class="mb-6 flex items-center justify-between">
 					<h3 class="text-lg font-bold text-slate-800 dark:text-white">Login Terbaru</h3>
-					<a href="/admin/log-login" class="text-xs font-semibold text-blue-600 hover:underline"
-						>Lihat Semua</a
+					<a
+						title="Lihat semua log"
+						href="/admin/log-login"
+						class="text-xs font-semibold text-blue-600 hover:underline"
 					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="17"
+							height="17"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							class="lucide lucide-square-arrow-out-up-right-icon lucide-square-arrow-out-up-right"
+							><path d="M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6" /><path
+								d="m21 3-9 9"
+							/><path d="M15 3h6v6" /></svg
+						>
+					</a>
 				</div>
 
 				<div class="space-y-4 overflow-y-auto">
@@ -200,13 +218,6 @@
 						<div
 							class="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 p-3 transition-colors hover:border-blue-200 dark:border-slate-700 dark:bg-slate-900/50"
 						>
-							<img
-								src="https://ui-avatars.com/api/?name={encodeURIComponent(
-									log.user.name
-								)}&background=1A305E&color=fff"
-								alt="avatar"
-								class="h-10 w-10 rounded-full"
-							/>
 							<div class="min-w-0 flex-1">
 								<p class="truncate text-sm font-bold text-slate-800 dark:text-slate-200">
 									{log.user.name}
@@ -253,7 +264,7 @@
 									class="hidden pb-4 font-bold tracking-wider text-slate-400 uppercase md:table-cell"
 									>Kategori</th
 								>
-								<th class="pb-4 text-right font-bold tracking-wider text-slate-400 uppercase"
+								<th class="pr-2 pb-4 text-right font-bold tracking-wider text-slate-400 uppercase"
 									>Aksi</th
 								>
 							</tr>
@@ -270,11 +281,11 @@
 										</p>
 									</td>
 									<td class="hidden py-4 md:table-cell">
-										<span class="rounded-md bg-slate-100 px-2 py-1 text-[10px] dark:bg-slate-700"
+										<span class="rounded-md bg-slate-100 px-2 py-1 text-[10px]"
 											>{doc.kategori?.nm_kat_info || '-'}</span
 										>
 									</td>
-									<td class="py-4 text-right">
+									<td class="py-4 pr-2 text-right">
 										<a
 											href="/admin/dokumen-publik/{doc.id_informasi}"
 											class="text-xs font-semibold text-blue-600 hover:text-blue-800">Detail</a
