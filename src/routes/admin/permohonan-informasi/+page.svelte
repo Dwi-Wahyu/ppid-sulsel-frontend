@@ -49,7 +49,6 @@
 				notificationDescription = 'Permohonan informasi berhasil dihapus.';
 				showNotification = true;
 
-				// Reload page after short delay
 				setTimeout(() => {
 					window.location.reload();
 				}, 1500);
@@ -99,15 +98,15 @@
 	// Get status badge classes based on status value
 	function getStatusBadgeClass(status: number): string {
 		switch (status) {
-			case 0: // Pending
+			case 0: // Menunggu Verifikasi
 				return 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400';
-			case 1: // Proses
+			case 1: // Sedang Diproses
 				return 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400';
-			case 2: // Selesai
+			case 2: // Dijawab
 				return 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400';
 			case 3: // Ditolak
 				return 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400';
-			case 4: // Batal
+			case 4: // Dibatalkan
 				return 'bg-slate-100 dark:bg-slate-900/30 text-slate-700 dark:text-slate-400';
 			case 5: // Disposisi
 				return 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400';
@@ -164,7 +163,7 @@
 						type="text"
 						name="search"
 						value={data.filters.search}
-						placeholder="Cari nama atau email..."
+						placeholder="Cari nama pemohon atau rincian informasi..."
 						autocomplete="off"
 						class="w-full rounded-lg border border-slate-200 py-2 pr-4 pl-10 text-sm focus:border-ppid-accent focus:ring-1 focus:ring-ppid-accent focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:placeholder-slate-500"
 					/>
@@ -185,10 +184,10 @@
 					class="bg-slate-50 text-xs font-semibold text-slate-700 uppercase dark:bg-slate-700/50 dark:text-slate-400"
 				>
 					<tr>
-						<th scope="col" class="px-6 py-4">Nama</th>
-						<th scope="col" class="px-6 py-4">Email</th>
-						<th scope="col" class="px-6 py-4">Tujuan</th>
-						<th scope="col" class="px-6 py-4">Diajukan</th>
+						<th scope="col" class="px-6 py-4">No. Permohonan</th>
+						<th scope="col" class="px-6 py-4">Nama Pemohon</th>
+						<th scope="col" class="px-6 py-4">Rincian Informasi</th>
+						<th scope="col" class="px-6 py-4">Tanggal</th>
 						<th scope="col" class="px-6 py-4">Status</th>
 						<th scope="col" class="px-6 py-4 text-right">Aksi</th>
 					</tr>
@@ -199,24 +198,35 @@
 							<tr
 								class="bg-white transition-colors hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700/30"
 							>
+								<!-- No. Permohonan -->
 								<td class="px-6 py-4">
-									<div class="flex items-center">
-										<div
-											class="line-clamp-2 max-w-xs font-medium text-[#1A305E] dark:text-slate-100"
-										>
-											{item.nama}
-										</div>
+									<div class="font-medium text-[#1A305E] dark:text-slate-100">
+										#{item.id_permohonan}
+									</div>
+									<div class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+										{formatDate(item.created_at)}
 									</div>
 								</td>
-								<td class="px-6 py-4">{item.email}</td>
+
+								<!-- Nama Pemohon -->
 								<td class="px-6 py-4">
-									<div class="max-w-xs truncate" title={item.tujuan}>
-										{item.tujuan}
+									<div class="font-semibold text-slate-900 dark:text-slate-100">{item.nama}</div>
+									<div class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{item.email}</div>
+								</td>
+
+								<!-- Rincian Informasi -->
+								<td class="px-6 py-4">
+									<div class="max-w-xs truncate" title={item.rincian_informasi || item.tujuan}>
+										{item.rincian_informasi || item.tujuan || '-'}
 									</div>
 								</td>
-								<td class="px-6 py-4 whitespace-nowrap">
+
+								<!-- Tanggal -->
+								<td class="px-6 py-4 whitespace-nowrap text-slate-500 dark:text-slate-400">
 									{formatDate(item.created_at)}
 								</td>
+
+								<!-- Status -->
 								<td class="px-6 py-4">
 									<span
 										class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold {getStatusBadgeClass(
@@ -226,12 +236,13 @@
 										{item.status_label}
 									</span>
 								</td>
+
+								<!-- Aksi -->
 								<td class="px-6 py-4 text-right">
 									<div class="flex items-center justify-end space-x-2">
-										<button
-											type="button"
-											onclick={() => goto(`/admin/permohonan-informasi/${item.id_permohonan}`)}
-											class="text-slate-400 transition-colors hover:text-[#1A305E] dark:text-slate-500 dark:hover:text-[#B8860B]"
+										<a
+											href={`/admin/permohonan-informasi/${item.id_permohonan}`}
+											class="text-slate-400 transition-colors hover:text-ppid-primary dark:text-slate-500 dark:hover:text-ppid-primary"
 											title="Lihat detail permohonan"
 											aria-label="Lihat detail permohonan {item.nama}"
 										>
@@ -249,7 +260,7 @@
 													d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
 												></path>
 											</svg>
-										</button>
+										</a>
 										<button
 											type="button"
 											onclick={() => confirmDelete(item.id_permohonan)}

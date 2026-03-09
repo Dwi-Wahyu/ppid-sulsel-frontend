@@ -4,6 +4,7 @@
 	import PageTitle from '$lib/components/PageTitle.svelte';
 	import SearchableSelect from '$lib/components/SearchableSelect.svelte';
 	import SuccessModal from '$lib/components/SuccessModal.svelte';
+	import ErrorModal from '$lib/components/ErrorModal.svelte';
 	import { onMount } from 'svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import * as m from '$lib/paraglide/messages.js';
@@ -51,6 +52,9 @@
 	// State
 	let isInstansi = $state(false);
 	let showSuccessModal = $state(false);
+	let showErrorModal = $state(false);
+	let errorModalTitle = $state('Perhatian!');
+	let errorModalMessage = $state('');
 	let isSubmitting = $state(false);
 	let honeyPot = $state(''); // Honeypot field
 	let formData = $state<FormData>({
@@ -141,13 +145,18 @@
 
 		// Validate NIK
 		if (formData.nik.length !== 16) {
-			alert('NIK harus 16 digit angka!');
+			errorModalTitle = 'NIK Tidak Valid';
+			errorModalMessage =
+				'NIK harus terdiri dari 16 digit angka. Harap periksa kembali nomor NIK Anda.';
+			showErrorModal = true;
 			return;
 		}
 
 		// Validate file upload
 		if (!formData.foto_ktp) {
-			alert('Foto KTP wajib diupload!');
+			errorModalTitle = 'Foto KTP Diperlukan';
+			errorModalMessage = 'Foto KTP wajib diupload sebelum mengirim permohonan.';
+			showErrorModal = true;
 			return;
 		}
 
@@ -195,7 +204,9 @@
 					const errorMsg = Object.values(json.errors || {})
 						.flat()
 						.join('\n');
-					alert(`Gagal valiasi:\n${errorMsg}`);
+					errorModalTitle = 'Gagal Validasi';
+					errorModalMessage = errorMsg;
+					showErrorModal = true;
 				} else {
 					throw new Error(json.message || 'Terjadi kesalahan pada server');
 				}
@@ -211,7 +222,9 @@
 			}, 2000);
 		} catch (error: any) {
 			console.error('Submission error:', error);
-			alert(error.message || 'Gagal mengirim permohonan. Silakan coba lagi.');
+			errorModalTitle = 'Terjadi Kesalahan';
+			errorModalMessage = error.message || 'Gagal mengirim permohonan. Silakan coba lagi.';
+			showErrorModal = true;
 		} finally {
 			isSubmitting = false;
 		}
@@ -387,7 +400,7 @@
 									{m['contact.phone']()} <span class="text-red-500">*</span>
 
 									<input
-										type="text"
+										type="tel"
 										bind:value={formData.no_hp}
 										placeholder="08xxxxxxxxxx"
 										class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
@@ -691,5 +704,6 @@
 </main>
 
 <SuccessModal bind:isOpen={showSuccessModal} />
+<ErrorModal bind:isOpen={showErrorModal} title={errorModalTitle} message={errorModalMessage} />
 
 <Footer />

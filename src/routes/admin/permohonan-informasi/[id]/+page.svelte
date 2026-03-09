@@ -16,9 +16,11 @@
 	let dispositionMessage = $state('');
 
 	// Derived values
-	let assignedSkpdIds = $derived(data.permohonan.disposisi?.map((d) => d.id_skpd) || []);
+	let assignedSkpdIds = $derived(
+		data.permohonan.disposisi?.map((d: { id_skpd: string }) => d.id_skpd) || []
+	);
 	let availableSkpd = $derived(
-		data.skpdList.filter((skpd) => !assignedSkpdIds.includes(skpd.id_skpd))
+		data.skpdList.filter((skpd: { id_skpd: string }) => !assignedSkpdIds.includes(skpd.id_skpd))
 	);
 
 	// Status config
@@ -111,42 +113,49 @@
 <div
 	class="mb-6 overflow-hidden rounded-2xl bg-linear-to-br from-ppid-primary to-ppid-primary-dark p-8 text-white shadow-xl"
 >
-	<div class="flex items-start justify-between">
-		<div class="flex-1">
-			<div class="mb-2 flex items-center gap-3">
-				<a
-					href="/admin/permohonan-informasi"
-					class="rounded-lg p-2 transition-colors hover:bg-white/10"
-					aria-label="Kembali ke daftar permohonan"
+	<div class="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+		<div class="flex flex-1 items-start gap-4">
+			<a
+				href="/admin/permohonan-informasi"
+				class="mt-1 shrink-0 rounded-lg p-2 transition-colors hover:bg-white/10"
+				aria-label="Kembali ke daftar permohonan"
+			>
+				<svg
+					class="h-5 w-5"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+					aria-hidden="true"
 				>
-					<svg
-						class="h-5 w-5"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						aria-hidden="true"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M15 19l-7-7 7-7"
-						/>
-					</svg>
-				</a>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M15 19l-7-7 7-7"
+					/>
+				</svg>
+			</a>
+			<div>
 				<h1 class="text-2xl font-bold">Detail Permohonan Informasi</h1>
-			</div>
-			<div class="flex items-center gap-4">
-				<p class="text-lg opacity-90">
-					<span class="font-semibold">#{data.permohonan.id_permohonan}</span> - {data.permohonan
-						.nama}
+				<p class="mt-1 font-mono text-sm tracking-wider text-white/80 uppercase">
+					Ref: #{data.permohonan.id_permohonan} — {data.permohonan.nama}
 				</p>
-				<span
-					class="rounded-full border border-white/30 bg-white/20 px-3 py-1 text-sm font-semibold"
-				>
-					{getStatusConfig(data.permohonan.status).label}
-				</span>
 			</div>
+		</div>
+		<div class="flex shrink-0 items-center gap-3">
+			<span class="rounded-full border border-white/30 bg-white/20 px-4 py-1.5 text-sm font-bold">
+				{getStatusConfig(data.permohonan.status).label}
+			</span>
+			<!-- Tombol Disposisi cepat di header -->
+			<button
+				type="button"
+				onclick={() => (showDispositionModal = true)}
+				class="rounded-lg border border-white/30 bg-white/10 px-4 py-1.5 text-sm font-bold transition-colors hover:bg-white/20"
+			>
+				{data.permohonan.disposisi && data.permohonan.disposisi.length > 0
+					? '+ Tambah OPD'
+					: 'Disposisi ke OPD'}
+			</button>
 		</div>
 	</div>
 </div>
@@ -607,6 +616,7 @@
 
 	<!-- Right: Actions -->
 	<div class="space-y-6">
+		<!-- Tindakan Admin: Jawab Langsung & Tolak — hanya saat status Menunggu Verifikasi (0) -->
 		{#if data.permohonan.status === 0}
 			<div
 				class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
@@ -633,8 +643,11 @@
 					</h3>
 				</div>
 				<div class="p-4">
-					<p class="mb-4 text-sm text-slate-600 dark:text-slate-400">Pilih tindakan:</p>
+					<p class="mb-4 text-sm text-slate-600 dark:text-slate-400">
+						Pilih tindakan untuk permohonan ini:
+					</p>
 					<div class="space-y-4">
+						<!-- Jawab Langsung -->
 						<button
 							type="button"
 							onclick={() => (showUpdateModal = true)}
@@ -660,67 +673,25 @@
 								<div>
 									<h4 class="font-bold text-slate-900 dark:text-white">Jawab Langsung</h4>
 									<p class="text-xs text-slate-500 dark:text-slate-400">
-										Berikan jawaban dan selesaikan permohonan ini secara langsung.
+										Berikan jawaban dan selesaikan permohonan secara langsung.
 									</p>
 								</div>
 								<div
 									class="ml-auto text-emerald-500 opacity-0 transition-all group-hover:opacity-100"
 								>
-									<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-										<path
+									<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+										><path
 											stroke-linecap="round"
 											stroke-linejoin="round"
 											stroke-width="2"
 											d="M9 5l7 7-7 7"
-										/>
-									</svg>
+										/></svg
+									>
 								</div>
 							</div>
 						</button>
 
-						<button
-							type="button"
-							onclick={() => (showDispositionModal = true)}
-							class="group relative w-full overflow-hidden rounded-xl border-2 border-purple-100 bg-white p-1 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-purple-500 hover:shadow-lg dark:border-purple-900/50 dark:bg-slate-800"
-							aria-label="Buka form buat disposisi"
-						>
-							<div
-								class="absolute inset-0 bg-linear-to-r from-purple-50 to-transparent opacity-0 transition-opacity group-hover:opacity-100 dark:from-purple-900/20"
-							></div>
-							<div class="relative flex items-center gap-4 p-4">
-								<div
-									class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-ppid-primary/10 text-ppid-primary transition-colors group-hover:bg-ppid-primary group-hover:text-white dark:bg-ppid-primary/20 dark:text-ppid-primary-light"
-								>
-									<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-										/>
-									</svg>
-								</div>
-								<div>
-									<h4 class="font-bold text-slate-900 dark:text-white">Buat Disposisi</h4>
-									<p class="text-xs text-slate-500 dark:text-slate-400">
-										Teruskan permohonan ke SKPD terkait untuk ditindaklanjuti.
-									</p>
-								</div>
-								<div
-									class="ml-auto text-purple-500 opacity-0 transition-all group-hover:opacity-100"
-								>
-									<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M9 5l7 7-7 7"
-										/>
-									</svg>
-								</div>
-							</div>
-						</button>
-
+						<!-- Tolak Permohonan -->
 						<button
 							type="button"
 							onclick={() => (showRejectModal = true)}
@@ -746,60 +717,110 @@
 								<div>
 									<h4 class="font-bold text-slate-900 dark:text-white">Tolak Permohonan</h4>
 									<p class="text-xs text-slate-500 dark:text-slate-400">
-										Tolak permohonan ini jika tidak memenuhi syarat atau informasi dikecualikan.
+										Tolak jika tidak memenuhi syarat atau informasi dikecualikan.
 									</p>
 								</div>
 								<div class="ml-auto text-red-500 opacity-0 transition-all group-hover:opacity-100">
-									<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-										<path
+									<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+										><path
 											stroke-linecap="round"
 											stroke-linejoin="round"
 											stroke-width="2"
 											d="M9 5l7 7-7 7"
-										/>
-									</svg>
+										/></svg
+									>
 								</div>
 							</div>
 						</button>
 					</div>
 				</div>
 			</div>
-		{:else}
-			<div
-				class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
-			>
-				<div
-					class="border-b border-white/10 bg-linear-to-r from-ppid-primary to-ppid-primary-light p-4"
-				>
-					<h3 class="flex items-center gap-2 text-lg font-bold text-white">
-						<svg
-							class="h-5 w-5"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-							aria-hidden="true"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-							/>
-						</svg>
-						Tambah OPD Lain
-					</h3>
-				</div>
-				<div class="p-4">
-					<button
-						type="button"
-						onclick={() => (showDispositionModal = true)}
-						class="w-full rounded-lg bg-linear-to-r from-ppid-primary to-ppid-primary-light px-6 py-3 font-semibold text-white shadow-md transition-all hover:from-ppid-primary-hover hover:to-ppid-primary"
-					>
-						Buka Form Disposisi
-					</button>
-				</div>
-			</div>
 		{/if}
+
+		<!-- Panel Disposisi — selalu visible (tambah OPD kapan saja) -->
+		<div
+			class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
+		>
+			<div
+				class="border-b border-white/10 bg-linear-to-r from-ppid-primary to-ppid-primary-light p-4"
+			>
+				<h3 class="flex items-center gap-2 text-lg font-bold text-white">
+					<svg
+						class="h-5 w-5"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						aria-hidden="true"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+						/>
+					</svg>
+					{data.permohonan.disposisi && data.permohonan.disposisi.length > 0
+						? 'Tambah OPD Lain'
+						: 'Disposisi ke OPD'}
+					{#if data.permohonan.disposisi && data.permohonan.disposisi.length > 0}
+						<span class="ml-auto rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-bold">
+							{data.permohonan.disposisi.length} OPD
+						</span>
+					{/if}
+				</h3>
+			</div>
+			<div class="p-4">
+				<p class="mb-4 text-sm text-slate-600 dark:text-slate-400">
+					{data.permohonan.disposisi && data.permohonan.disposisi.length > 0
+						? 'Teruskan ke OPD tambahan untuk ditindaklanjuti.'
+						: 'Teruskan permohonan ke SKPD terkait untuk ditindaklanjuti.'}
+				</p>
+				<button
+					type="button"
+					onclick={() => (showDispositionModal = true)}
+					class="group relative w-full overflow-hidden rounded-xl border-2 border-purple-100 bg-white p-1 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-purple-500 hover:shadow-lg dark:border-purple-900/50 dark:bg-slate-800"
+					aria-label="Buka form disposisi"
+				>
+					<div
+						class="absolute inset-0 bg-linear-to-r from-purple-50 to-transparent opacity-0 transition-opacity group-hover:opacity-100 dark:from-purple-900/20"
+					></div>
+					<div class="relative flex items-center gap-4 p-4">
+						<div
+							class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-ppid-primary/10 text-ppid-primary transition-colors group-hover:bg-ppid-primary group-hover:text-white dark:bg-ppid-primary/20 dark:text-ppid-primary-light"
+						>
+							<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+								/>
+							</svg>
+						</div>
+						<div>
+							<h4 class="font-bold text-slate-900 dark:text-white">
+								{data.permohonan.disposisi && data.permohonan.disposisi.length > 0
+									? 'Tambah OPD Tujuan'
+									: 'Buat Disposisi'}
+							</h4>
+							<p class="text-xs text-slate-500 dark:text-slate-400">
+								Pilih OPD/SKPD untuk menindaklanjuti permohonan ini.
+							</p>
+						</div>
+						<div class="ml-auto text-purple-500 opacity-0 transition-all group-hover:opacity-100">
+							<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+								><path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M9 5l7 7-7 7"
+								/></svg
+							>
+						</div>
+					</div>
+				</button>
+			</div>
+		</div>
 	</div>
 </div>
 
