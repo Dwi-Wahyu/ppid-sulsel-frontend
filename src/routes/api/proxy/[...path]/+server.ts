@@ -7,7 +7,13 @@ export const fallback: RequestHandler = async ({ url, params, request, locals })
 	const token = locals.token;
 
 	// Siapkan Header
-	const headers = new Headers(request.headers);
+	const headers = new Headers();
+
+	// Hanya teruskan header yang memang diperlukan
+	if (request.headers.get('content-type')) {
+		headers.set('content-type', request.headers.get('content-type')!);
+	}
+
 	headers.delete('host'); // Keamanan: hapus host agar tidak bentrok
 	headers.set('Accept', 'application/json');
 
@@ -31,8 +37,15 @@ export const fallback: RequestHandler = async ({ url, params, request, locals })
 			duplex: 'half'
 		});
 
-		// Teruskan response apa adanya
-		return response;
+		// Buat response baru untuk membersihkan header yang bermasalah
+		const responseHeaders = new Headers(response.headers);
+		responseHeaders.delete('content-encoding'); // Hapus ini untuk mencegah ERR_CONTENT_DECODING_FAILED
+		responseHeaders.delete('content-length'); // Biarkan SvelteKit menghitung ulang panjang data
+
+		return new Response(response.body, {
+			status: response.status,
+			headers: responseHeaders
+		});
 	} catch (err) {
 		console.error('Proxy Fetch Error:', err);
 		throw error(500, 'Koneksi ke server API gagal');
