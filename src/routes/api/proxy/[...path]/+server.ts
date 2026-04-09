@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { PUBLIC_API_URL } from '$env/static/public';
+import { API_URL } from '$env/static/private';
 
 export const fallback: RequestHandler = async ({ url, params, request, locals }) => {
 	// Ambil token dari locals (yang diisi oleh hooks.server.ts)
@@ -23,7 +23,7 @@ export const fallback: RequestHandler = async ({ url, params, request, locals })
 	}
 
 	// Bangun URL target (menggunakan url.search untuk query params)
-	const targetUrl = `${PUBLIC_API_URL}/${params.path}${url.search}`;
+	const targetUrl = `${API_URL}/${params.path}${url.search}`;
 
 	try {
 		// Lakukan Request ke Laravel
