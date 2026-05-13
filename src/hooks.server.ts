@@ -58,7 +58,7 @@ export const handleAuth: Handle = async ({ event, resolve }) => {
 					path: '/',
 					httpOnly: true,
 					sameSite: 'lax',
-					secure: !dev,
+					secure: false, // Allow HTTP for local/container testing
 					maxAge: parseInt(ACCESS_TOKEN_MAX_AGE)
 				});
 
@@ -67,7 +67,7 @@ export const handleAuth: Handle = async ({ event, resolve }) => {
 					path: '/',
 					httpOnly: true,
 					sameSite: 'lax',
-					secure: !dev,
+					secure: false, // Allow HTTP for local/container testing
 					maxAge: parseInt(REFRESH_TOKEN_MAX_AGE)
 				});
 
@@ -76,7 +76,7 @@ export const handleAuth: Handle = async ({ event, resolve }) => {
 					path: '/',
 					httpOnly: true,
 					sameSite: 'lax',
-					secure: !dev,
+					secure: false, // Allow HTTP for local/container testing
 					maxAge: 60 * 60 * 8
 				});
 			} else {

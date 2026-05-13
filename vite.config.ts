@@ -5,13 +5,13 @@ import { defineConfig } from 'vitest/config';
 import { playwright } from '@vitest/browser-playwright';
 import { sveltekit } from '@sveltejs/kit/vite';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
 	plugins: [
+		paraglideVitePlugin({ project: './project.inlang', outdir: './src/lib/paraglide' }),
 		tailwindcss(),
 		sveltekit(),
-		devtoolsJson(),
-		paraglideVitePlugin({ project: './project.inlang', outdir: './src/lib/paraglide' })
-	],
+		mode === 'development' && devtoolsJson()
+	].filter(Boolean),
 	test: {
 		expect: { requireAssertions: true },
 		projects: [
@@ -40,4 +40,4 @@ export default defineConfig({
 			}
 		]
 	}
-});
+}));

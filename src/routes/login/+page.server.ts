@@ -102,7 +102,7 @@ export const actions: Actions = {
 				path: '/',
 				httpOnly: true,
 				sameSite: 'lax',
-				secure: !dev,
+				secure: false, // Set to false to allow testing on HTTP/localhost
 				maxAge: 60 * 60
 			});
 
@@ -111,7 +111,7 @@ export const actions: Actions = {
 				path: '/',
 				httpOnly: true,
 				sameSite: 'lax',
-				secure: !dev,
+				secure: false, // Set to false to allow testing on HTTP/localhost
 				maxAge: 60 * 60 * 24 * 7
 			});
 
@@ -120,7 +120,7 @@ export const actions: Actions = {
 				path: '/',
 				httpOnly: true,
 				sameSite: 'lax',
-				secure: !dev,
+				secure: false, // Set to false to allow testing on HTTP/localhost
 				maxAge: 60 * 60 * 8
 			});
 
