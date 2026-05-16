@@ -130,7 +130,7 @@
 
 <div class="mb-4 flex items-center justify-between">
 	<h2 class="text-xl leading-tight font-semibold text-slate-800 dark:text-slate-100">
-		Pengajuan Keberatan
+		Daftar Pengajuan Keberatan
 	</h2>
 </div>
 
@@ -164,7 +164,7 @@
 						type="text"
 						name="search"
 						value={data.filters.search}
-						placeholder="Cari judul pengajuan..."
+						placeholder="Cari nama pemohon atau rincian keberatan..."
 						autocomplete="off"
 						class="w-full rounded-lg border border-slate-200 py-2 pr-4 pl-10 text-sm focus:border-ppid-accent focus:ring-1 focus:ring-ppid-accent focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:placeholder-slate-500"
 					/>
@@ -185,10 +185,10 @@
 					class="bg-slate-50 text-xs font-semibold text-slate-700 uppercase dark:bg-slate-700/50 dark:text-slate-400"
 				>
 					<tr>
-						<th scope="col" class="px-6 py-4">No Pendaftaran</th>
+						<th scope="col" class="px-6 py-4">No. Pendaftaran</th>
 						<th scope="col" class="px-6 py-4">Nama Pemohon</th>
-						<th scope="col" class="px-6 py-4">Kasus</th>
-						<th scope="col" class="px-6 py-4">SKPD</th>
+						<th scope="col" class="px-6 py-4">Kasus / Detail</th>
+						<th scope="col" class="px-6 py-4">Tanggal</th>
 						<th scope="col" class="px-6 py-4">Status</th>
 						<th scope="col" class="px-6 py-4 text-right">Aksi</th>
 					</tr>
@@ -199,22 +199,39 @@
 							<tr
 								class="bg-white transition-colors hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700/30"
 							>
+								<!-- No Pendaftaran -->
 								<td class="px-6 py-4">
-									<div class="flex items-center">
-										<div
-											class="line-clamp-2 max-w-xs font-medium text-[#1A305E] dark:text-slate-100"
-										>
-											{item.no_pendaftaran}
-										</div>
+									<div class="font-medium text-[#1A305E] dark:text-slate-100">
+										{item.no_pendaftaran}
+									</div>
+									<div class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+										{formatDate(item.created_at)}
 									</div>
 								</td>
-								<td class="px-6 py-4">{item.nama_pemohon}</td>
+
+								<!-- Nama Pemohon -->
+								<td class="px-6 py-4">
+									<div class="font-semibold text-slate-900 dark:text-slate-100">
+										{item.nama_pemohon}
+									</div>
+									<div class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+										{item.skpd?.nm_skpd || '-'}
+									</div>
+								</td>
+
+								<!-- Kasus -->
 								<td class="px-6 py-4">
 									<div class="max-w-xs truncate" title={item.kasus}>
-										{item.kasus}
+										{item.kasus || '-'}
 									</div>
 								</td>
-								<td class="px-6 py-4">{item.skpd?.nm_skpd || '-'}</td>
+
+								<!-- Tanggal -->
+								<td class="px-6 py-4 whitespace-nowrap text-slate-500 dark:text-slate-400">
+									{formatDate(item.created_at)}
+								</td>
+
+								<!-- Status -->
 								<td class="px-6 py-4">
 									<span
 										class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold {getStatusBadgeClass(
@@ -224,6 +241,8 @@
 										{item.status_label}
 									</span>
 								</td>
+
+								<!-- Aksi -->
 								<td class="px-6 py-4 text-right">
 									<div class="flex items-center justify-end space-x-2">
 										<a
@@ -247,6 +266,22 @@
 												></path>
 											</svg>
 										</a>
+										<button
+											type="button"
+											onclick={() => confirmDelete(item.id_pengajuan)}
+											class="text-slate-400 transition-colors hover:text-red-600 dark:text-slate-500 dark:hover:text-red-400"
+											title="Hapus pengajuan"
+											aria-label="Hapus pengajuan {item.nama_pemohon}"
+										>
+											<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+												></path>
+											</svg>
+										</button>
 									</div>
 								</td>
 							</tr>
@@ -310,7 +345,7 @@
 </div>
 
 <!-- Confirmation Dialog -->
-<!-- <ConfirmationDialog
+<ConfirmationDialog
 	bind:show={showDeleteDialog}
 	title="Hapus Pengajuan Keberatan?"
 	description="Data pengajuan akan dihapus permanen dan tidak dapat dikembalikan."
@@ -318,12 +353,12 @@
 	confirmText="Ya, Hapus"
 	cancelText="Batal"
 	onConfirm={handleDelete}
-/> -->
+/>
 
 <!-- Notification Dialog -->
-<!-- <NotificationDialog
+<NotificationDialog
 	bind:show={showNotification}
 	title={notificationTitle}
 	description={notificationDescription}
 	theme={notificationTheme}
-/> -->
+/>

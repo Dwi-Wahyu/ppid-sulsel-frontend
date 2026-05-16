@@ -25,8 +25,7 @@
 	// Fetch Data
 	async function fetchLatestNews() {
 		try {
-			const response = await api.get(`/public/berita/latest`);
-			const result = await response.json();
+			const result = await api.get(`/public/berita/latest`);
 
 			if (result && result.data) {
 				news = result.data;

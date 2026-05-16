@@ -135,7 +135,7 @@
 		</div>
 		<a
 			href="/admin/slide-banner/create"
-			class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700"
+			class="inline-flex items-center gap-2 rounded-xl bg-ppid-primary px-6 py-2.5 text-sm font-black text-white shadow-lg shadow-ppid-primary/20 transition-all hover:opacity-90"
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -246,7 +246,7 @@
 									<div class="flex justify-end gap-2">
 										<a
 											href="/admin/slide-banner/{banner.id_slide}/edit"
-											class="rounded-lg p-2 text-slate-400 transition-all hover:bg-indigo-50 hover:text-indigo-600 dark:text-slate-500 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-400"
+											class="rounded-xl p-2.5 text-slate-400 transition-all hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/20"
 											title="Edit"
 											aria-label="Edit banner {banner.nm_slide}"
 										>
@@ -269,7 +269,7 @@
 										<button
 											type="button"
 											onclick={() => confirmDelete(banner.id_slide)}
-											class="rounded-lg p-2 text-slate-400 transition-all hover:bg-rose-50 hover:text-rose-600 dark:text-slate-500 dark:hover:bg-rose-900/20 dark:hover:text-rose-400"
+											class="rounded-xl p-2.5 text-slate-400 transition-all hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
 											title="Hapus"
 											aria-label="Delete banner {banner.nm_slide}"
 										>
@@ -315,17 +315,17 @@
 					type="button"
 					onclick={() => changePage(pagination.prev_page_url || null)}
 					disabled={!pagination.prev_page_url}
-					class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+					class="rounded-xl border-2 border-slate-100 bg-white px-6 py-2 text-xs font-black text-slate-600 transition-all hover:border-ppid-primary hover:text-ppid-primary disabled:opacity-30 dark:border-slate-800 dark:bg-slate-800"
 				>
-					Sebelumnya
+					PREV
 				</button>
 				<button
 					type="button"
 					onclick={() => changePage(pagination.next_page_url || null)}
 					disabled={!pagination.next_page_url}
-					class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+					class="rounded-xl border-2 border-slate-100 bg-white px-6 py-2 text-xs font-black text-slate-600 transition-all hover:border-ppid-primary hover:text-ppid-primary disabled:opacity-30 dark:border-slate-800 dark:bg-slate-800"
 				>
-					Berikutnya
+					NEXT
 				</button>
 			</div>
 		</div>

@@ -241,7 +241,7 @@
 	<!-- Add Button -->
 	<button
 		onclick={openCreateModal}
-		class="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+		class="inline-flex items-center gap-2 rounded-xl bg-ppid-primary px-6 py-2.5 text-sm font-black text-white shadow-lg shadow-ppid-primary/20 transition-all hover:opacity-90"
 	>
 		<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"
@@ -270,13 +270,13 @@
 		</div>
 		<button
 			onclick={applyFilters}
-			class="h-fit self-end rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+			class="inline-flex h-fit items-center justify-center gap-2 self-end rounded-xl bg-ppid-primary px-6 py-2.5 text-sm font-black text-white shadow-lg shadow-ppid-primary/20 transition-all hover:opacity-90"
 		>
 			Terapkan Filter
 		</button>
 		<button
 			onclick={resetFilters}
-			class="h-fit self-end rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
+			class="h-fit self-end rounded-xl border-2 border-slate-100 bg-white px-6 py-2.5 text-sm font-black text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
 		>
 			Reset
 		</button>
@@ -343,7 +343,7 @@
 							<div class="flex justify-center gap-2">
 								<button
 									onclick={() => openEditModal(item)}
-									class="rounded p-1 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-slate-700"
+									class="rounded-xl p-2.5 text-slate-400 transition-all hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/20"
 									title="Edit"
 								>
 									<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -357,7 +357,7 @@
 								</button>
 								<button
 									onclick={() => openDeleteModal(item)}
-									class="rounded p-1 text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-slate-700"
+									class="rounded-xl p-2.5 text-slate-400 transition-all hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
 									title="Hapus"
 								>
 									<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -412,18 +412,18 @@
 					)} dari {data.ikphns.total} data
 				</div>
 				<div class="flex gap-1">
-					<div class="flex gap-1">
+					<div class="flex gap-2">
 						<button
 							onclick={() => changePage(data.ikphns.current_page - 1)}
 							disabled={data.ikphns.current_page === 1}
-							class="rounded-lg border border-slate-300 px-3 py-1 text-sm disabled:opacity-50 dark:border-slate-600"
+							class="rounded-xl border-2 border-slate-100 bg-white px-6 py-2 text-xs font-black text-slate-600 transition-all hover:border-ppid-primary hover:text-ppid-primary disabled:opacity-30 dark:border-slate-800 dark:bg-slate-800"
 						>
-							Prev
+							PREV
 						</button>
 
 						{#each getPaginationRange(data.ikphns.current_page, data.ikphns.last_page) as pageNum}
 							{#if pageNum === '...'}
-								<span class="px-2 py-1 text-slate-400">...</span>
+								<span class="px-4 py-2 font-black text-slate-400">...</span>
 							{:else}
 								<button
 									onclick={() => {
@@ -431,10 +431,10 @@
 											changePage(pageNum);
 										}
 									}}
-									class="rounded-lg border px-3 py-1 text-sm transition-colors {pageNum ===
+									class="rounded-xl border-2 px-4 py-2 text-xs font-black transition-all {pageNum ===
 									data.ikphns.current_page
-										? 'border-blue-600 bg-blue-600 text-white'
-										: 'border-slate-300 hover:bg-slate-50 dark:border-slate-600 dark:hover:bg-slate-700'}"
+										? 'border-ppid-primary bg-ppid-primary text-white'
+										: 'border-slate-100 bg-white text-slate-600 hover:border-ppid-primary hover:text-ppid-primary dark:border-slate-800 dark:bg-slate-800'}"
 								>
 									{pageNum}
 								</button>
@@ -444,9 +444,9 @@
 						<button
 							onclick={() => changePage(data.ikphns.current_page + 1)}
 							disabled={data.ikphns.current_page === data.ikphns.last_page}
-							class="rounded-lg border border-slate-300 px-3 py-1 text-sm disabled:opacity-50 dark:border-slate-600"
+							class="rounded-xl border-2 border-slate-100 bg-white px-6 py-2 text-xs font-black text-slate-600 transition-all hover:border-ppid-primary hover:text-ppid-primary disabled:opacity-30 dark:border-slate-800 dark:bg-slate-800"
 						>
-							Next
+							NEXT
 						</button>
 					</div>
 				</div>
@@ -509,14 +509,14 @@
 				<div class="flex justify-end gap-2">
 					<button
 						onclick={() => (showCreateModal = false)}
-						class="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
+						class="rounded-xl border-2 border-slate-100 bg-white px-6 py-2 text-sm font-black text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
 					>
 						Batal
 					</button>
 					<button
 						onclick={handleCreate}
 						disabled={loading}
-						class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:bg-slate-400"
+						class="inline-flex items-center gap-2 rounded-xl bg-ppid-primary px-6 py-2 text-sm font-black text-white shadow-lg shadow-ppid-primary/20 transition-all hover:opacity-90 disabled:opacity-50"
 					>
 						{loading ? 'Menyimpan...' : 'Simpan'}
 					</button>
@@ -592,14 +592,14 @@
 				<div class="flex justify-end gap-2">
 					<button
 						onclick={() => (showEditModal = false)}
-						class="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
+						class="rounded-xl border-2 border-slate-100 bg-white px-6 py-2 text-sm font-black text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
 					>
 						Batal
 					</button>
 					<button
 						onclick={handleUpdate}
 						disabled={loading}
-						class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:bg-slate-400"
+						class="inline-flex items-center gap-2 rounded-xl bg-ppid-primary px-6 py-2 text-sm font-black text-white shadow-lg shadow-ppid-primary/20 transition-all hover:opacity-90 disabled:opacity-50"
 					>
 						{loading ? 'Menyimpan...' : 'Update'}
 					</button>
@@ -621,14 +621,14 @@
 			<div class="flex justify-end gap-2">
 				<button
 					onclick={() => (showDeleteModal = false)}
-					class="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
+					class="rounded-xl border-2 border-slate-100 bg-white px-6 py-2 text-sm font-black text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
 				>
 					Batal
 				</button>
 				<button
 					onclick={handleDelete}
 					disabled={loading}
-					class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:bg-slate-400"
+					class="inline-flex items-center gap-2 rounded-xl bg-red-600 px-6 py-2 text-sm font-black text-white shadow-lg shadow-red-600/20 transition-all hover:opacity-90 disabled:opacity-50"
 				>
 					{loading ? 'Menghapus...' : 'Ya, Hapus'}
 				</button>

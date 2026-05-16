@@ -142,7 +142,7 @@
 				>
 					<div class="text-left">
 						<div class="text-lg font-bold">{m['layanan_pages.permohonan_title']()}</div>
-						<div class="text-sm opacity-80">Pantau permohonan informasi Anda</div>
+						<div class="text-sm opacity-80">{m['layanan_pages.check_permohonan_desc']()}</div>
 					</div>
 				</button>
 
@@ -159,7 +159,7 @@
 				>
 					<div class="text-left">
 						<div class="text-lg font-bold">{m['layanan_pages.keberatan_title']()}</div>
-						<div class="text-sm opacity-80">Cek status pengajuan keberatan</div>
+						<div class="text-sm opacity-80">{m['layanan_pages.check_keberatan_desc']()}</div>
 					</div>
 				</button>
 			</div>
@@ -281,9 +281,7 @@
 								{#if item.file}
 									<div class="border-t border-slate-200 pt-6 dark:border-slate-600">
 										<a
-											href="{PUBLIC_BACKEND_URL}/uploads/{isPermohonan(item)
-												? item.id_permohonan
-												: item.id_pengajuan}"
+											href={item.file}
 											target="_blank"
 											class="inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-ppid-primary px-6 py-4 text-base font-bold text-white shadow-lg shadow-ppid-primary/20 transition-all hover:bg-ppid-primary-dark"
 										>
@@ -309,36 +307,42 @@
 								>
 									Tracking Status Unit Kerja (OPD)
 								</h4>
-								<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+								<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
 									{#each item.disposisi as disp}
 										<div
-											class="rounded-2xl border border-slate-100 bg-slate-50/50 p-5 dark:border-slate-700 dark:bg-slate-900/30"
+											class="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-800"
 										>
 											<div class="mb-3 flex items-center justify-between">
 												<span
-													class="text-[10px] font-black tracking-tighter text-slate-400 uppercase"
-													>Unit Kerja</span
-												>
-												<span
-													class="rounded-md bg-white px-2 py-1 text-[10px] font-bold shadow-sm dark:bg-slate-800
-													{disp.status === 'selesai' ? 'text-green-600' : 'text-amber-500'}"
+													class="rounded-full px-2 py-0.5 text-[9px] font-black tracking-widest uppercase {disp.status ===
+													'selesai'
+														? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+														: disp.status === 'ditolak'
+															? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+															: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'}"
 												>
 													{disp.status.toUpperCase()}
 												</span>
 											</div>
 											<h5
-												class="mb-4 line-clamp-2 text-sm font-bold text-slate-800 dark:text-slate-200"
+												class="mb-2 min-h-[2.5rem] font-bold text-slate-800 dark:text-slate-200"
 											>
 												{disp.skpd?.nm_skpd || 'OPD Terkait'}
 											</h5>
 
-											{#each disp.respon as res}
-												<div
-													class="mt-2 rounded-xl bg-white p-3 text-xs shadow-sm dark:bg-slate-800"
-												>
-													<p class="text-slate-600 italic dark:text-slate-400">"{res.respon}"</p>
-												</div>
-											{/each}
+											<div class="mt-auto space-y-2">
+												{#each disp.respon as res}
+													<div
+														class="rounded-xl border border-slate-100 bg-slate-50 p-3 text-xs dark:border-slate-700 dark:bg-slate-900/50"
+													>
+														<p class="leading-relaxed text-slate-600 italic dark:text-slate-400">
+															"{res.isi_respon}"
+														</p>
+													</div>
+												{:else}
+													<p class="text-[10px] text-slate-400 italic">Belum ada respon resmi</p>
+												{/each}
+											</div>
 										</div>
 									{/each}
 								</div>

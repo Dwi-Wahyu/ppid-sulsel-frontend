@@ -6,14 +6,14 @@
 	const { data } = $props();
 
 	let activeTab = $state(data.activeTab);
-	let showAll: Record<string, boolean> = {
+	let showAll: Record<string, boolean> = $state({
 		kategori: false,
 		tahun: false,
 		domisili: false,
 		pekerjaan: false,
 		alasan: false,
 		bentuk_informasi: false
-	};
+	});
 
 	const limitedCount = 10;
 
@@ -186,7 +186,7 @@
 			onclick={() => switchTab('pekerjaan')}
 			class="cursor-pointer px-6 py-3 text-sm font-medium whitespace-nowrap transition-colors {activeTab ===
 			'pekerjaan'
-				? 'border-b-2 border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
+				? 'bg-black/5	dark:text-white'
 				: 'text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'}"
 		>
 			Pekerjaan
@@ -250,7 +250,7 @@
 				<div class="mt-4 text-center">
 					<button
 						onclick={() => (showAll.kategori = !showAll.kategori)}
-						class="rounded-lg px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-slate-50 dark:text-blue-400 dark:hover:bg-slate-700"
+						class="rounded-xl border-2 border-slate-100 bg-white px-6 py-2 text-xs font-black text-slate-600 transition-all hover:border-ppid-primary hover:text-ppid-primary dark:border-slate-800 dark:bg-slate-800"
 					>
 						{showAll.kategori
 							? 'Tampilkan Lebih Sedikit'
@@ -268,7 +268,7 @@
 				<h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100">Tahun Informasi</h3>
 				<button
 					onclick={() => openModal('tahun', 'create')}
-					class="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+					class="inline-flex items-center gap-2 rounded-xl bg-ppid-primary px-6 py-2.5 text-sm font-black text-white shadow-lg shadow-ppid-primary/20 transition-all hover:opacity-90"
 				>
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"
@@ -301,7 +301,7 @@
 										<div class="flex items-center justify-end gap-2">
 											<button
 												onclick={() => openModal('tahun', 'edit', tahun)}
-												class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-50 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-blue-400"
+												class="rounded-xl p-2.5 text-slate-400 transition-all hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/20"
 												title="Edit Tahun Informasi"
 											>
 												<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -316,7 +316,7 @@
 											<button
 												onclick={() =>
 													(deleteConfirm = { show: true, type: 'tahun', id: tahun.id })}
-												class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-slate-400 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+												class="rounded-xl p-2.5 text-slate-400 transition-all hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
 												title="Hapus Tahun Informasi"
 											>
 												<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -347,7 +347,7 @@
 				<div class="mt-4 text-center">
 					<button
 						onclick={() => (showAll.tahun = !showAll.tahun)}
-						class="rounded-lg px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-slate-50 dark:text-blue-400 dark:hover:bg-slate-700"
+						class="rounded-xl border-2 border-slate-100 bg-white px-6 py-2 text-xs font-black text-slate-600 transition-all hover:border-ppid-primary hover:text-ppid-primary dark:border-slate-800 dark:bg-slate-800"
 					>
 						{showAll.tahun
 							? 'Tampilkan Lebih Sedikit'
@@ -365,7 +365,7 @@
 				<h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100">Domisili</h3>
 				<button
 					onclick={() => openModal('domisili', 'create')}
-					class="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+					class="inline-flex items-center gap-2 rounded-xl bg-ppid-primary px-6 py-2.5 text-sm font-black text-white shadow-lg shadow-ppid-primary/20 transition-all hover:opacity-90"
 				>
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"
@@ -414,7 +414,7 @@
 										<div class="flex items-center justify-end gap-2">
 											<button
 												onclick={() => openModal('domisili', 'edit', domisili)}
-												class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-50 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-blue-400"
+												class="rounded-xl p-2.5 text-slate-400 transition-all hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/20"
 												title="Edit Domisili"
 											>
 												<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -429,7 +429,7 @@
 											<button
 												onclick={() =>
 													(deleteConfirm = { show: true, type: 'domisili', id: domisili.id })}
-												class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-slate-400 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+												class="rounded-xl p-2.5 text-slate-400 transition-all hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
 												title="Hapus Domisili"
 											>
 												<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -460,7 +460,7 @@
 				<div class="mt-4 text-center">
 					<button
 						onclick={() => (showAll.domisili = !showAll.domisili)}
-						class="rounded-lg px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-slate-50 dark:text-blue-400 dark:hover:bg-slate-700"
+						class="rounded-xl border-2 border-slate-100 bg-white px-6 py-2 text-xs font-black text-slate-600 transition-all hover:border-ppid-primary hover:text-ppid-primary dark:border-slate-800 dark:bg-slate-800"
 					>
 						{showAll.domisili
 							? 'Tampilkan Lebih Sedikit'
@@ -478,7 +478,7 @@
 				<h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100">Pekerjaan</h3>
 				<button
 					onclick={() => openModal('pekerjaan', 'create')}
-					class="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+					class="inline-flex items-center gap-2 rounded-xl bg-ppid-primary px-6 py-2.5 text-sm font-black text-white shadow-lg shadow-ppid-primary/20 transition-all hover:opacity-90"
 				>
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"
@@ -525,7 +525,7 @@
 										<div class="flex items-center justify-end gap-2">
 											<button
 												onclick={() => openModal('pekerjaan', 'edit', pekerjaan)}
-												class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-50 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-blue-400"
+												class="rounded-xl p-2.5 text-slate-400 transition-all hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/20"
 												title="Edit Pekerjaan"
 											>
 												<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -540,7 +540,7 @@
 											<button
 												onclick={() =>
 													(deleteConfirm = { show: true, type: 'pekerjaan', id: pekerjaan.id })}
-												class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-slate-400 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+												class="rounded-xl p-2.5 text-slate-400 transition-all hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
 												title="Hapus Pekerjaan"
 											>
 												<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -571,7 +571,7 @@
 				<div class="mt-4 text-center">
 					<button
 						onclick={() => (showAll.pekerjaan = !showAll.pekerjaan)}
-						class="rounded-lg px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-slate-50 dark:text-blue-400 dark:hover:bg-slate-700"
+						class="rounded-xl border-2 border-slate-100 bg-white px-6 py-2 text-xs font-black text-slate-600 transition-all hover:border-ppid-primary hover:text-ppid-primary dark:border-slate-800 dark:bg-slate-800"
 					>
 						{showAll.pekerjaan
 							? 'Tampilkan Lebih Sedikit'
@@ -589,7 +589,7 @@
 				<h3 class="text-lg font-semibold text-slate-800 dark:text-slate-100">Bentuk Informasi</h3>
 				<button
 					onclick={() => openModal('bentuk_informasi', 'create')}
-					class="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+					class="inline-flex items-center gap-2 rounded-xl bg-ppid-primary px-6 py-2.5 text-sm font-black text-white shadow-lg shadow-ppid-primary/20 transition-all hover:opacity-90"
 				>
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"
@@ -622,7 +622,7 @@
 										<div class="flex items-center justify-end gap-2">
 											<button
 												onclick={() => openModal('bentuk_informasi', 'edit', bentuk)}
-												class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-50 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-blue-400"
+												class="rounded-xl p-2.5 text-slate-400 transition-all hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/20"
 												title="Edit Bentuk Informasi"
 											>
 												<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -637,7 +637,7 @@
 											<button
 												onclick={() =>
 													(deleteConfirm = { show: true, type: 'bentuk_informasi', id: bentuk.id })}
-												class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-slate-400 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+												class="rounded-xl p-2.5 text-slate-400 transition-all hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
 												title="Hapus Bentuk Informasi"
 											>
 												<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -668,7 +668,7 @@
 				<div class="mt-4 text-center">
 					<button
 						onclick={() => (showAll.bentuk_informasi = !showAll.bentuk_informasi)}
-						class="rounded-lg px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-slate-50 dark:text-blue-400 dark:hover:bg-slate-700"
+						class="rounded-xl border-2 border-slate-100 bg-white px-6 py-2 text-xs font-black text-slate-600 transition-all hover:border-ppid-primary hover:text-ppid-primary dark:border-slate-800 dark:bg-slate-800"
 					>
 						{showAll.bentuk_informasi
 							? 'Tampilkan Lebih Sedikit'
@@ -683,7 +683,7 @@
 <!-- Tahun Modal -->
 {#if modals.tahun.show}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-		<div class="w-full max-w-md rounded-lg bg-white p-6 dark:bg-slate-800">
+		<div class="w-full max-w-md rounded-xl bg-white p-6 dark:bg-slate-800">
 			<h3 class="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
 				{modals.tahun.mode === 'create' ? 'Tambah' : 'Edit'} Tahun Informasi
 			</h3>
@@ -693,7 +693,6 @@
 
 					const formData = {
 						waktu:
-							modals.tahun.item?.waktu ||
 							(document.getElementById('tahun-waktu') as HTMLInputElement).value
 					};
 
@@ -709,7 +708,7 @@
 							type="text"
 							value={modals.tahun.item?.waktu || ''}
 							required
-							class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
+							class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-ppid-primary dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
 						/>
 					</label>
 				</div>
@@ -717,13 +716,13 @@
 					<button
 						type="button"
 						onclick={() => closeModal('tahun')}
-						class="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700"
+						class="rounded-xl border-2 border-slate-100 bg-white px-6 py-2 text-sm font-black text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
 					>
 						Batal
 					</button>
 					<button
 						type="submit"
-						class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+						class="inline-flex items-center gap-2 rounded-xl bg-ppid-primary px-6 py-2 text-sm font-black text-white shadow-lg shadow-ppid-primary/20 transition-all hover:opacity-90 disabled:opacity-50"
 					>
 						Simpan
 					</button>
@@ -736,7 +735,7 @@
 <!-- Domisili Modal -->
 {#if modals.domisili.show}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-		<div class="w-full max-w-md rounded-lg bg-white p-6 dark:bg-slate-800">
+		<div class="w-full max-w-md rounded-xl bg-white p-6 dark:bg-slate-800">
 			<h3 class="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
 				{modals.domisili.mode === 'create' ? 'Tambah' : 'Edit'} Domisili
 			</h3>
@@ -746,11 +745,10 @@
 
 					const formData = {
 						nama_daerah:
-							modals.domisili.item?.nama_daerah ||
-							document.getElementById('domisili-nama_daerah').value,
+							(document.getElementById('domisili-nama_daerah') as HTMLInputElement).value,
 						provinsi:
-							modals.domisili.item?.provinsi || document.getElementById('domisili-provinsi').value,
-						is_active: document.getElementById('domisili-is_active').checked
+							(document.getElementById('domisili-provinsi') as HTMLInputElement).value,
+						is_active: (document.getElementById('domisili-is_active') as HTMLInputElement).checked
 					};
 					handleSubmit('domisili', formData);
 				}}
@@ -764,7 +762,7 @@
 							type="text"
 							value={modals.domisili.item?.nama_daerah || ''}
 							required
-							class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
+							class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-ppid-primary dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
 						/>
 					</label>
 				</div>
@@ -777,7 +775,7 @@
 							type="text"
 							value={modals.domisili.item?.provinsi || ''}
 							required
-							class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
+							class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-ppid-primary dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
 						/>
 					</label>
 				</div>
@@ -787,7 +785,7 @@
 							id="domisili-is_active"
 							type="checkbox"
 							checked={modals.domisili.item?.is_active || false}
-							class="rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-slate-600"
+							class="rounded border-slate-300 text-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:border-slate-600"
 						/>
 						<span class="text-sm font-medium text-slate-700 dark:text-slate-300">Aktif</span>
 					</label>
@@ -796,13 +794,13 @@
 					<button
 						type="button"
 						onclick={() => closeModal('domisili')}
-						class="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700"
+						class="rounded-xl border-2 border-slate-100 bg-white px-6 py-2 text-sm font-black text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
 					>
 						Batal
 					</button>
 					<button
 						type="submit"
-						class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+						class="inline-flex items-center gap-2 rounded-xl bg-ppid-primary px-6 py-2 text-sm font-black text-white shadow-lg shadow-ppid-primary/20 transition-all hover:opacity-90 disabled:opacity-50"
 					>
 						Simpan
 					</button>
@@ -815,17 +813,17 @@
 <!-- Pekerjaan Modal -->
 {#if modals.pekerjaan.show}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-		<div class="w-full max-w-md rounded-lg bg-white p-6 dark:bg-slate-800">
+		<div class="w-full max-w-md rounded-xl bg-white p-6 dark:bg-slate-800">
 			<h3 class="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
 				{modals.pekerjaan.mode === 'create' ? 'Tambah' : 'Edit'} Pekerjaan
 			</h3>
 			<form
-				onsubmit={() => {
+				onsubmit={(e) => {
+					e.preventDefault();
 					const formData = {
 						nama_pekerjaan:
-							modals.pekerjaan.item?.nama_pekerjaan ||
-							document.getElementById('pekerjaan-nama_pekerjaan').value,
-						is_active: document.getElementById('pekerjaan-is_active').checked
+							(document.getElementById('pekerjaan-nama_pekerjaan') as HTMLInputElement).value,
+						is_active: (document.getElementById('pekerjaan-is_active') as HTMLInputElement).checked
 					};
 					handleSubmit('pekerjaan', formData);
 				}}
@@ -839,7 +837,7 @@
 							type="text"
 							value={modals.pekerjaan.item?.nama_pekerjaan || ''}
 							required
-							class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
+							class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-ppid-primary dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
 						/>
 					</label>
 				</div>
@@ -849,7 +847,7 @@
 							id="pekerjaan-is_active"
 							type="checkbox"
 							checked={modals.pekerjaan.item?.is_active || false}
-							class="rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-slate-600"
+							class="rounded border-slate-300 text-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:border-slate-600"
 						/>
 						<span class="text-sm font-medium text-slate-700 dark:text-slate-300">Aktif</span>
 					</label>
@@ -858,13 +856,13 @@
 					<button
 						type="button"
 						onclick={() => closeModal('pekerjaan')}
-						class="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700"
+						class="rounded-xl border-2 border-slate-100 bg-white px-6 py-2 text-sm font-black text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
 					>
 						Batal
 					</button>
 					<button
 						type="submit"
-						class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+						class="inline-flex items-center gap-2 rounded-xl bg-ppid-primary px-6 py-2 text-sm font-black text-white shadow-lg shadow-ppid-primary/20 transition-all hover:opacity-90 disabled:opacity-50"
 					>
 						Simpan
 					</button>
@@ -877,16 +875,16 @@
 <!-- Bentuk Informasi Modal -->
 {#if modals.bentuk_informasi.show}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-		<div class="w-full max-w-md rounded-lg bg-white p-6 dark:bg-slate-800">
+		<div class="w-full max-w-md rounded-xl bg-white p-6 dark:bg-slate-800">
 			<h3 class="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">
 				{modals.bentuk_informasi.mode === 'create' ? 'Tambah' : 'Edit'} Bentuk Informasi
 			</h3>
 			<form
-				onsubmit={() => {
+				onsubmit={(e) => {
+					e.preventDefault();
 					const formData = {
 						judul:
-							modals.bentuk_informasi.item?.judul ||
-							document.getElementById('bentuk_informasi-judul').value
+							(document.getElementById('bentuk_informasi-judul') as HTMLInputElement).value
 					};
 					handleSubmit('bentuk_informasi', formData);
 				}}
@@ -900,7 +898,7 @@
 							type="text"
 							value={modals.bentuk_informasi.item?.judul || ''}
 							required
-							class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
+							class="w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-ppid-primary dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
 						/>
 					</label>
 				</div>
@@ -908,13 +906,13 @@
 					<button
 						type="button"
 						onclick={() => closeModal('bentuk_informasi')}
-						class="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700"
+						class="rounded-xl border-2 border-slate-100 bg-white px-6 py-2 text-sm font-black text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
 					>
 						Batal
 					</button>
 					<button
 						type="submit"
-						class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+						class="inline-flex items-center gap-2 rounded-xl bg-ppid-primary px-6 py-2 text-sm font-black text-white shadow-lg shadow-ppid-primary/20 transition-all hover:opacity-90 disabled:opacity-50"
 					>
 						Simpan
 					</button>
@@ -927,7 +925,7 @@
 <!-- Delete Confirmation -->
 {#if deleteConfirm.show}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-		<div class="w-full max-w-md rounded-lg bg-white p-6 dark:bg-slate-800">
+		<div class="w-full max-w-md rounded-xl bg-white p-6 dark:bg-slate-800">
 			<h3 class="mb-2 text-lg font-semibold text-red-600 dark:text-red-400">Hapus Data?</h3>
 			<p class="mb-6 text-sm text-slate-600 dark:text-slate-400">
 				Data akan dihapus permanen dan tidak dapat dikembalikan.
@@ -935,13 +933,13 @@
 			<div class="flex justify-end gap-2">
 				<button
 					onclick={() => (deleteConfirm = { show: false, type: '', id: null })}
-					class="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700"
+					class="rounded-xl border-2 border-slate-100 bg-white px-6 py-2 text-sm font-black text-slate-600 transition-all hover:border-slate-200 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
 				>
 					Batal
 				</button>
 				<button
 					onclick={handleDelete}
-					class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+					class="inline-flex items-center gap-2 rounded-xl bg-red-600 px-6 py-2 text-sm font-black text-white shadow-lg shadow-red-600/20 transition-all hover:opacity-90 disabled:opacity-50"
 				>
 					Ya, Hapus
 				</button>
@@ -953,7 +951,7 @@
 <!-- Notification -->
 {#if notification.show}
 	<div
-		class="fixed right-4 bottom-4 z-50 max-w-sm rounded-lg p-4 shadow-lg {notification.type ===
+		class="fixed right-4 bottom-4 z-50 max-w-sm rounded-xl p-4 shadow-lg {notification.type ===
 		'success'
 			? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
 			: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'}"

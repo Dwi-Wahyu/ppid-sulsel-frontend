@@ -4,43 +4,32 @@
 	import PageTitle from '$lib/components/PageTitle.svelte';
 	import SearchableSelect from '$lib/components/SearchableSelect.svelte';
 	import SuccessModal from '$lib/components/SuccessModal.svelte';
-	import ErrorModal from '$lib/components/ErrorModal.svelte';
-	import { onMount } from 'svelte';
-	import { PUBLIC_API_URL } from '$env/static/public';
 	import * as m from '$lib/paraglide/messages.js';
 
-	// Interfaces
-	interface Domisili {
-		id: string;
-		nama_daerah: string;
-	}
+	import { superForm } from 'sveltekit-superforms/client';
+	import type { PageData } from './$types';
 
-	interface Pekerjaan {
-		id: string;
-		nama_pekerjaan: string;
-	}
+	let { data }: { data: PageData } = $props();
 
-	interface BentukInformasi {
-		id: string;
-		judul: string;
-	}
+	const { form, errors, enhance, delayed, message, validate } = superForm(data.form, {
+		taintedMessage: null,
+		scrollToError: 'smooth',
+		validationMethod: 'onInput',
+		onResult: ({ result }) => {
+			if (result.type === 'success') {
+				showSuccessModal = true;
+				// Reset files manually since superforms doesn't clear file inputs automatically
+				const fileInputs = document.querySelectorAll('input[type="file"]');
+				fileInputs.forEach((input) => {
+					(input as HTMLInputElement).value = '';
+				});
+				isInstansi = false;
+			}
+		}
+	});
 
-	interface FormData {
-		nama: string;
-		nik: string;
-		email: string;
-		no_hp: string;
-		pekerjaan_id: string;
-		domisili_id: string;
-		alamat: string;
-		foto_ktp: File | null;
-		dokumen_pendukung: File | null;
-		nmr_pengesahan: string;
-		tujuan: string;
-		rincian: string;
-		id_bentuk_informasi: string;
-		contoh_informasi: string;
-	}
+	let isInstansi = $state(false);
+	let showSuccessModal = $state(false);
 
 	// Helper function for title case
 	function toTitleCase(str: string) {
@@ -49,206 +38,18 @@
 		});
 	}
 
-	// State
-	let isInstansi = $state(false);
-	let showSuccessModal = $state(false);
-	let showErrorModal = $state(false);
-	let errorModalTitle = $state('Perhatian!');
-	let errorModalMessage = $state('');
-	let isSubmitting = $state(false);
-	let honeyPot = $state(''); // Honeypot field
-	let formData = $state<FormData>({
-		nama: '',
-		nik: '',
-		email: '',
-		no_hp: '',
-		pekerjaan_id: '',
-		domisili_id: '',
-		alamat: '',
-		foto_ktp: null,
-		dokumen_pendukung: null,
-		nmr_pengesahan: '',
-		tujuan: '',
-		rincian: '',
-		id_bentuk_informasi: '',
-		contoh_informasi: ''
-	});
-
-	// Data fetching
-	let masterPekerjaan = $state<Pekerjaan[]>([]);
-	let masterDomisili = $state<Domisili[]>([]);
-	let bentukInformasis = $state<BentukInformasi[]>([]);
-
-	onMount(async () => {
-		try {
-			const [resDomisili, resPekerjaan, resBentukInfo] = await Promise.all([
-				fetch(`${PUBLIC_API_URL}/public/domisili`),
-				fetch(`${PUBLIC_API_URL}/public/pekerjaan`),
-				fetch(`${PUBLIC_API_URL}/public/bentuk-informasi`)
-			]);
-
-			const jsonDomisili = await resDomisili.json();
-			const jsonPekerjaan = await resPekerjaan.json();
-			const jsonBentukInfo = await resBentukInfo.json();
-
-			if (jsonDomisili.data) {
-				masterDomisili = jsonDomisili.data.map((item: any) => ({
-					id: String(item.id),
-					nama_daerah: toTitleCase(item.nama_daerah)
-				}));
-			}
-
-			if (jsonPekerjaan.data) {
-				masterPekerjaan = jsonPekerjaan.data.map((item: any) => ({
-					id: String(item.id),
-					nama_pekerjaan: item.nama_pekerjaan
-				}));
-			}
-
-			if (jsonBentukInfo.data) {
-				bentukInformasis = jsonBentukInfo.data.map((item: any) => ({
-					id: String(item.id),
-					judul: item.judul
-				}));
-			}
-		} catch (error) {
-			console.error('Gagal mengambil data master:', error);
-		}
-	});
-
-	// File upload handlers
-	function handleFileUpload(e: Event, fieldName: keyof FormData) {
-		const target = e.target as HTMLInputElement;
-		const file = target?.files?.[0];
-		if (file) {
-			// @ts-ignore - dynamic assignment for file
-			formData[fieldName] = file;
-		}
-	}
-
-	// NIK validation
-	function validateNik(e: Event) {
+	// NIK validation wrapper
+	function handleNikInput(e: Event) {
 		const target = e.target as HTMLInputElement;
 		const value = target.value.replace(/\D/g, '');
-		formData.nik = value.substring(0, 16);
-	}
-
-	// Form submission
-	async function handleSubmit(e: SubmitEvent) {
-		e.preventDefault();
-
-		// Honeypot check
-		if (honeyPot) {
-			console.warn('Bot detected');
-			return;
-		}
-
-		// Validate NIK
-		if (formData.nik.length !== 16) {
-			errorModalTitle = 'NIK Tidak Valid';
-			errorModalMessage =
-				'NIK harus terdiri dari 16 digit angka. Harap periksa kembali nomor NIK Anda.';
-			showErrorModal = true;
-			return;
-		}
-
-		// Validate file upload
-		if (!formData.foto_ktp) {
-			errorModalTitle = 'Foto KTP Diperlukan';
-			errorModalMessage = 'Foto KTP wajib diupload sebelum mengirim permohonan.';
-			showErrorModal = true;
-			return;
-		}
-
-		isSubmitting = true;
-
-		try {
-			const data = new FormData();
-
-			// Append simple fields
-			data.append('nama', formData.nama);
-			data.append('nik', formData.nik);
-			data.append('email', formData.email);
-			data.append('no_hp', formData.no_hp);
-			data.append('pekerjaan_id', formData.pekerjaan_id);
-			data.append('domisili_id', formData.domisili_id);
-			data.append('alamat', formData.alamat);
-			data.append('tujuan', formData.tujuan);
-			data.append('rincian', formData.rincian);
-			data.append('id_bentuk_informasi', formData.id_bentuk_informasi);
-
-			// Optional fields
-			if (formData.nmr_pengesahan) data.append('nmr_pengesahan', formData.nmr_pengesahan);
-			if (formData.contoh_informasi) data.append('contoh_informasi', formData.contoh_informasi);
-
-			// Files
-			if (formData.foto_ktp) data.append('foto_ktp', formData.foto_ktp);
-			if (formData.dokumen_pendukung) data.append('dokumen_pendukung', formData.dokumen_pendukung);
-
-			// Honeypot field (should be empty, but sending key for backend check if needed)
-			data.append('website', honeyPot);
-
-			const res = await fetch(`${PUBLIC_API_URL}/public/permohonan-informasi`, {
-				method: 'POST',
-				headers: {
-					Accept: 'application/json'
-				},
-				body: data
-			});
-
-			const json = await res.json();
-
-			if (!res.ok) {
-				if (res.status === 422) {
-					// Validation error
-					const errorMsg = Object.values(json.errors || {})
-						.flat()
-						.join('\n');
-					errorModalTitle = 'Gagal Validasi';
-					errorModalMessage = errorMsg;
-					showErrorModal = true;
-				} else {
-					throw new Error(json.message || 'Terjadi kesalahan pada server');
-				}
-				return;
-			}
-
-			// Show success modal
-			showSuccessModal = true;
-
-			// Reset form after short delay
-			setTimeout(() => {
-				resetForm();
-			}, 2000);
-		} catch (error: any) {
-			console.error('Submission error:', error);
-			errorModalTitle = 'Terjadi Kesalahan';
-			errorModalMessage = error.message || 'Gagal mengirim permohonan. Silakan coba lagi.';
-			showErrorModal = true;
-		} finally {
-			isSubmitting = false;
-		}
+		$form.nik = value.substring(0, 16);
+		validate('nik');
 	}
 
 	function resetForm() {
-		formData = {
-			nama: '',
-			nik: '',
-			email: '',
-			no_hp: '',
-			pekerjaan_id: '',
-			domisili_id: '',
-			alamat: '',
-			foto_ktp: null,
-			dokumen_pendukung: null,
-			nmr_pengesahan: '',
-			tujuan: '',
-			rincian: '',
-			id_bentuk_informasi: '',
-			contoh_informasi: ''
-		};
-		isInstansi = false;
-		honeyPot = '';
+		// Native reset on the form triggers superforms reset
+		const formEl = document.getElementById('permohonanForm') as HTMLFormElement;
+		if (formEl) formEl.reset();
 	}
 </script>
 
@@ -285,41 +86,19 @@
 			<div
 				class="relative rounded-2xl border border-gray-200 bg-white p-8 shadow-sm md:p-10 dark:border-slate-700 dark:bg-slate-800"
 			>
-				<div class="mb-10 hidden text-center md:block">
-					<div
-						class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-ppid-primary/5 text-ppid-primary dark:text-white"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="32"
-							height="32"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-							<polyline points="14 2 14 8 20 8" />
-							<line x1="16" x2="8" y1="13" y2="13" />
-							<line x1="16" x2="8" y1="17" y2="17" />
-							<polyline points="10 9 9 9 8 9" />
-						</svg>
+				{#if $message}
+					<div class="mb-6 rounded-lg bg-red-100 p-4 text-red-700">
+						{$message}
 					</div>
-					<h2 class="mb-2 text-2xl font-bold text-ppid-primary dark:text-white">
-						{m['layanan_pages.form_title']()}
-					</h2>
-					<p class="text-gray-600 dark:text-gray-300">{m['layanan_pages.form_desc']()}</p>
-				</div>
+				{/if}
 
-				<form onsubmit={handleSubmit} class="space-y-8" id="permohonanForm">
+				<form method="POST" use:enhance class="space-y-8" id="permohonanForm" enctype="multipart/form-data">
 					<!-- Honeypot Field -->
 					<input
 						type="text"
 						name="website"
 						class="hidden"
-						bind:value={honeyPot}
+						bind:value={$form.website}
 						autocomplete="off"
 					/>
 
@@ -348,156 +127,173 @@
 						<!-- Row 1: Nama & NIK -->
 						<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 							<div class="space-y-2">
-								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+								<label for="nama" class="block text-sm font-semibold {$errors.nama ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'}">
 									{m['form.fullname']()} <span class="text-red-500">*</span>
-
-									<input
-										type="text"
-										bind:value={formData.nama}
-										placeholder={m['form.fullname_placeholder']()}
-										class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-										required
-									/>
 								</label>
+								<input
+									type="text"
+									id="nama"
+									name="nama"
+									bind:value={$form.nama}
+									placeholder={m['form.fullname_placeholder']()}
+									class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 dark:bg-slate-800 {$errors.nama ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
+									aria-invalid={$errors.nama ? 'true' : undefined}
+								/>
+								{#if $errors.nama}<span class="text-xs text-red-500">{$errors.nama}</span>{/if}
 							</div>
 
 							<div class="space-y-2">
-								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+								<label for="nik" class="block text-sm font-semibold {$errors.nik ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'}">
 									{m['form.nik']()} <span class="text-red-500">*</span>
-
-									<input
-										type="text"
-										bind:value={formData.nik}
-										oninput={validateNik}
-										placeholder={m['form.nik_placeholder']()}
-										maxlength="16"
-										class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-										required
-									/>
 								</label>
-								<p class="mt-1 text-xs text-gray-500">{m['form.nik_error']()}</p>
+								<input
+									type="text"
+									id="nik"
+									name="nik"
+									bind:value={$form.nik}
+									oninput={handleNikInput}
+									placeholder={m['form.nik_placeholder']()}
+									maxlength="16"
+									class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 dark:bg-slate-800 {$errors.nik ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
+									aria-invalid={$errors.nik ? 'true' : undefined}
+								/>
+								{#if $errors.nik}
+									<span class="text-xs text-red-500">{$errors.nik}</span>
+								{:else}
+									<span class="text-xs text-gray-500">{m['form.nik_error']()}</span>
+								{/if}
 							</div>
 						</div>
 
 						<!-- Row 2: Email & No. HP -->
 						<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 							<div class="space-y-2">
-								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+								<label for="email" class="block text-sm font-semibold {$errors.email ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'}">
 									{m['contact.email']()} <span class="text-red-500">*</span>
-
-									<input
-										type="email"
-										bind:value={formData.email}
-										placeholder="contoh@email.com"
-										class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-										required
-									/>
 								</label>
+								<input
+									type="email"
+									id="email"
+									name="email"
+									bind:value={$form.email}
+									placeholder="contoh@email.com"
+									class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 dark:bg-slate-800 {$errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
+									aria-invalid={$errors.email ? 'true' : undefined}
+								/>
+								{#if $errors.email}<span class="text-xs text-red-500">{$errors.email}</span>{/if}
 							</div>
 
 							<div class="space-y-2">
-								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+								<label for="no_hp" class="block text-sm font-semibold {$errors.no_hp ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'}">
 									{m['contact.phone']()} <span class="text-red-500">*</span>
-
-									<input
-										type="tel"
-										bind:value={formData.no_hp}
-										placeholder="08xxxxxxxxxx"
-										class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-										required
-									/>
 								</label>
+								<input
+									type="tel"
+									id="no_hp"
+									name="no_hp"
+									bind:value={$form.no_hp}
+									placeholder="08xxxxxxxxxx"
+									class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 dark:bg-slate-800 {$errors.no_hp ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
+									aria-invalid={$errors.no_hp ? 'true' : undefined}
+								/>
+								{#if $errors.no_hp}<span class="text-xs text-red-500">{$errors.no_hp}</span>{/if}
 							</div>
 						</div>
 
 						<!-- Row 3: Pekerjaan & Domisili -->
 						<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 							<div class="space-y-2">
-								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+								<label for="pekerjaan_id" class="block text-sm font-semibold {$errors.pekerjaan_id ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'}">
 									{m['form.job']()} <span class="text-red-500">*</span>
-
-									<SearchableSelect
-										options={masterPekerjaan}
-										bind:value={formData.pekerjaan_id}
-										name="pekerjaan_id"
-										placeholder={m['form.job_placeholder']()}
-										idKey="id"
-										labelKey="nama_pekerjaan"
-										required={true}
-									/>
 								</label>
+								<SearchableSelect
+									options={data.pekerjaanOptions}
+									bind:value={$form.pekerjaan_id}
+									name="pekerjaan_id"
+									placeholder={m['form.job_placeholder']()}
+									idKey="value"
+									labelKey="label"
+									isInvalid={!!$errors.pekerjaan_id}
+								/>
+								{#if $errors.pekerjaan_id}<span class="text-xs text-red-500">{$errors.pekerjaan_id}</span>{/if}
 							</div>
 
 							<div class="space-y-2">
-								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+								<label for="domisili_id" class="block text-sm font-semibold {$errors.domisili_id ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'}">
 									{m['form.domicile']()} <span class="text-red-500">*</span>
-
-									<SearchableSelect
-										options={masterDomisili}
-										bind:value={formData.domisili_id}
-										name="domisili_id"
-										placeholder={m['form.domicile_placeholder']()}
-										idKey="id"
-										labelKey="nama_daerah"
-										required={true}
-									/>
 								</label>
-								<p class="mt-1 text-xs text-gray-500">{m['form.domicile_hint']()}</p>
+								<SearchableSelect
+									options={data.domisiliOptions}
+									bind:value={$form.domisili_id}
+									name="domisili_id"
+									placeholder={m['form.domicile_placeholder']()}
+									idKey="value"
+									labelKey="label"
+									isInvalid={!!$errors.domisili_id}
+								/>
+								{#if $errors.domisili_id}
+									<span class="text-xs text-red-500">{$errors.domisili_id}</span>
+								{:else}
+									<span class="text-xs text-gray-500">{m['form.domicile_hint']()}</span>
+								{/if}
 							</div>
 						</div>
 
 						<!-- Row 4: Alamat -->
 						<div class="space-y-2">
-							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+							<label for="alamat" class="block text-sm font-semibold {$errors.alamat ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'}">
 								{m['contact.address']()} <span class="text-red-500">*</span>
-
-								<input
-									type="text"
-									bind:value={formData.alamat}
-									placeholder={m['form.address_placeholder']()}
-									class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-									required
-								/>
 							</label>
+							<input
+								type="text"
+								id="alamat"
+								name="alamat"
+								bind:value={$form.alamat}
+								placeholder={m['form.address_placeholder']()}
+								class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 dark:bg-slate-800 {$errors.alamat ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
+								aria-invalid={$errors.alamat ? 'true' : undefined}
+							/>
+							{#if $errors.alamat}<span class="text-xs text-red-500">{$errors.alamat}</span>{/if}
 						</div>
 
 						<!-- Row 5: Upload KTP -->
 						<div class="space-y-2">
-							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+							<label for="foto_ktp" class="block text-sm font-semibold {$errors.foto_ktp ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'}">
 								{m['form.upload_ktp']()} <span class="text-red-500">*</span>
-
-								<input
-									type="file"
-									onchange={(e) => handleFileUpload(e, 'foto_ktp')}
-									accept="image/jpeg,image/jpg,image/png"
-									class="mt-1 block w-full cursor-pointer rounded-lg border border-gray-300 bg-white text-sm text-gray-700 file:mr-4 file:border-0 file:bg-ppid-primary file:px-6 file:py-3 file:text-sm file:font-semibold file:text-white hover:file:bg-ppid-primary/90 focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800 dark:text-gray-300"
-									required
-								/>
 							</label>
-
-							<p class="mt-1 text-xs text-gray-500">
-								<i class="fas fa-info-circle mr-1"></i>
-								{m['form.file_format_hint']()}
-							</p>
+							<input
+								type="file"
+								id="foto_ktp"
+								name="foto_ktp"
+								accept="image/jpeg,image/jpg,image/png"
+								class="block w-full cursor-pointer rounded-lg border bg-white text-sm text-gray-700 file:mr-4 file:border-0 file:bg-ppid-primary file:px-6 file:py-3 file:text-sm file:font-semibold file:text-white hover:file:bg-ppid-primary/90 focus:ring-2 dark:bg-slate-800 dark:text-gray-300 {$errors.foto_ktp ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
+							/>
+							{#if $errors.foto_ktp}
+								<span class="text-xs text-red-500">{$errors.foto_ktp}</span>
+							{:else}
+								<p class="text-xs text-gray-500">
+									<i class="fas fa-info-circle mr-1"></i>
+									{m['form.file_format_hint']()}
+								</p>
+							{/if}
 						</div>
 
 						<!-- Row 6: Upload Dokumen Pendukung -->
 						<div class="space-y-2">
-							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+							<label for="dokumen_pendukung" class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
 								{m['form.upload_supporting_doc']()}
-
-								<input
-									type="file"
-									onchange={(e) => handleFileUpload(e, 'dokumen_pendukung')}
-									accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-									class="mt-1 block w-full cursor-pointer rounded-lg border border-gray-300 bg-white text-sm text-gray-700 file:mr-4 file:border-0 file:bg-linear-to-r file:from-ppid-primary/90 file:to-ppid-primary file:px-6 file:py-3 file:text-sm file:font-semibold file:text-white hover:file:from-ppid-primary hover:file:to-ppid-primary/90 focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800 dark:text-gray-300"
-								/>
 							</label>
-
-							<p class="mt-1 text-xs leading-relaxed text-gray-500">
+							<input
+								type="file"
+								id="dokumen_pendukung"
+								name="dokumen_pendukung"
+								accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+								class="block w-full cursor-pointer rounded-lg border border-gray-300 bg-white text-sm text-gray-700 file:mr-4 file:border-0 file:bg-linear-to-r file:from-ppid-primary/90 file:to-ppid-primary file:px-6 file:py-3 file:text-sm file:font-semibold file:text-white hover:file:from-ppid-primary hover:file:to-ppid-primary/90 focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800 dark:text-gray-300"
+							/>
+							<p class="text-xs leading-relaxed text-gray-500">
 								{m['form.supporting_doc_hint']()}
 							</p>
-							<p class="mt-0.5 text-xs text-gray-400">
+							<p class="text-xs text-gray-400">
 								{m['form.file_format_hint_2']()}
 							</p>
 						</div>
@@ -530,20 +326,24 @@
 						<!-- Row 8: Nomor Pengesahan (Conditional) -->
 						{#if isInstansi}
 							<div class="space-y-2">
-								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+								<label for="nmr_pengesahan" class="block text-sm font-semibold {$errors.nmr_pengesahan ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'}">
 									{m['form.agency_number']()} <span class="text-red-500">*</span>
-
-									<input
-										type="text"
-										bind:value={formData.nmr_pengesahan}
-										placeholder={m['form.agency_number_placeholder']()}
-										required={isInstansi}
-										class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-									/>
 								</label>
-								<p class="mt-1 text-xs text-gray-500">
-									{m['form.agency_number_required']()}
-								</p>
+								<input
+									type="text"
+									id="nmr_pengesahan"
+									name="nmr_pengesahan"
+									bind:value={$form.nmr_pengesahan}
+									placeholder={m['form.agency_number_placeholder']()}
+									required={isInstansi}
+									class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 dark:bg-slate-800 {$errors.nmr_pengesahan ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
+									aria-invalid={$errors.nmr_pengesahan ? 'true' : undefined}
+								/>
+								{#if $errors.nmr_pengesahan}
+									<span class="text-xs text-red-500">{$errors.nmr_pengesahan}</span>
+								{:else}
+									<span class="text-xs text-gray-500">{m['form.agency_number_required']()}</span>
+								{/if}
 							</div>
 						{/if}
 					</div>
@@ -572,70 +372,81 @@
 
 						<!-- Row 1: Tujuan -->
 						<div class="space-y-2">
-							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+							<label for="tujuan" class="block text-sm font-semibold {$errors.tujuan ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'}">
 								{m['form.purpose']()} <span class="text-red-500">*</span>
-
-								<input
-									type="text"
-									bind:value={formData.tujuan}
-									placeholder={m['form.purpose_placeholder']()}
-									class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-									required
-								/>
 							</label>
+							<input
+								type="text"
+								id="tujuan"
+								name="tujuan"
+								bind:value={$form.tujuan}
+								placeholder={m['form.purpose_placeholder']()}
+								class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 dark:bg-slate-800 {$errors.tujuan ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
+								aria-invalid={$errors.tujuan ? 'true' : undefined}
+							/>
+							{#if $errors.tujuan}<span class="text-xs text-red-500">{$errors.tujuan}</span>{/if}
 						</div>
 
 						<!-- Row 2: Rincian -->
 						<div class="space-y-2">
-							<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+							<label for="rincian" class="block text-sm font-semibold {$errors.rincian ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'}">
 								{m['form.details']()} <span class="text-red-500">*</span>
-
-								<textarea
-									bind:value={formData.rincian}
-									rows="5"
-									placeholder={m['form.details_placeholder']()}
-									class="mt-1 w-full resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-									required
-								></textarea>
 							</label>
-							<p class="mt-1 text-xs text-gray-500">
-								{m['form.details_hint']()}
-							</p>
+							<textarea
+								id="rincian"
+								name="rincian"
+								bind:value={$form.rincian}
+								rows="5"
+								placeholder={m['form.details_placeholder']()}
+								class="w-full resize-none rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 dark:bg-slate-800 {$errors.rincian ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
+								aria-invalid={$errors.rincian ? 'true' : undefined}
+							></textarea>
+							{#if $errors.rincian}
+								<span class="text-xs text-red-500">{$errors.rincian}</span>
+							{:else}
+								<p class="mt-1 text-xs text-gray-500">{m['form.details_hint']()}</p>
+							{/if}
 						</div>
 
 						<!-- Row 3: Format & Contoh -->
 						<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 							<div class="space-y-2">
-								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+								<label for="id_bentuk_informasi" class="block text-sm font-semibold {$errors.id_bentuk_informasi ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'}">
 									{m['form.format']()} <span class="text-red-500">*</span>
-
-									<select
-										bind:value={formData.id_bentuk_informasi}
-										class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-										required
-									>
-										<option value="">{m['form.format_placeholder']()}</option>
-										{#each bentukInformasis as bentuk}
-											<option value={bentuk.id}>{bentuk.judul}</option>
-										{/each}
-									</select>
 								</label>
+								<select
+									id="id_bentuk_informasi"
+									name="id_bentuk_informasi"
+									bind:value={$form.id_bentuk_informasi}
+									class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 dark:bg-slate-800 {$errors.id_bentuk_informasi ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
+									aria-invalid={$errors.id_bentuk_informasi ? 'true' : undefined}
+								>
+									<option value="">{m['form.format_placeholder']()}</option>
+									{#each data.bentukInfoOptions as bentuk}
+										<option value={bentuk.value}>{bentuk.label}</option>
+									{/each}
+								</select>
+								{#if $errors.id_bentuk_informasi}<span class="text-xs text-red-500">{$errors.id_bentuk_informasi}</span>{/if}
 							</div>
 
 							<div class="space-y-2">
-								<label class="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+								<label for="contoh_informasi" class="block text-sm font-semibold {$errors.contoh_informasi ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'}">
 									{m['form.example_link']()}
-
-									<input
-										type="text"
-										bind:value={formData.contoh_informasi}
-										placeholder="https://contoh-link-informasi.com"
-										class="mt-1 w-full rounded-lg border border-gray-300 bg-white px-4 py-3 transition-all outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:bg-slate-800"
-									/>
 								</label>
-								<p class="mt-1 text-xs text-gray-500">
-									{m['form.example_link_hint']()}
-								</p>
+								<input
+									type="text"
+									id="contoh_informasi"
+									name="contoh_informasi"
+									bind:value={$form.contoh_informasi}
+									placeholder="https://contoh-link-informasi.com"
+									class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 dark:bg-slate-800 {$errors.contoh_informasi ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
+									aria-invalid={$errors.contoh_informasi ? 'true' : undefined}
+								/>
+								{#if $errors.contoh_informasi}
+									<span class="text-xs text-red-500">{$errors.contoh_informasi}</span>
+								{:else}
+									<p class="text-xs text-gray-500">{m['form.example_link_hint']()}</p>
+								{/if}
 							</div>
 						</div>
 					</div>
@@ -646,7 +457,7 @@
 							type="reset"
 							onclick={resetForm}
 							class="flex items-center justify-center gap-2 rounded-lg bg-gray-100 px-6 py-3 font-semibold text-gray-700 transition-all hover:bg-gray-200"
-							disabled={isSubmitting}
+							disabled={$delayed}
 						>
 							<i class="fas fa-redo"></i>
 							{m['form.reset']()}
@@ -654,9 +465,9 @@
 						<button
 							type="submit"
 							class="flex transform items-center justify-center gap-2 rounded-lg bg-ppid-primary px-8 py-3.5 font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-ppid-primary/90 hover:shadow-xl disabled:cursor-not-allowed disabled:bg-gray-400 disabled:hover:translate-y-0"
-							disabled={isSubmitting}
+							disabled={$delayed}
 						>
-							{#if isSubmitting}
+							{#if $delayed}
 								<svg
 									class="mr-2 h-5 w-5 animate-spin text-white"
 									xmlns="http://www.w3.org/2000/svg"
@@ -704,6 +515,5 @@
 </main>
 
 <SuccessModal bind:isOpen={showSuccessModal} />
-<ErrorModal bind:isOpen={showErrorModal} title={errorModalTitle} message={errorModalMessage} />
 
 <Footer />

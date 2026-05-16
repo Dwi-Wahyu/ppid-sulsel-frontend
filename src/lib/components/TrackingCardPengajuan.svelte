@@ -6,13 +6,31 @@
 	aria-labelledby="tracking-title"
 	class="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
 >
-	<div class="border-b border-slate-100 p-6 dark:border-slate-700">
-		<h3 id="tracking-title" class="text-lg font-bold text-slate-900 dark:text-white">
+	<div
+		class="border-b border-white/10 bg-linear-to-r from-ppid-primary to-ppid-primary-light p-4"
+	>
+		<h3 id="tracking-title" class="flex items-center gap-2 text-lg font-bold text-white">
+			<svg
+				class="h-5 w-5"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+				aria-hidden="true"
+			>
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+				/>
+			</svg>
 			Tracking Disposisi OPD
+			{#if disposisi.length > 0}
+				<span class="ml-2 rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-bold">
+					{disposisi.length} OPD
+				</span>
+			{/if}
 		</h3>
-		<p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-			Status respon dari setiap instansi terkait
-		</p>
 	</div>
 
 	<div class="p-6">

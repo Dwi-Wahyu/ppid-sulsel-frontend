@@ -10,6 +10,7 @@
 		idKey?: string;
 		labelKey?: string;
 		extraClass?: string;
+		isInvalid?: boolean;
 	}
 
 	let {
@@ -20,7 +21,8 @@
 		required = false,
 		idKey = 'id',
 		labelKey = 'label',
-		extraClass = ''
+		extraClass = '',
+		isInvalid = false
 	}: Props = $props();
 
 	let isOpen = $state(false);
@@ -107,11 +109,17 @@
 
 	<button
 		type="button"
+		id={name}
 		bind:this={buttonRef}
 		onclick={toggleDropdown}
 		aria-haspopup="listbox"
 		aria-expanded={isOpen}
-		class={`flex w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-4 py-3 text-left text-gray-700 transition-all outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:bg-slate-800 dark:text-gray-300 ${extraClass}`}
+		aria-invalid={isInvalid ? 'true' : undefined}
+		class={`flex w-full items-center justify-between rounded-lg border bg-white px-4 py-3 text-left text-gray-700 transition-all outline-none focus:ring-2 dark:bg-slate-800 dark:text-gray-300 ${
+			isInvalid
+				? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'
+				: 'border-gray-300 focus:border-blue-500 focus:ring-blue-500/20'
+		} ${extraClass}`}
 	>
 		<span class:text-gray-400={!value}>{selectedLabel()}</span>
 		<svg
