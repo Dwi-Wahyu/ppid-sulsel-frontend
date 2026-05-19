@@ -52,7 +52,7 @@ export const actions: Actions = {
 		const formData = await request.formData();
 
 		const status = formData.get('status') as string;
-		const pesan = formData.get('pesan') as string;
+		const jawaban = formData.get('pesan') as string;
 		const file = formData.get('file') as File;
 
 		// Validate required fields
@@ -60,14 +60,14 @@ export const actions: Actions = {
 			return fail(400, { error: 'Status is required' });
 		}
 
-		if (!pesan) {
+		if (!jawaban) {
 			return fail(400, { error: 'Pesan is required' });
 		}
 
 		// Create multipart form data for API
 		const apiFormData = new FormData();
 		apiFormData.append('status', status);
-		apiFormData.append('pesan', pesan);
+		apiFormData.append('jawaban', jawaban);
 		apiFormData.append('_method', 'PUT'); // Laravel method spoofing
 
 		// Add file if provided and not empty
@@ -113,7 +113,7 @@ export const actions: Actions = {
 		const formData = await request.formData();
 
 		const selectedSkpd = formData.getAll('id_skpd') as string[];
-		const pesan = formData.get('pesan') as string;
+		const catatan = formData.get('pesan') as string;
 
 		// Validate required fields
 		if (!selectedSkpd || selectedSkpd.length === 0) {
@@ -123,7 +123,7 @@ export const actions: Actions = {
 		// Create request body
 		const requestBody = {
 			id_skpd: selectedSkpd,
-			pesan: pesan || undefined
+			catatan: catatan || undefined
 		};
 
 		try {

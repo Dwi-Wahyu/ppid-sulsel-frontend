@@ -27,11 +27,13 @@
 		if (typeof window === 'undefined' || !(window as any).FilePond) return;
 
 		const FilePond = (window as any).FilePond;
+		const FileValidateType = (window as any).FilePondPluginFileValidateType; // Plugin Validasi Tipe
 		const ImagePreview = (window as any).FilePondPluginImagePreview;
 		const PdfPreview = (window as any).FilePondPluginPdfPreview; // Plugin PDF [cite: 34]
 
 		// Registrasi Plugin [cite: 34, 35]
 		const plugins = [];
+		if (FileValidateType) plugins.push(FileValidateType);
 		if (ImagePreview) plugins.push(ImagePreview);
 		if (PdfPreview) plugins.push(PdfPreview);
 
@@ -101,6 +103,7 @@
 		try {
 			// Memuat aset JS vendor
 			await loadScript('/vendor/filepond/index.js', 'filepond-js');
+			await loadScript('/vendor/filepond/file-validate-type.min.js', 'filepond-validate-js');
 			await loadScript('/vendor/filepond/image-preview.js', 'filepond-image-preview-js');
 			await loadScript(
 				'/vendor/filepond/filepond-plugin-pdf-preview.min.js',

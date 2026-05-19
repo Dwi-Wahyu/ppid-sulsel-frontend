@@ -336,7 +336,7 @@
 														class="rounded-xl border border-slate-100 bg-slate-50 p-3 text-xs dark:border-slate-700 dark:bg-slate-900/50"
 													>
 														<p class="leading-relaxed text-slate-600 italic dark:text-slate-400">
-															"{res.isi_respon}"
+															"{res.respon}"
 														</p>
 													</div>
 												{:else}

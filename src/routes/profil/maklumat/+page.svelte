@@ -4,7 +4,7 @@
 	import PageTitle from '$lib/components/PageTitle.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { onMount } from 'svelte';
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { PUBLIC_API_URL, PUBLIC_BACKEND_URL } from '$env/static/public';
 
 	interface ProfilData {
 		deskripsi: string;
@@ -23,9 +23,8 @@
 			if (result.success && result.data) {
 				profil.deskripsi = result.data.deskripsi || '';
 				if (result.data.file_banner) {
-					// Check if it's already a full URL or needs storage prefix
-					// Usually files stored via `storeAs` need `storage/` prefix if symlinked
-					profil.file_banner = `${PUBLIC_API_URL}/storage/${result.data.file_banner}`;
+					// Use /uploads/ prefix for Laravel storage access
+					profil.file_banner = `${PUBLIC_BACKEND_URL}/uploads/${result.data.file_banner}`;
 				}
 			}
 		} catch (error) {
@@ -60,37 +59,50 @@
 					<h2 class="font-bold text-gray-900 dark:text-white">
 						{m['maklumat.title']()}
 					</h2>
-					<button
-						class="flex items-center gap-2 text-sm font-medium text-ppid-primary transition-colors hover:text-ppid-accent dark:text-white"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="16"
-							height="16"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="h-4 w-4"
+					{#if profil.file_banner}
+						<a
+							href={profil.file_banner}
+							download
+							target="_blank"
+							class="flex items-center gap-2 text-sm font-medium text-ppid-primary transition-colors hover:text-ppid-accent dark:text-white"
 						>
-							<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-							<polyline points="7 10 12 15 17 10" />
-							<line x1="12" x2="12" y1="15" y2="3" />
-						</svg>
-						{m['common.download']()}
-					</button>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="16"
+								height="16"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								class="h-4 w-4"
+							>
+								<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+								<polyline points="7 10 12 15 17 10" />
+								<line x1="12" x2="12" y1="15" y2="3" />
+							</svg>
+							{m['common.download']()}
+						</a>
+					{/if}
 				</div>
 
 				<div class="p-6">
 					<div class="overflow-hidden rounded-lg border border-gray-200 dark:border-slate-700">
 						{#if profil.file_banner}
-							<img
-								src={profil.file_banner}
-								alt={m['maklumat.banner_alt']()}
-								class="h-auto w-full"
-							/>
+							{#if profil.file_banner.endsWith('.pdf')}
+								<iframe
+									src={profil.file_banner}
+									class="h-[600px] w-full"
+									title="Banner Maklumat PDF"
+								></iframe>
+							{:else}
+								<img
+									src={profil.file_banner}
+									alt={m['maklumat.banner_alt']()}
+									class="h-auto w-full"
+								/>
+							{/if}
 						{:else}
 							<img
 								src="/images/20230918134717_Maklumat pelayanan informasi publik.png"

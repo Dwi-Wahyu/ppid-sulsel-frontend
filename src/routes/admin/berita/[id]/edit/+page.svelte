@@ -259,7 +259,7 @@
 					<button
 						type="submit"
 						disabled={isSaving}
-						class="rounded-xl bg-blue-600 px-8 py-3 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-blue-700 disabled:opacity-50"
+						class="rounded-xl bg-ppid-primary px-8 py-3 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-ppid-primary/90 disabled:opacity-50"
 					>
 						{isSaving ? 'Menyimpan...' : 'Simpan Perubahan'}
 					</button>

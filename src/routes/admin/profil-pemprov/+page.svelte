@@ -64,7 +64,7 @@
 				use:enhance={() => {
 					isSaving = true;
 					return async ({ update }) => {
-						await update();
+						await update({ reset: false });
 						isSaving = false;
 					};
 				}}
@@ -109,17 +109,17 @@
 							label="Upload Foto Gubernur"
 						/>
 						<input
-							type="text"
+							type="url"
 							name="ig_gubernur"
 							bind:value={formData.ig_gubernur}
-							placeholder="Instagram Gubernur"
+							placeholder="Instagram Gubernur (contoh: https://instagram.com/...)"
 							class="w-full rounded-lg border-2 border-slate-200 p-2 dark:bg-slate-700"
 						/>
 						<input
-							type="text"
+							type="url"
 							name="fb_gubernur"
 							bind:value={formData.fb_gubernur}
-							placeholder="Facebook Gubernur"
+							placeholder="Facebook Gubernur (contoh: https://facebook.com/...)"
 							class="w-full rounded-lg border-2 border-slate-200 p-2 dark:bg-slate-700"
 						/>
 					</div>
@@ -142,17 +142,17 @@
 							label="Upload Foto Wakil Gubernur"
 						/>
 						<input
-							type="text"
+							type="url"
 							name="ig_wakil"
 							bind:value={formData.ig_wakil}
-							placeholder="Instagram Wakil Gubernur"
+							placeholder="Instagram Wakil Gubernur (contoh: https://instagram.com/...)"
 							class="w-full rounded-lg border-2 border-slate-200 p-2 dark:bg-slate-700"
 						/>
 						<input
-							type="text"
+							type="url"
 							name="fb_wakil"
 							bind:value={formData.fb_wakil}
-							placeholder="Facebook Wakil Gubernur"
+							placeholder="Facebook Wakil Gubernur (contoh: https://facebook.com/...)"
 							class="w-full rounded-lg border-2 border-slate-200 p-2 dark:bg-slate-700"
 						/>
 					</div>

@@ -24,7 +24,7 @@ export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
         const dokumen: DokumenPublik = dokumenResult.data;
 
         // Fetch kategori list
-        const kategoriResponse = await fetch(`${API_URL}/admin/master-data/kategori-informasi`, {
+        const kategoriResponse = await fetch(`${API_URL}/admin/master-data/kategori-informasi?all=true`, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 Accept: 'application/json'
@@ -34,7 +34,8 @@ export const load: PageServerLoad = async ({ params, fetch, cookies }) => {
         let kategoriList: KategoriInformasi[] = [];
         if (kategoriResponse.ok) {
             const kategoriData = await kategoriResponse.json();
-            kategoriList = kategoriData.data || [];
+            // Handle both paginated and non-paginated responses just in case
+            kategoriList = Array.isArray(kategoriData.data) ? kategoriData.data : (kategoriData.data?.data || []);
         }
 
         // Fetch SKPD list

@@ -44,7 +44,7 @@ export const load: PageServerLoad = async ({ fetch, cookies, url }) => {
         const result: DokumenPublikApiResponse = await response.json();
 
         // Fetch kategori list for filter
-        const kategoriResponse = await fetch(`${API_URL}/admin/master-data/kategori-informasi`, {
+        const kategoriResponse = await fetch(`${API_URL}/admin/master-data/kategori-informasi?all=true`, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 Accept: 'application/json'
@@ -54,7 +54,7 @@ export const load: PageServerLoad = async ({ fetch, cookies, url }) => {
         let kategoriList: KategoriInformasi[] = [];
         if (kategoriResponse.ok) {
             const kategoriData = await kategoriResponse.json();
-            kategoriList = kategoriData.data || [];
+            kategoriList = Array.isArray(kategoriData.data) ? kategoriData.data : (kategoriData.data?.data || []);
         }
 
         // Fetch SKPD list for admin users

@@ -251,7 +251,7 @@
 			<button
 				type="submit"
 				disabled={isSubmitting}
-				class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-8 py-2.5 text-sm font-bold text-white shadow-md shadow-blue-500/20 transition-all hover:bg-blue-700 focus:ring-4 focus:ring-blue-500/30 disabled:cursor-not-allowed disabled:opacity-50"
+				class="inline-flex items-center gap-2 rounded-lg bg-ppid-primary px-8 py-2.5 text-sm font-bold text-white shadow-md shadow-blue-500/20 transition-all hover:bg-ppid-primary/90 focus:ring-4 focus:ring-blue-500/30 disabled:cursor-not-allowed disabled:opacity-50"
 			>
 				{#if isSubmitting}
 					<svg class="size-4 animate-spin" viewBox="0 0 24 24" aria-hidden="true">

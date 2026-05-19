@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { api } from '$lib/api'; // Menggunakan helper proxy
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { PUBLIC_API_URL, PUBLIC_BACKEND_URL } from '$env/static/public';
 	import FilePond from '$lib/components/FilePond.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 
@@ -22,7 +22,12 @@
 	let notificationType = $state<'success' | 'error'>('success');
 	let notificationMessage = $state('');
 
-	const current_path = $derived(currentData.struktur_organisasi_path);
+	// Transform storage/ path to uploads/ prefix based on web.php route
+	const display_url = $derived.by(() => {
+		if (!currentData.struktur_organisasi_path) return null;
+		const cleanPath = currentData.struktur_organisasi_path.replace('storage/', '');
+		return `${PUBLIC_BACKEND_URL}/uploads/${cleanPath}`;
+	});
 
 	onMount(async () => {
 		try {
@@ -155,7 +160,7 @@
 				</form>
 			</div>
 
-			{#if current_path}
+			{#if display_url}
 				<div
 					class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
 				>
@@ -164,7 +169,7 @@
 					>
 						<h2 class="text-lg font-bold text-slate-900 dark:text-white">Preview Saat Ini</h2>
 						<a
-							href={`${PUBLIC_API_URL}/${current_path}`}
+							href={display_url}
 							download
 							class="rounded-lg bg-ppid-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-700"
 						>
@@ -175,18 +180,11 @@
 					<div class="p-8">
 						<div class="overflow-hidden rounded-xl border-2 border-slate-200">
 							<iframe
-								src={`${PUBLIC_API_URL}/${current_path}`}
+								src={display_url}
 								class="w-full bg-white"
 								style="height: 800px;"
 								title="Preview Struktur Organisasi"
-							>
-								<p class="p-8 text-center text-slate-600">
-									Browser tidak mendukung pratinjau. <a
-										href={`${PUBLIC_API_URL}/${current_path}`}
-										class="text-blue-600 underline">Klik di sini untuk download</a
-									>.
-								</p>
-							</iframe>
+							></iframe>
 						</div>
 					</div>
 				</div>

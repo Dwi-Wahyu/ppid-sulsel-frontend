@@ -5,6 +5,7 @@
 	import SidebarDropdownLink from './SidebarDropdownLink.svelte';
 	import { sidebar } from '$lib/state/sidebar.svelte';
 	import { onMount } from 'svelte';
+	import { page } from '$app/state';
 	import { PUBLIC_API_URL } from '$env/static/public';
 
 	let activeDropdown = $state<string | null>(null);
@@ -32,9 +33,8 @@
 						{ href: '/admin/profil-pemprov', label: 'Profil Pemerintah Provinsi' },
 						{ href: '/admin/sambutan', label: 'Sambutan' },
 						{ href: '/admin/struktur-organisasi', label: 'Struktur Organisasi' },
-						{ href: '/admin/tugas-fungsi', label: 'Tugas & Fungsi' },
 						{ href: '/admin/visi-misi', label: 'Visi & Misi' },
-						{ href: '/admin/maklumat-pelayanan', label: 'Maklumat Pelayanan' },
+						{ href: '/admin/maklumat', label: 'Maklumat Pelayanan' },
 						{ href: '/admin/sosial-media', label: 'Sosial Media' }
 					]
 				},
@@ -100,6 +100,9 @@
 		}
 	];
 
+	// Reactive state to hold the fetched links
+	let dynamicMenuGroups = $state([...menuGroups]);
+
 	onMount(async () => {
 		try {
 			const response = await fetch(`${PUBLIC_API_URL}/public/informasi/kategori`);
@@ -107,32 +110,61 @@
 
 			if (result) {
 				const kategoriLinks = result.map((item: any) => ({
-					href: `/admin/informasi-publik/${item.slug}`,
+					// Pastikan href sama dengan slug karena /admin/dokumen-publik itu base link aslinya di beberapa tempat, 
+					// tapi berdasarkan routing di /admin/dokumen-publik maka link yang benar sepertinya adalah /admin/informasi-publik/${item.slug}
+					href: `/admin/informasi-publik/${item.slug}`, 
 					label: item.name
 				}));
+				
+				// Juga tambahkan Semua Dokumen Publik agar bisa kembali
+				kategoriLinks.unshift({
+					href: `/admin/dokumen-publik`,
+					label: 'Semua Dokumen'
+				});
 
-				// 2. Cari grup "Master Data" dan dropdown "Informasi Publik"
-				const manajemenGroup = menuGroups.find((g) => g.title === 'Master Data');
-				if (manajemenGroup) {
-					const infoPublikDropdown = manajemenGroup.items.find(
+				// Create a new array reference for Svelte 5 reactivity
+				const newMenuGroups = [...dynamicMenuGroups];
+				const manajemenGroupIndex = newMenuGroups.findIndex((g) => g.title === 'Master Data');
+				
+				if (manajemenGroupIndex !== -1) {
+					const manajemenGroup = { ...newMenuGroups[manajemenGroupIndex] };
+					const items = [...manajemenGroup.items];
+					
+					const infoPublikDropdownIndex = items.findIndex(
 						(i) => i.type === 'dropdown' && i.label === 'Informasi Publik'
 					);
 
-					if (infoPublikDropdown && infoPublikDropdown.links) {
-						// 3. Masukkan kategori ke dalam list links
-						// Kita gunakan spread agar menu statis yang sudah ada tidak hilang
-						infoPublikDropdown.links = [...infoPublikDropdown.links, ...kategoriLinks];
+					if (infoPublikDropdownIndex !== -1) {
+						const infoPublikDropdown = { ...items[infoPublikDropdownIndex] };
+						if (infoPublikDropdown.type === 'dropdown' && infoPublikDropdown.links) {
+							// Merge static links with dynamic links
+							infoPublikDropdown.links = [
+								...infoPublikDropdown.links.filter(l => l.label === 'Pengadaan Barang & Jasa'), 
+								...kategoriLinks
+							];
+							items[infoPublikDropdownIndex] = infoPublikDropdown;
+						}
 					}
+					
+					manajemenGroup.items = items;
+					newMenuGroups[manajemenGroupIndex] = manajemenGroup;
 				}
+				
+				dynamicMenuGroups = newMenuGroups;
 			}
 		} catch (error) {
 			console.error('Gagal memuat kategori:', error);
 		}
 	});
+
+	function isDropdownActive(links: {href: string, label: string}[] | undefined) {
+		if (!links) return false;
+		return links.some(link => page.url.pathname === link.href || page.url.pathname.startsWith(link.href + '/'));
+	}
 </script>
 
 <Sidebar title="Admin Panel">
-	{#each menuGroups as group}
+	{#each dynamicMenuGroups as group}
 		{#if sidebar.isOpen}
 			<div class="mt-4 mb-2 px-6 transition-all duration-300">
 				<span class="text-[10px] font-bold tracking-[2px] text-slate-400 uppercase">
@@ -157,7 +189,7 @@
 						{/snippet}
 					</SidebarLink>
 				{:else if item.type === 'dropdown'}
-					<SidebarDropdown label={item.label} active={false} {activeDropdown} {setActiveDropdown}>
+					<SidebarDropdown label={item.label} active={isDropdownActive(item.links)} {activeDropdown} {setActiveDropdown}>
 						{#snippet icon()}
 							<svg class="h-full w-full" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path

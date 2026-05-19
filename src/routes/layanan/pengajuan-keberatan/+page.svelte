@@ -108,10 +108,12 @@
 									{m['contact.phone']()} <span class="text-red-500">*</span>
 								</label>
 								<input
-									type="text"
+									type="tel"
 									id="no_telp_pemohon"
 									name="no_telp_pemohon"
 									bind:value={$form.no_telp_pemohon}
+									oninput={(e) => ($form.no_telp_pemohon = e.currentTarget.value.replace(/\D/g, ''))}
+									maxlength="15"
 									placeholder="08xxxxxxxxxx"
 									class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 dark:bg-slate-800 {$errors.no_telp_pemohon ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
 									aria-invalid={$errors.no_telp_pemohon ? 'true' : undefined}
@@ -242,10 +244,12 @@
 										{m['objection.phone']()} (Kuasa)
 									</label>
 									<input
-										type="text"
+										type="tel"
 										id="no_telp_kuasa"
 										name="no_telp_kuasa"
 										bind:value={$form.no_telp_kuasa}
+										oninput={(e) => ($form.no_telp_kuasa = e.currentTarget.value.replace(/\D/g, ''))}
+										maxlength="15"
 										class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 dark:bg-slate-800 {$errors.no_telp_kuasa ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
 										aria-invalid={$errors.no_telp_kuasa ? 'true' : undefined}
 									/>

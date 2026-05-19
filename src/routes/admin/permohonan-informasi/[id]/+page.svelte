@@ -546,7 +546,7 @@
 														<p
 															class="text-sm leading-relaxed whitespace-pre-wrap text-slate-900 dark:text-slate-100"
 														>
-															{respon.pesan}
+															{respon.respon}
 														</p>
 														{#if respon.file}
 															<div class="mt-3">
