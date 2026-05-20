@@ -1,5 +1,5 @@
 # Build stage
-FROM oven/bun:latest AS build
+FROM docker.io/oven/bun:latest AS build
 
 WORKDIR /app
 
@@ -33,7 +33,7 @@ ENV REFRESH_TOKEN_MAX_AGE=$REFRESH_TOKEN_MAX_AGE
 RUN ulimit -n 65536 || echo "Could not increase ulimit" && bun run build
 
 # Runtime stage
-FROM oven/bun:latest
+FROM docker.io/oven/bun:latest
 
 WORKDIR /app
 
