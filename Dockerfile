@@ -30,7 +30,7 @@ ENV REFRESH_TOKEN_MAX_AGE=$REFRESH_TOKEN_MAX_AGE
 # Build the application
 # We try to increase ulimit, but if it fails (due to lack of privileges), 
 # the user should run podman build with --ulimit nofile=65536:65536
-RUN ulimit -n 65536 || echo "Could not increase ulimit" && bun run build
+RUN bun run build
 
 # Runtime stage
 FROM docker.io/oven/bun:latest
