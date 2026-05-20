@@ -4,7 +4,6 @@
 	import * as m from '$lib/paraglide/messages.js';
 	import { env } from '$env/dynamic/public';
 	import SearchModal from './SearchModal.svelte';
-	import { PUBLIC_API_URL, PUBLIC_BACKEND_URL } from '$env/static/public';
 	import { api } from '$lib/api';
 
 	// Define types based on Laravel API contract

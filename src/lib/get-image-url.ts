@@ -1,4 +1,4 @@
-import { PUBLIC_BACKEND_URL } from '$env/static/public';
+import { env } from '$env/dynamic/public';
 
 /**
  * Menghasilkan URL lengkap untuk aset yang disimpan di Laravel storage.
@@ -11,5 +11,5 @@ export function getImageUrl(path: string): string {
 	if (path.startsWith('http://') || path.startsWith('https://')) return path;
 	// Bersihkan leading slash agar tidak double slash
 	const cleanPath = path.startsWith('/') ? path.slice(1) : path;
-	return `${PUBLIC_BACKEND_URL}/storage/${cleanPath}`;
+	return `${env.PUBLIC_BACKEND_URL}/storage/${cleanPath}`;
 }

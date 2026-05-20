@@ -1,8 +1,10 @@
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { API_URL } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 export const fallback: RequestHandler = async ({ url, params, request, locals }) => {
+	// Ambil API_URL dari dynamic env
+	const API_URL = env.API_URL;
 	// Ambil token dari locals (yang diisi oleh hooks.server.ts)
 	const token = locals.token;
 
