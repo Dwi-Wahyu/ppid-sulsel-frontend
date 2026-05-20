@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { env } from '$env/dynamic/public';
+	import { getImageUrl } from '$lib/get-image-url';
 	import { api } from '$lib/api';
 	import Sosmed from './Sosmed.svelte';
 	import { browser } from '$app/environment';

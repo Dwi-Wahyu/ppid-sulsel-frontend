@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { api } from '$lib/api'; // Menggunakan helper proxy API
 	import { PUBLIC_API_URL } from '$env/static/public';
+	import { getImageUrl } from '$lib/get-image-url';
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 
@@ -256,7 +257,7 @@
 								<td class="px-6 py-4 text-right">
 									<div class="flex justify-end gap-1 opacity-100 transition-opacity">
 										<a
-											href={`${PUBLIC_API_URL.replace('/api', '')}/storage/sop/${item.file}`}
+											href={getImageUrl(`sop/${item.file}`)}
 											target="_blank"
 											class="rounded-lg p-2 text-slate-400 transition-colors hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
 											title="Lihat Dokumen"

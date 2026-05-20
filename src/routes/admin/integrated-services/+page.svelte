@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
+	import { getImageUrl } from '$lib/get-image-url';
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 
@@ -197,7 +198,7 @@
 								<td class="px-6 py-4">
 									{#if service.icon}
 										<img
-											src={`${PUBLIC_API_URL.replace('/api', '')}/storage/integrated_services/${service.icon}`}
+											src={getImageUrl(`integrated_services/${service.icon}`)}
 											alt={service.title}
 											class="h-10 w-10 rounded-full border border-slate-200 object-contain dark:border-slate-600"
 										/>

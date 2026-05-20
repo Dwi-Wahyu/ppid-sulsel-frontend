@@ -3,6 +3,7 @@
 	import { fade } from 'svelte/transition';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import * as m from '$lib/paraglide/messages.js';
+	import { getImageUrl } from '$lib/get-image-url';
 
 	// Interface Data
 	interface ProcurementItem {
@@ -101,7 +102,7 @@
 
 	// Helper: URL Storage
 	const getFileUrl = (fileName: string) => {
-		return `${PUBLIC_API_URL.replace('/api', '')}/storage/${fileName}`;
+		return getImageUrl(fileName);
 	};
 </script>
 

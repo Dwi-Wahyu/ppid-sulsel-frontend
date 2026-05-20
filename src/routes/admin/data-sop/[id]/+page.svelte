@@ -1,25 +1,29 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
+	import { getImageUrl } from '$lib/get-image-url';
 
 	interface SOP {
 		id: number;
 		judul: string;
 		file: string;
 		jumlah_download: number;
-		id_skpd: string | null;
-		created_at: string;
-		updated_at: string;
+		id_skpd: number;
+		created_at: string | null;
+		updated_at: string | null;
+		skpd?: {
+			nm_skpd: string;
+		};
 	}
 
 	let sopId = $state('');
 	let sop = $state<SOP | null>(null);
 	let isLoading = $state(true);
-	let fileExtension = $state('');
 	let fileUrl = $state('');
+	let fileExtension = $state('');
 
 	onMount(async () => {
-		sopId = window.location.pathname.split('/')[3]; // Extract ID from URL
+		sopId = window.location.pathname.split('/')[3];
 		await fetchSOP();
 	});
 
@@ -34,7 +38,7 @@
 				sop = result.data;
 				if (sop) {
 					fileExtension = sop.file.split('.').pop()?.toLowerCase() || '';
-					fileUrl = `${PUBLIC_API_URL.replace('/api', '')}/storage/sop/${sop.file}`;
+					fileUrl = getImageUrl(`sop/${sop.file}`);
 				}
 			}
 		} catch (error) {
@@ -44,7 +48,8 @@
 		}
 	}
 
-	function formatDate(dateStr: string): string {
+	function formatDate(dateStr: string | null): string {
+		if (!dateStr) return '-';
 		return new Date(dateStr).toLocaleDateString('id-ID', {
 			day: 'numeric',
 			month: 'long',
@@ -56,22 +61,21 @@
 </script>
 
 <svelte:head>
-	<title>Detail SOP - Admin PPID</title>
+	<title>Detail SOP - Admin</title>
 </svelte:head>
 
 <div class="mb-6 flex items-center gap-4">
 	<a
 		href="/admin/data-sop"
-		class="rounded-xl border border-slate-200 bg-white p-2 text-slate-400 transition-all hover:text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:hover:text-slate-300"
+		class="rounded-xl border border-slate-200 bg-white p-2.5 text-slate-400 shadow-sm transition-all hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:hover:text-slate-300"
 		aria-label="Kembali ke daftar SOP"
 	>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
-			class="h-6 w-6"
+			class="h-5 w-5"
 			fill="none"
 			viewBox="0 0 24 24"
 			stroke="currentColor"
-			aria-hidden="true"
 		>
 			<path
 				stroke-linecap="round"
@@ -81,9 +85,10 @@
 			/>
 		</svg>
 	</a>
-	<h3 class="text-lg font-bold text-ppid-primary dark:text-white">
-		{sop?.judul || 'Loading...'}
-	</h3>
+	<div>
+		<h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">Detail SOP</h1>
+		<p class="text-sm text-slate-500 dark:text-slate-400">Pratinjau dan informasi dokumen SOP.</p>
+	</div>
 </div>
 
 {#if isLoading}
@@ -91,131 +96,126 @@
 		class="flex items-center justify-center rounded-2xl border border-slate-200 bg-white p-12 shadow-sm dark:border-slate-700 dark:bg-slate-800"
 	>
 		<div class="flex flex-col items-center gap-3">
-			<svg
-				class="h-8 w-8 animate-spin text-ppid-primary"
-				xmlns="http://www.w3.org/2000/svg"
-				fill="none"
-				viewBox="0 0 24 24"
-				aria-hidden="true"
-			>
-				<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"
-				></circle>
-				<path
-					class="opacity-75"
-					fill="currentColor"
-					d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-				></path>
-			</svg>
+			<div class="h-8 w-8 animate-spin rounded-full border-4 border-ppid-primary border-t-transparent"></div>
 			<p class="text-sm text-slate-500 dark:text-slate-400">Memuat data...</p>
 		</div>
 	</div>
 {:else if sop}
 	<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-		<!-- Main Content - Document Preview -->
-		<div class="space-y-6 lg:col-span-2">
+		<!-- Sidebar Information -->
+		<div class="space-y-6 lg:col-span-1">
 			<div
-				class="rounded-xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+				class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
 			>
-				<h4
-					class="mb-4 text-sm font-semibold tracking-wider text-slate-400 uppercase dark:text-slate-500"
-				>
-					Pratinjau Dokumen
-				</h4>
+				<div class="bg-slate-50/50 p-6 dark:bg-slate-700/50">
+					<h3 class="font-bold text-slate-900 dark:text-slate-100">Informasi Dokumen</h3>
+				</div>
+				<div class="p-6">
+					<dl class="space-y-4">
+						<div>
+							<dt class="text-xs font-semibold text-slate-400 uppercase">Judul</dt>
+							<dd class="mt-1 text-sm font-medium text-slate-900 dark:text-slate-100">
+								{sop.judul}
+							</dd>
+						</div>
+						<div>
+							<dt class="text-xs font-semibold text-slate-400 uppercase">Instansi</dt>
+							<dd class="mt-1 text-sm font-medium text-slate-900 dark:text-slate-100">
+								{sop.skpd?.nm_skpd || '-'}
+							</dd>
+						</div>
+						<div>
+							<dt class="text-xs font-semibold text-slate-400 uppercase">Format File</dt>
+							<dd class="mt-1">
+								<span
+									class="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-bold text-blue-600 uppercase dark:bg-blue-900/30 dark:text-blue-400"
+								>
+									{fileExtension}
+								</span>
+							</dd>
+						</div>
+						<div>
+							<dt class="text-xs font-semibold text-slate-400 uppercase">Total Unduhan</dt>
+							<dd class="mt-1 text-sm font-medium text-slate-900 dark:text-slate-100">
+								{sop.jumlah_download} kali
+							</dd>
+						</div>
+						<div>
+							<dt class="text-xs font-semibold text-slate-400 uppercase">Diunggah Pada</dt>
+							<dd class="mt-1 text-sm text-slate-600 dark:text-slate-400">
+								{formatDate(sop.created_at)}
+							</dd>
+						</div>
+					</dl>
 
-				{#if ['jpg', 'jpeg', 'png'].includes(fileExtension)}
-					<img
-						src={fileUrl}
-						alt={sop.judul}
-						class="w-full rounded-lg border border-slate-200 dark:border-slate-600"
-					/>
-				{:else if fileExtension === 'pdf'}
-					<iframe
-						src={fileUrl}
-						class="h-[600px] w-full rounded-lg border border-slate-200 dark:border-slate-600"
-						title="PDF Preview"
-					></iframe>
-				{:else}
-					<div
-						class="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-10 text-center dark:border-slate-600 dark:bg-slate-700/50"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class="mx-auto mb-4 h-16 w-16 text-slate-400 dark:text-slate-500"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-							aria-hidden="true"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-							/>
-						</svg>
-						<p class="mb-4 text-slate-500 dark:text-slate-400">
-							Format file tidak mendukung pratinjau langsung.
-						</p>
+					<div class="mt-8">
 						<a
 							href={fileUrl}
-							download
-							class="hover:bg-ppid-dark inline-block rounded-lg bg-ppid-primary px-4 py-2 text-white transition-colors"
+							target="_blank"
+							class="flex w-full items-center justify-center gap-2 rounded-xl bg-ppid-primary py-3 text-sm font-bold text-white shadow-md transition-all hover:bg-ppid-primary-hover hover:shadow-lg"
 						>
-							Download untuk Melihat
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-4 w-4"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+								/>
+							</svg>
+							Download Dokumen
 						</a>
 					</div>
-				{/if}
+				</div>
 			</div>
 		</div>
 
-		<!-- Sidebar - Document Info -->
-		<div class="space-y-6">
+		<!-- Preview Section -->
+		<div class="lg:col-span-2">
 			<div
-				class="rounded-xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+				class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
 			>
-				<h4
-					class="mb-4 text-sm font-semibold tracking-wider text-slate-400 uppercase dark:text-slate-500"
-				>
-					Informasi Dokumen
-				</h4>
-				<div class="space-y-4">
-					<div>
-						<p class="text-xs text-slate-400 dark:text-slate-500">ID SKPD Pemilik</p>
-						<p class="font-medium text-ppid-primary dark:text-white">
-							{sop.id_skpd || 'Tidak Diketahui'}
-						</p>
-					</div>
-					<div>
-						<p class="text-xs text-slate-400 dark:text-slate-500">Total Unduhan</p>
-						<p class="font-medium text-ppid-primary dark:text-white">
-							{sop.jumlah_download} kali
-						</p>
-					</div>
-					<div>
-						<p class="text-xs text-slate-400 dark:text-slate-500">Terakhir Diperbarui</p>
-						<p class="text-sm font-medium text-ppid-primary dark:text-white">
-							{formatDate(sop.updated_at)}
-						</p>
-					</div>
+				<div class="bg-slate-50/50 p-6 dark:bg-slate-700/50">
+					<h3 class="font-bold text-slate-900 dark:text-slate-100">Pratinjau Dokumen</h3>
 				</div>
-
-				<hr class="my-6 border-slate-100 dark:border-slate-700" />
-
-				<div class="flex flex-col gap-3">
-					<a
-						href={fileUrl}
-						target="_blank"
-						rel="noopener noreferrer"
-						class="w-full rounded-lg bg-blue-50 py-2 text-center font-medium text-blue-600 transition hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50"
-					>
-						Buka di Tab Baru
-					</a>
-					<a
-						href="/admin/data-sop/{sop.id}/edit"
-						class="w-full rounded-lg bg-amber-50 py-2 text-center font-medium text-amber-600 transition hover:bg-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-900/50"
-					>
-						Edit Data
-					</a>
+				<div class="bg-slate-100 p-0 dark:bg-slate-900">
+					{#if fileExtension === 'pdf'}
+						<iframe src={fileUrl} title="Preview PDF" class="h-[800px] w-full border-0"></iframe>
+					{:else if ['jpg', 'jpeg', 'png'].includes(fileExtension)}
+						<div class="flex items-center justify-center p-8">
+							<img src={fileUrl} alt={sop.judul} class="max-w-full rounded-lg shadow-sm" />
+						</div>
+					{:else}
+						<div class="flex flex-col items-center justify-center py-24 text-center">
+							<div
+								class="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-slate-200 dark:bg-slate-800"
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-10 w-10 text-slate-400"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+									/>
+								</svg>
+							</div>
+							<p class="max-w-xs text-sm text-slate-500">
+								Pratinjau tidak tersedia untuk format <strong>.{fileExtension}</strong>. Silakan
+								unduh dokumen untuk melihat isi selengkapnya.
+							</p>
+						</div>
+					{/if}
 				</div>
 			</div>
 		</div>

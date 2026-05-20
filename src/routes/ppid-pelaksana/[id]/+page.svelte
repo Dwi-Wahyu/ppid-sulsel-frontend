@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { PUBLIC_API_URL, PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { getImageUrl } from '$lib/get-image-url';
 	import * as m from '$lib/paraglide/messages.js';
 	import { onMount } from 'svelte';
 
@@ -92,7 +92,7 @@
 						>
 							<img
 								src={data.skpd.logo
-									? `${PUBLIC_BACKEND_URL}/uploads/${data.skpd.logo}`
+									? getImageUrl(data.skpd.logo)
 									: '/images/logo-sulsel.png'}
 								alt="Logo {data.skpd.nm_skpd}"
 								class="h-28 w-28 object-contain p-2 md:h-32 md:w-32"
@@ -281,14 +281,14 @@
 								class="w-full overflow-hidden rounded-xl border border-gray-200 dark:border-slate-600"
 							>
 								<iframe
-									src={`${PUBLIC_BACKEND_URL}/uploads/${data.skpd.visimisi}`}
+									src={getImageUrl(data.skpd.visimisi)}
 									title="Dokumen Visi Misi"
 									class="h-150 w-full bg-gray-50"
 								></iframe>
 							</div>
 							<div class="mt-4 text-right">
 								<a
-									href={`${PUBLIC_BACKEND_URL}/uploads/${data.skpd.visimisi}`}
+									href={getImageUrl(data.skpd.visimisi)}
 									target="_blank"
 									class="inline-flex items-center gap-2 text-sm font-medium text-ppid-primary hover:text-ppid-accent dark:text-gray-300"
 								>
@@ -357,14 +357,14 @@
 									class="w-full overflow-hidden rounded-xl border border-gray-200 dark:border-slate-600"
 								>
 									<iframe
-										src={`${PUBLIC_BACKEND_URL}/uploads/${data.skpd.tupoksi}`}
+										src={getImageUrl(data.skpd.tupoksi)}
 										title="Dokumen Tupoksi"
 										class="h-150 w-full bg-gray-50"
 									></iframe>
 								</div>
 								<div class="mt-4 text-right">
 									<a
-										href={`${PUBLIC_BACKEND_URL}/uploads/${data.skpd.tupoksi}`}
+										href={getImageUrl(data.skpd.tupoksi)}
 										target="_blank"
 										class="inline-flex items-center gap-2 text-sm font-medium text-ppid-primary hover:text-ppid-accent dark:text-gray-300"
 									>

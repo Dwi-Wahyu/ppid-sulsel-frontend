@@ -614,7 +614,7 @@
 								<td class="px-6 py-4">
 									{#if info.file}
 										<a
-											href="{PUBLIC_API_URL}/storage/{info.file}"
+											href={getImageUrl(info.file)}
 											target="_blank"
 											class="flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
 										>
@@ -738,5 +738,8 @@
 	bind:show={showNotification}
 	title={notificationTitle}
 	description={notificationDescription}
+	theme={notificationTheme}
+/>
+cription={notificationDescription}
 	theme={notificationTheme}
 />

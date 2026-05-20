@@ -97,7 +97,7 @@
 						</h1>
 						{#if data.profil?.foto_gubernur}
 							<img
-								src={`${PUBLIC_BACKEND_URL}/uploads/${data.profil.foto_gubernur}`}
+								src={getImageUrl(data.profil.foto_gubernur)}
 								alt="Gubernur"
 								class="h-64 w-full rounded-xl object-cover shadow-md"
 							/>
@@ -130,7 +130,7 @@
 						</h1>
 						{#if data.profil?.foto_wakil}
 							<img
-								src={`${PUBLIC_BACKEND_URL}/uploads/${data.profil.foto_wakil}`}
+								src={getImageUrl(data.profil.foto_wakil)}
 								alt="Wakil Gubernur"
 								class="h-64 w-full rounded-xl object-cover shadow-md"
 							/>
@@ -192,5 +192,8 @@
 	bind:show={showNotification}
 	theme={notificationType}
 	title={notificationType === 'success' ? 'Berhasil!' : 'Gagal!'}
+	description={notificationMessage}
+/>
+notificationType === 'success' ? 'Berhasil!' : 'Gagal!'}
 	description={notificationMessage}
 />

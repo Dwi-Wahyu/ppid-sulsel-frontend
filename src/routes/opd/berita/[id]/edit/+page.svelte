@@ -181,7 +181,7 @@
 								class="flex items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/50"
 							>
 								<img
-									src={`${PUBLIC_BACKEND_URL}/uploads/berita/${currentImage}`}
+									src={getImageUrl(`berita/${currentImage}`)}
 									alt="Thumbnail Berita"
 									class="h-20 w-20 rounded-xl object-cover shadow-sm"
 								/>
@@ -259,5 +259,8 @@
 	bind:show={showNotification}
 	theme={notificationType}
 	title={notificationType === 'success' ? 'BERHASIL!' : 'GAGAL!'}
+	description={notificationMessage}
+/>
+ss' ? 'BERHASIL!' : 'GAGAL!'}
 	description={notificationMessage}
 />

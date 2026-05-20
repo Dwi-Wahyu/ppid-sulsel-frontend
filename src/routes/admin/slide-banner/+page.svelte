@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
+	import { getImageUrl } from '$lib/get-image-url';
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 
@@ -204,7 +205,7 @@
 									>
 										{#if banner.nm_slide}
 											<img
-												src={`${PUBLIC_API_URL.replace('/api', '')}/storage/slide-banner/${banner.nm_slide}`}
+												src={getImageUrl(`slide-banner/${banner.nm_slide}`)}
 												alt="Banner preview"
 												class="h-full w-full object-cover"
 											/>

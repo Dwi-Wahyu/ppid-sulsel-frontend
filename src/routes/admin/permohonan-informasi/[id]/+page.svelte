@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
-	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { getImageUrl } from '$lib/get-image-url';
 	import type { PageData, ActionData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -551,7 +551,7 @@
 														{#if respon.file}
 															<div class="mt-3">
 																<a
-																	href="/uploads/{respon.file}"
+																	href={getImageUrl(`respon-disposisi/${respon.file}`)}
 																	target="_blank"
 																	rel="noopener noreferrer"
 																	class="inline-flex items-center gap-2 rounded-lg bg-ppid-primary px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-ppid-primary-hover hover:shadow-lg"

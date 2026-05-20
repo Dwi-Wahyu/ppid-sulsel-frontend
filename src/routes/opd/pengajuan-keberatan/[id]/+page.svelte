@@ -3,7 +3,7 @@
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 	import { invalidateAll } from '$app/navigation';
 	import { api } from '$lib/api.js';
-	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { getImageUrl } from '$lib/get-image-url';
 
 	let { data } = $props();
 	const pengajuan = $derived(data.pengajuan);
@@ -395,7 +395,7 @@
                         </p>
                         {#if userDisposisi.respon[0].file}
                             <a
-                                href="{PUBLIC_BACKEND_URL}/uploads/respon-disposisi/{userDisposisi.respon[0].file}"
+                                href={getImageUrl(`respon-disposisi/${userDisposisi.respon[0].file}`)}
                                 target="_blank"
                                 class="inline-flex items-center gap-2 rounded-lg bg-emerald-50 px-4 py-2 text-xs font-bold text-emerald-700 transition-colors hover:bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400"
                             >

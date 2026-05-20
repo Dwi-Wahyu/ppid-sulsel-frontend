@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { getImageUrl } from '$lib/get-image-url';
 	import FilePond from '$lib/components/FilePond.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
@@ -238,7 +238,7 @@
 						</label>
 						<div class="mb-2">
 							<img
-								src={`${PUBLIC_API_URL.replace('/api', '')}/storage/integrated_services/${currentIcon}`}
+								src={getImageUrl(`integrated_services/${currentIcon}`)}
 								alt="Current Icon"
 								class="h-16 w-16 rounded-lg border border-slate-200 object-contain dark:border-slate-600"
 							/>

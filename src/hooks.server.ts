@@ -2,7 +2,6 @@ import { redirect, type Handle } from '@sveltejs/kit';
 import { paraglideMiddleware } from '$lib/paraglide/server';
 import { sequence } from '@sveltejs/kit/hooks';
 import { ACCESS_TOKEN_MAX_AGE, API_URL, REFRESH_TOKEN_MAX_AGE } from '$env/static/private';
-import { dev } from '$app/environment'; // Tambahkan impor ini
 
 const handleParaglide: Handle = ({ event, resolve }) =>
 	paraglideMiddleware(event.request, ({ request, locale }) => {

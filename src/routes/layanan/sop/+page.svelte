@@ -2,9 +2,10 @@
 	import Footer from '$lib/components/Footer.svelte';
 	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 	import { onMount } from 'svelte';
-	import { env } from '$env/dynamic/public';
+	import { getImageUrl } from '$lib/get-image-url';
 	import * as m from '$lib/paraglide/messages.js';
 	import { goto } from '$app/navigation';
+	import { env } from '$env/dynamic/public';
 
 	// Types
 	interface SopItem {
@@ -12,41 +13,42 @@
 		judul: string;
 		file: string;
 		jumlah_download: number;
-		created_at: string | null;
-		updated_at: string | null;
-	}
-
-	interface ApiResponse {
-		success: boolean;
-		data: {
-			current_page: number;
-			data: SopItem[];
-			last_page: number;
-			total: number;
-			per_page: number;
+		id_skpd: number;
+		created_at: string;
+		skpd: {
+			nm_skpd: string;
 		};
 	}
 
-	// State (Svelte 5 Runes)
-	let searchTerm = $state('');
-	let currentPage = $state(1);
-	let isLoading = $state(false);
-	let sopResponse = $state<ApiResponse['data'] | null>(null);
+	interface Pagination {
+		current_page: number;
+		last_page: number;
+		total: number;
+	}
 
-	// Fetch Data
-	async function fetchSop(page: number = 1, search: string = '') {
+	// State
+	let sopList = $state<SopItem[]>([]);
+	let isLoading = $state(true);
+	let currentPage = $state(1);
+	let totalPages = $state(1);
+	let searchTerm = $state('');
+	let debounceTimer: any;
+
+	async function fetchSop(page = 1, search = '') {
 		isLoading = true;
 		try {
-			const url = new URL(`${env.PUBLIC_API_URL}/public/sop`);
-			url.searchParams.append('page', page.toString());
-			if (search) url.searchParams.append('search', search);
+			const query = new URLSearchParams({
+				page: page.toString(),
+				search: search
+			});
 
-			const response = await fetch(url.toString());
-			const result: ApiResponse = await response.json();
+			const response = await fetch(`${env.PUBLIC_API_URL}/public/sop?${query.toString()}`);
+			const result = await response.json();
 
 			if (result.success) {
-				sopResponse = result.data;
+				sopList = result.data.data;
 				currentPage = result.data.current_page;
+				totalPages = result.data.last_page;
 			}
 		} catch (error) {
 			console.error('Failed to fetch SOP:', error);
@@ -55,22 +57,11 @@
 		}
 	}
 
-	// Effects
-	onMount(() => {
-		fetchSop();
-	});
-
-	// Handlers
-	function handleSearch(e: SubmitEvent) {
-		e.preventDefault();
-		fetchSop(1, searchTerm);
-	}
-
-	function handlePageChange(newPage: number) {
-		if (sopResponse && newPage >= 1 && newPage <= sopResponse.last_page) {
-			fetchSop(newPage, searchTerm);
-			window.scrollTo({ top: 0, behavior: 'smooth' });
-		}
+	function handleSearch() {
+		clearTimeout(debounceTimer);
+		debounceTimer = setTimeout(() => {
+			fetchSop(1, searchTerm);
+		}, 500);
 	}
 
 	async function handleDownload(id: number, filename: string) {
@@ -79,7 +70,7 @@
 			await fetch(`${env.PUBLIC_API_URL}/public/sop/download/${id}`);
 
 			// Open file in new tab
-			window.open(`${env.PUBLIC_BACKEND_URL}/uploads/sop/${filename}`, '_blank');
+			window.open(getImageUrl(`sop/${filename}`), '_blank');
 
 			// Refresh data to update download count locally
 			fetchSop(currentPage, searchTerm);
@@ -87,176 +78,147 @@
 			console.error('Download failed:', error);
 		}
 	}
+
+	function goToDetail(id: number) {
+		goto(`/layanan/sop/${id}`);
+	}
+
+	onMount(() => {
+		fetchSop();
+	});
 </script>
 
-<header class="border-b border-gray-200 bg-white font-sans dark:border-slate-700 dark:bg-slate-800">
-	<div class="container mx-auto px-4 py-8">
-		<Breadcrumb
-			items={[
-				{ label: 'breadcrumb.home', href: '/' },
-				{ label: 'common.services' },
-				{ label: 'sop_page.title' }
-			]}
-		/>
+<svelte:head>
+	<title>{m['sop.title']()} - PPID Provinsi Sulawesi Selatan</title>
+</svelte:head>
 
-		<div class="mt-4 flex items-end justify-between">
-			<div>
-				<h1 class="mb-2 text-3xl font-bold text-ppid-primary md:text-4xl dark:text-white">
-					{m['sop_page.title']()}
-				</h1>
-				<p class="text-gray-600 dark:text-gray-300">{m['sop_page.subtitle']()}</p>
-			</div>
-			<div class="hidden md:block" aria-hidden="true">
-				<div class="h-1.5 w-24 rounded-full bg-linear-to-r from-ppid-primary to-ppid-accent"></div>
-			</div>
+<main class="min-h-screen bg-slate-50 dark:bg-slate-900">
+	<div class="relative overflow-hidden bg-ppid-primary py-20 text-white">
+		<div class="container relative z-10 mx-auto px-4">
+			<Breadcrumb
+				items={[
+					{ label: m['common.home'](), href: '/' },
+					{ label: m['common.services']() },
+					{ label: 'SOP' }
+				]}
+				class="mb-6 text-white/80"
+			/>
+			<h1 class="text-4xl font-black md:text-5xl">{m['sop.title']()}</h1>
+			<p class="mt-4 max-w-2xl text-lg text-white/80">
+				{m['sop.description']()}
+			</p>
 		</div>
+		<div
+			class="absolute -right-20 -bottom-20 h-80 w-80 rounded-full bg-white/10 blur-3xl"
+			aria-hidden="true"
+		></div>
 	</div>
-</header>
 
-<main class="bg-gray-50 py-12 font-sans md:py-16 dark:bg-slate-900">
-	<div class="container mx-auto px-4">
-		<div class="mx-auto max-w-7xl">
-			<section class="mb-8 max-w-2xl" aria-label="Pencarian SOP">
-				<form onsubmit={handleSearch} class="flex gap-3">
-					<div class="group relative flex-1">
-						<span
-							class="absolute inset-y-0 left-3 flex items-center text-gray-400 transition-colors group-focus-within:text-ppid-primary"
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="20"
-								height="20"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg
-							>
-						</span>
-						<input
-							type="search"
-							bind:value={searchTerm}
-							placeholder={m['sop_page.search_placeholder']()}
-							aria-label="Cari judul SOP"
-							class="w-full rounded-xl border border-gray-200 bg-white py-3 pr-4 pl-10 text-gray-900 shadow-sm transition-all outline-none placeholder:text-gray-400 focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary/20 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-						/>
-					</div>
-					<button
-						type="submit"
-						class="rounded-xl bg-ppid-primary px-8 py-3 font-semibold text-white shadow-lg shadow-ppid-primary/20 transition-all hover:-translate-y-0.5 hover:bg-ppid-primary-hover hover:shadow-ppid-primary/30 focus:ring-4 focus:ring-ppid-primary/30 active:translate-y-0"
+	<div class="container mx-auto -mt-10 px-4 pb-20">
+		<div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-800 dark:bg-slate-800">
+			<!-- Search Bar -->
+			<div class="mb-8">
+				<div class="relative mx-auto max-w-2xl">
+					<input
+						type="text"
+						bind:value={searchTerm}
+						oninput={handleSearch}
+						placeholder={m['sop.search_placeholder']()}
+						class="w-full rounded-2xl border-none bg-slate-50 py-4 pr-4 pl-12 shadow-inner ring-2 ring-transparent transition-all focus:ring-ppid-primary/20 dark:bg-slate-900 dark:text-white"
+					/>
+					<svg
+						class="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-slate-400"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
 					>
-						{isLoading ? m['status.searching']() : m['common.search']()}
-					</button>
-				</form>
-			</section>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+						/>
+					</svg>
+				</div>
+			</div>
 
-			<div
-				class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
-			>
-				<div class="overflow-x-auto">
-					<table class="w-full border-collapse text-left">
-						<thead class="bg-ppid-primary text-white">
-							<tr>
-								<th scope="col" class="w-16 px-6 py-4 text-center text-sm font-semibold">No</th>
-								<th scope="col" class="px-6 py-4 text-sm font-semibold"
-									>{m['sop_page.title_column']()}</th
-								>
-								<th scope="col" class="w-48 px-6 py-4 text-center text-sm font-semibold"
-									>{m['sop_page.action_column']()}</th
-								>
-							</tr>
-						</thead>
-						<tbody class="divide-y divide-gray-200 dark:divide-slate-700">
-							{#if isLoading}
-								<tr>
-									<td colspan="3" class="px-6 py-12 text-center">
-										<div class="flex justify-center">
-											<div
-												class="h-8 w-8 animate-spin rounded-full border-4 border-blue-700 border-t-transparent"
-											></div>
-										</div>
-									</td>
-								</tr>
-							{:else if sopResponse && sopResponse.data.length > 0}
-								{#each sopResponse.data as sop, index (sop.id)}
-									<tr
-										class="group transition-colors hover:bg-blue-50/50 dark:hover:bg-slate-700/50"
+			{#if isLoading}
+				<div class="flex flex-col items-center justify-center py-20">
+					<div class="h-12 w-12 animate-spin rounded-full border-4 border-ppid-primary border-t-transparent"></div>
+					<p class="mt-4 font-medium text-slate-500">{m['common.loading']()}</p>
+				</div>
+			{:else if sopList.length === 0}
+				<div class="py-20 text-center">
+					<div class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-slate-50 dark:bg-slate-900">
+						<svg class="h-10 w-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+						</svg>
+					</div>
+					<p class="text-lg font-medium text-slate-400">{m['sop.no_data']()}</p>
+				</div>
+			{:else}
+				<div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+					{#each sopList as item}
+						<div
+							class="group flex flex-col justify-between rounded-2xl border border-slate-100 bg-white p-5 transition-all hover:border-ppid-primary/20 hover:shadow-xl dark:border-slate-700 dark:bg-slate-900/50"
+						>
+							<div>
+								<div class="mb-4 flex items-start justify-between">
+									<div class="flex h-10 w-10 items-center justify-center rounded-xl bg-ppid-primary/10 text-ppid-primary group-hover:bg-ppid-primary group-hover:text-white transition-colors">
+										<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+										</svg>
+									</div>
+									<span class="text-xs font-bold text-slate-400 uppercase tracking-tighter">SOP</span>
+								</div>
+								<h3 class="mb-2 line-clamp-2 text-lg font-bold text-slate-800 dark:text-white group-hover:text-ppid-primary transition-colors">
+									{item.judul}
+								</h3>
+								<p class="mb-4 text-xs font-medium text-slate-500 dark:text-slate-400">
+									{item.skpd.nm_skpd}
+								</p>
+							</div>
+
+							<div class="flex items-center justify-between border-t border-slate-50 pt-4 dark:border-slate-800">
+								<div class="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+									<svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+									</svg>
+									{item.jumlah_download} {m['sop.downloads']()}
+								</div>
+								<div class="flex gap-2">
+									<button
+										onclick={() => handleDownload(item.id, item.file)}
+										class="rounded-lg bg-ppid-primary/10 p-2 text-ppid-primary transition-colors hover:bg-ppid-primary hover:text-white"
+										title={m['common.download']()}
 									>
-										<td class="px-6 py-4 text-center font-medium text-gray-500 dark:text-gray-400">
-											{(sopResponse.current_page - 1) * sopResponse.per_page + index + 1}
-										</td>
-										<td
-											class="px-6 py-4 font-medium text-gray-800 uppercase transition-colors group-hover:text-blue-700 dark:text-white"
-										>
-											{sop.judul}
-										</td>
-										<td class="px-6 py-4">
-											<div class="flex items-center justify-center gap-3">
-												<button
-													onclick={() => handleDownload(sop.id, sop.file)}
-													class="flex items-center gap-1.5 rounded-lg bg-blue-700/10 px-3 py-1.5 text-xs font-bold text-blue-700 transition-all hover:bg-blue-700 hover:text-white focus:ring-2 focus:ring-blue-700/50"
-													aria-label="Download {sop.judul}"
-												>
-													<svg
-														xmlns="http://www.w3.org/2000/svg"
-														width="16"
-														height="16"
-														viewBox="0 0 24 24"
-														fill="none"
-														stroke="currentColor"
-														stroke-width="2"
-														stroke-linecap="round"
-														stroke-linejoin="round"
-														><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline
-															points="7 10 12 15 17 10"
-														/><line x1="12" x2="12" y1="15" y2="3" /></svg
-													>
-													{sop.jumlah_download}
-												</button>
-											</div>
-										</td>
-									</tr>
-								{/each}
-							{:else}
-								<tr>
-									<td
-										colspan="3"
-										class="bg-gray-50 px-6 py-12 text-center text-gray-500 italic dark:bg-slate-700/50 dark:text-gray-400"
-									>
-										{m['sop_page.no_data']()}
-									</td>
-								</tr>
-							{/if}
-						</tbody>
-					</table>
+										<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+										</svg>
+									</button>
+								</div>
+							</div>
+						</div>
+					{/each}
 				</div>
 
-				{#if sopResponse && sopResponse.last_page > 1}
-					<nav
-						class="flex items-center justify-between border-t border-gray-100 bg-gray-50/50 px-6 py-4 dark:border-slate-700 dark:bg-slate-800"
-						aria-label="Pagination"
-					>
-						<span class="text-sm text-gray-500 dark:text-gray-400">
-							{m['common.page']()}
-							<span class="font-medium text-gray-900 dark:text-white">{currentPage}</span>
-							{m['common.from']()}
-							<span class="font-medium text-gray-900 dark:text-white">{sopResponse.last_page}</span>
-						</span>
-
-						<div class="flex items-center gap-2">
+				<!-- Pagination -->
+				{#if totalPages > 1}
+					<nav class="mt-12 flex items-center justify-center gap-2" aria-label="Pagination">
+						<div class="flex items-center gap-2 rounded-2xl bg-white p-2 shadow-lg dark:bg-slate-800">
 							<button
-								onclick={() => handlePageChange(currentPage - 1)}
-								disabled={currentPage === 1 || isLoading}
+								onclick={() => fetchSop(currentPage - 1, searchTerm)}
+								disabled={currentPage === 1}
 								class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-xs transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:bg-slate-700 dark:text-gray-300 dark:hover:bg-slate-600"
 							>
-								{m['common.prev']()}
+								{m['common.previous']()}
 							</button>
-
+							<span class="px-4 text-sm font-bold text-slate-600 dark:text-slate-300">
+								{currentPage} / {totalPages}
+							</span>
 							<button
-								onclick={() => handlePageChange(currentPage + 1)}
-								disabled={currentPage === sopResponse.last_page || isLoading}
+								onclick={() => fetchSop(currentPage + 1, searchTerm)}
+								disabled={currentPage === totalPages}
 								class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-xs transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:bg-slate-700 dark:text-gray-300 dark:hover:bg-slate-600"
 							>
 								{m['common.next']()}
@@ -264,7 +226,7 @@
 						</div>
 					</nav>
 				{/if}
-			</div>
+			{/if}
 		</div>
 	</div>
 </main>

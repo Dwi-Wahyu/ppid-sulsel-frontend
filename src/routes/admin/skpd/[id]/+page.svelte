@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { getImageUrl } from '$lib/get-image-url';
 	import { goto } from '$app/navigation';
 	import { enhance } from '$app/forms';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
@@ -98,7 +98,7 @@
 			<div class="flex items-center gap-4">
 				<img
 					src={data.skpd.logo
-						? `${PUBLIC_API_URL}/storage/logo-skpd/${data.skpd.logo}`
+						? getImageUrl(`logo-skpd/${data.skpd.logo}`)
 						: '/images/logo-sulsel.png'}
 					alt="Logo {data.skpd.nm_skpd}"
 					class="h-16 w-16 object-contain"

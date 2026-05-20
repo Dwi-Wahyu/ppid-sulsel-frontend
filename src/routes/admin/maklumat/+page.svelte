@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { api } from '$lib/api'; // Menggunakan helper proxy
-	import { PUBLIC_API_URL, PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { getImageUrl } from '$lib/get-image-url';
 	import TinyMCE from '$lib/components/TinyMCE.svelte';
 	import FilePond from '$lib/components/FilePond.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
@@ -155,7 +155,7 @@
 											/></svg
 										>
 										<a
-											href={`${PUBLIC_BACKEND_URL}/uploads/${currentData.file_banner}`}
+											href={getImageUrl(currentData.file_banner)}
 											target="_blank"
 											class="text-sm font-medium text-blue-600 hover:underline"
 											>Lihat PDF Terunggah</a
@@ -163,7 +163,7 @@
 									</div>
 								{:else}
 									<img
-										src={`${PUBLIC_BACKEND_URL}/uploads/${currentData.file_banner}`}
+										src={getImageUrl(currentData.file_banner)}
 										alt="Banner"
 										class="max-h-64 rounded-lg object-contain shadow-sm"
 									/>

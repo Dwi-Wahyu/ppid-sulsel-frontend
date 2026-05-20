@@ -297,7 +297,7 @@
 						</div>
 					</div>
 					<a
-						href="{PUBLIC_API_URL}/storage/{data.dokumen.file}"
+						href={getImageUrl(data.dokumen.file)}
 						target="_blank"
 						class="rounded border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-500 dark:bg-slate-600 dark:text-slate-200 dark:hover:bg-slate-500"
 					>
@@ -394,5 +394,8 @@
 	bind:show={showNotification}
 	title={notificationTitle}
 	description={notificationDescription}
+	theme={notificationTheme}
+/>
+cription={notificationDescription}
 	theme={notificationTheme}
 />

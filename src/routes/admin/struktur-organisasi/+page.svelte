@@ -26,7 +26,7 @@
 	const display_url = $derived.by(() => {
 		if (!currentData.struktur_organisasi_path) return null;
 		const cleanPath = currentData.struktur_organisasi_path.replace('storage/', '');
-		return `${PUBLIC_BACKEND_URL}/uploads/${cleanPath}`;
+		return getImageUrl(cleanPath);
 	});
 
 	onMount(async () => {
@@ -203,5 +203,7 @@
 	bind:show={showNotification}
 	theme={notificationType}
 	title={notificationType === 'success' ? 'Berhasil!' : 'Gagal!'}
+	description={notificationMessage}
+/>'success' ? 'Berhasil!' : 'Gagal!'}
 	description={notificationMessage}
 />

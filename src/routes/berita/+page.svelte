@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { PUBLIC_API_URL, PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { getImageUrl } from '$lib/get-image-url';
 	import Footer from '$lib/components/Footer.svelte';
 	import * as m from '$lib/paraglide/messages.js';
+	import { PUBLIC_API_URL } from '$env/static/public';
 
 	// --- Type Definitions ---
 	interface Category {
@@ -231,7 +232,7 @@
 									{#if item.image}
 										<img
 											src={item.image
-												? `${PUBLIC_BACKEND_URL}/uploads/berita/${item.image}`
+												? getImageUrl(`berita/${item.image}`)
 												: '/img/placeholder-news.jpg'}
 											alt={item.title}
 											role="presentation"

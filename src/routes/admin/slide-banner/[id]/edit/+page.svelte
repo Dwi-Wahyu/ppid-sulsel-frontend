@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { getImageUrl } from '$lib/get-image-url';
 	import FilePond from '$lib/components/FilePond.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
@@ -170,7 +170,7 @@
 							class="relative rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-600 dark:bg-slate-700/50"
 						>
 							<img
-								src={`${PUBLIC_API_URL.replace('/api', '')}/storage/slide-banner/${currentImage}`}
+								src={getImageUrl(`slide-banner/${currentImage}`)}
 								alt="Current banner"
 								class="max-h-64 w-full rounded-lg object-contain"
 							/>

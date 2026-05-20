@@ -43,9 +43,7 @@
 				const activeSlides = json.data.filter((s) => s.is_active).sort((a, b) => a.order - b.order);
 
 				// Transform filename to full URL
-				slides = activeSlides.map(
-					(s) => `${PUBLIC_BACKEND_URL}/uploads/slide-banner/${s.nm_slide}`
-				);
+				slides = activeSlides.map((s) => getImageUrl(`slide-banner/${s.nm_slide}`));
 			}
 		} catch (e) {
 			console.error('Failed to fetch banners:', e);
@@ -377,6 +375,9 @@
 		</div>
 	</div>
 {/if}
+
+<!-- Search Modal Component -->
+<SearchModal bind:isOpen={searchModalOpen} />
 
 <!-- Search Modal Component -->
 <SearchModal bind:isOpen={searchModalOpen} />

@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { api } from '$lib/api';
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { getImageUrl } from '$lib/get-image-url';
 	import FilePond from '$lib/components/FilePond.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
@@ -211,7 +211,7 @@
 							<div>
 								<p class="text-sm font-medium text-slate-900 dark:text-slate-100">File Saat Ini:</p>
 								<a
-									href={`${PUBLIC_API_URL.replace('/api', '')}/storage/sop/${currentFile}`}
+									href={getImageUrl(`sop/${currentFile}`)}
 									target="_blank"
 									rel="noopener noreferrer"
 									class="text-xs font-semibold text-ppid-primary hover:underline dark:text-ppid-primary-light"

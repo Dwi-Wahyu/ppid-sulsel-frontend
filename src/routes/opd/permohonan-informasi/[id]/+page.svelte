@@ -295,7 +295,7 @@
 								<p class="text-slate-800">{respon.pesan}</p>
 								{#if respon.file}
 									<a
-										href={`${PUBLIC_BACKEND_URL}/uploads/respon-disposisi/${respon.file}`}
+										href={getImageUrl(`respon-disposisi/${respon.file}`)}
 										target="_blank"
 										rel="noopener noreferrer"
 										class="mt-2 inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline"
@@ -590,3 +590,4 @@
 />
 
 <SuccessModal bind:isOpen={showSuccess} title="Berhasil!" message={successMessage} />
+:isOpen={showSuccess} title="Berhasil!" message={successMessage} />

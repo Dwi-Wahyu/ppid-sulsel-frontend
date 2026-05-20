@@ -3,11 +3,9 @@
 	import { page } from '$app/state';
 	import * as m from '$lib/paraglide/messages.js';
 	import { env } from '$env/dynamic/public';
+	import { getImageUrl } from '$lib/get-image-url';
 
 	let { data } = $props();
-
-	const API_BASE = env.PUBLIC_API_URL || 'http://localhost:8000/api';
-	const FILE_BASE = API_BASE.replace('/api', '');
 
 	let searchQuery = $state('');
 
@@ -21,7 +19,7 @@
 
 	function getFileUrl(file: string) {
 		if (!file) return null;
-		return `${FILE_BASE}/storage/informasi/${encodeURIComponent(file)}`;
+		return getImageUrl(`informasi/${encodeURIComponent(file)}`);
 	}
 
 	function getFileExt(file: string) {

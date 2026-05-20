@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import * as m from '$lib/paraglide/messages.js';
 	import { env } from '$env/dynamic/public';
+	import { getImageUrl } from '$lib/get-image-url';
 
 	interface DokumenDetail {
 		id_informasi: number;
@@ -9,379 +10,201 @@
 		ket: string | null;
 		file: string;
 		tgl_upload: string;
-		tgl_verify: string | null;
-		jumlah_download: number;
-		tahun: string;
-		verify: string;
-		kategori?: {
+		id_kat_info: number;
+		id_skpd: number;
+		viewers: number;
+		size: string | null;
+		ext: string | null;
+		category: {
 			id_kat_info: number;
 			nm_kat_info: string;
 		};
-		skpd?: {
+		skpd: {
 			id_skpd: number;
 			nm_skpd: string;
 		};
 	}
 
 	interface PageData {
-		informasi: DokumenDetail;
+		success: boolean;
+		data: DokumenDetail;
 	}
 
 	let { data } = $props<{ data: PageData }>();
 
 	const BACKEND_URL = env.PUBLIC_BACKEND_URL || 'http://localhost:8000';
 
-	// 		if (file.startsWith('http')) {
-	// 			return file;
-	// 		}
-	// 		return `${BACKEND_URL}/storage/${file}`;
 	function getFileUrl(file: string): string {
 		if (file.startsWith('http')) {
 			return file;
 		}
-		return `${BACKEND_URL}/storage/${file}`;
+		return getImageUrl(file);
 	}
 
 	function getDownloadUrl(id: number): string {
 		return `${BACKEND_URL}/api/public/informasi/download/${id}`;
 	}
+
+	function formatDate(dateStr: string) {
+		return new Date(dateStr).toLocaleDateString('id-ID', {
+			day: 'numeric',
+			month: 'long',
+			year: 'numeric'
+		});
+	}
+
+	const doc = $derived(data.data);
 </script>
 
 <svelte:head>
-	<title>{data.informasi.judul} - PPID Sulawesi Selatan</title>
+	<title>{doc?.judul || 'Detail Dokumen'} - PPID Provinsi Sulawesi Selatan</title>
 </svelte:head>
 
-<!-- Breadcrumb + Title Section -->
-<!-- Breadcrumb + Title Section -->
-<div
-	class="border-b border-gray-200 bg-white font-['Plus_Jakarta_Sans'] dark:border-slate-700 dark:bg-slate-800"
->
-	<div class="container mx-auto px-4 py-6">
-		<!-- Breadcrumb -->
-		<div class="mb-4 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-			<a href="/" class="transition-colors hover:text-ppid-primary dark:text-white">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="16"
-					height="16"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					class="h-4 w-4"
-				>
-					<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-					<polyline points="9 22 9 12 15 12 15 22" />
-				</svg>
-			</a>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="16"
-				height="16"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				class="h-4 w-4 text-gray-400"
-			>
-				<path d="m9 18 6-6-6-6" />
-			</svg>
-			<a href="/informasi-publik" class="transition-colors hover:text-ppid-primary dark:text-white">
-				{m['public_info.title']()}
-			</a>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="16"
-				height="16"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				class="h-4 w-4 text-gray-400"
-			>
-				<path d="m9 18 6-6-6-6" />
-			</svg>
-			<span class="font-medium text-ppid-primary dark:text-white"
-				>{m['public_info.detail.breadcrumb']()}</span
-			>
-		</div>
-
-		<!-- Title -->
-		<div class="flex items-end justify-between">
-			<div>
-				<h1
-					class="mb-2 text-2xl leading-tight font-bold text-ppid-primary md:text-3xl dark:text-white"
-				>
-					{data.informasi.judul}
-				</h1>
-				<p class="text-gray-600 dark:text-gray-300">{m['public_info.detail.subtitle']()}</p>
-			</div>
-			<div class="hidden md:block">
-				<div class="h-1 w-20 rounded-full bg-linear-to-r from-ppid-primary to-transparent"></div>
-			</div>
-		</div>
-	</div>
-</div>
-
-<!-- Main Content -->
-<main class="bg-gray-50 py-10 font-['Plus_Jakarta_Sans'] md:py-16 dark:bg-slate-900">
+<main class="min-h-screen bg-slate-50 py-12 dark:bg-slate-900">
 	<div class="container mx-auto px-4">
-		<div class="mx-auto max-w-4xl">
-			<div
-				class="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl shadow-ppid-primary/5 dark:border-slate-700 dark:bg-slate-800"
-			>
-				<!-- Detail Header -->
-				<div
-					class="relative overflow-hidden bg-linear-to-br from-ppid-primary to-[#2A4A8E] p-8 text-white"
-				>
-					<div class="absolute top-0 right-0 p-8 opacity-10">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="120"
-							height="120"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-							<polyline points="14 2 14 8 20 8" />
-							<line x1="16" y1="13" x2="8" y2="13" />
-							<line x1="16" y1="17" x2="8" y2="17" />
-							<line x1="10" y1="9" x2="8" y2="9" />
-						</svg>
-					</div>
-					<div class="relative z-10">
+		<div class="mx-auto max-w-5xl">
+			<!-- Header & Action -->
+			<div class="mb-8 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+				<div class="flex-1">
+					<div class="mb-2 flex flex-wrap items-center gap-2">
 						<span
-							class="mb-4 inline-block rounded-full bg-ppid-accent px-3 py-1 text-xs font-bold tracking-wider text-white uppercase"
+							class="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
 						>
-							{data.informasi.kategori?.nm_kat_info || m['public_info.detail.fallback_category']()}
+							{doc?.category?.nm_kat_info}
 						</span>
-						<h2 class="mb-4 text-2xl font-bold">{data.informasi.judul}</h2>
-						<div class="flex flex-wrap items-center gap-6 text-sm text-white/80">
-							<div class="flex items-center gap-2">
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="16"
-									height="16"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									class="h-4 w-4"
-								>
-									<rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-									<line x1="16" y1="2" x2="16" y2="6" />
-									<line x1="8" y1="2" x2="8" y2="6" />
-									<line x1="3" y1="10" x2="21" y2="10" />
-								</svg>
-								{data.informasi.tgl_upload}
+						<span class="text-sm text-slate-500">
+							Terakhir diperbarui: {formatDate(doc.tgl_upload)}
+						</span>
+					</div>
+					<h1 class="text-2xl font-black text-slate-900 md:text-3xl dark:text-white">
+						{doc?.judul}
+					</h1>
+				</div>
+
+				<div class="flex w-full flex-wrap gap-3 md:w-auto">
+					<a
+						href={getDownloadUrl(doc.id_informasi)}
+						download
+						class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-ppid-primary px-6 py-3 font-bold text-white shadow-lg shadow-ppid-primary/20 transition-all hover:bg-ppid-primary/90 md:flex-none"
+					>
+						<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+							/>
+						</svg>
+						{m['public_info.download']()}
+					</a>
+				</div>
+			</div>
+
+			<!-- Main Content -->
+			<div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+				<!-- Document Preview -->
+				<div class="lg:col-span-2">
+					<div
+						class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xs dark:border-slate-800 dark:bg-slate-800"
+					>
+						<div class="flex items-center justify-between border-b border-slate-100 p-6 dark:border-slate-700">
+							<h2 class="font-bold text-slate-900 dark:text-white">Pratinjau Dokumen</h2>
+							<div class="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
+								<span class="rounded-lg bg-slate-100 px-2 py-1 dark:bg-slate-900">{doc.ext || 'PDF'}</span>
+								<span>{doc.size || 'Unknown Size'}</span>
 							</div>
-							<div class="flex items-center gap-2">
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="16"
-									height="16"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									class="h-4 w-4"
-								>
-									<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-									<polyline points="7 10 12 15 17 10" />
-									<line x1="12" x2="12" y1="15" y2="3" />
-								</svg>
-								{data.informasi.jumlah_download || 0}
-								{m['public_info.detail.downloads']()}
-							</div>
+						</div>
+
+						<div class="bg-slate-100 dark:bg-slate-900">
+							{#if doc.ext?.toLowerCase() === 'pdf'}
+								<iframe
+									src={getFileUrl(doc.file)}
+									title="Preview Dokumen"
+									class="h-[800px] w-full border-0"
+								></iframe>
+							{:else if ['jpg', 'jpeg', 'png', 'webp'].includes(doc.ext?.toLowerCase() || '')}
+								<div class="flex items-center justify-center p-8">
+									<img
+										src={getFileUrl(doc.file)}
+										alt={doc.judul}
+										class="max-w-full rounded-xl shadow-sm"
+									/>
+								</div>
+							{:else}
+								<div class="flex flex-col items-center justify-center py-32 text-center">
+									<div class="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-white dark:bg-slate-800">
+										<svg class="h-10 w-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+										</svg>
+									</div>
+									<h3 class="text-lg font-bold text-slate-900 dark:text-white">Pratinjau Tidak Tersedia</h3>
+									<p class="mt-1 text-slate-500">Format file ini tidak mendukung pratinjau langsung.</p>
+									<a
+										href={getDownloadUrl(doc.id_informasi)}
+										class="mt-6 text-sm font-bold text-ppid-primary hover:underline"
+									>
+										Unduh untuk melihat dokumen &rarr;
+									</a>
+								</div>
+							{/if}
 						</div>
 					</div>
 				</div>
 
-				<!-- Detail Body -->
-				<div class="p-8">
-					<div class="mb-8 grid grid-cols-1 gap-8 md:grid-cols-2">
+				<!-- Sidebar Info -->
+				<div class="space-y-6">
+					<div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-800">
+						<h3 class="mb-6 border-l-4 border-ppid-accent pl-4 text-lg font-bold text-slate-900 dark:text-white">
+							Detail Informasi
+						</h3>
+
 						<div class="space-y-6">
 							<div>
-								<label
-									class="mb-1 block text-xs font-bold tracking-widest text-gray-400 uppercase dark:text-gray-500"
-								>
-									{m['public_info.detail.skpd_label']()}
-								</label>
-								<p class="font-medium text-gray-900 italic dark:text-white">
-									{data.informasi.skpd?.nm_skpd || '-'}
+								<span class="mb-1 block text-xs font-bold text-slate-400 uppercase tracking-wider">Sumber Informasi</span>
+								<p class="font-bold text-slate-900 dark:text-white">{doc.skpd.nm_skpd}</p>
+							</div>
+
+							<div>
+								<span class="mb-1 block text-xs font-bold text-slate-400 uppercase tracking-wider">Keterangan</span>
+								<p class="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+									{doc.ket || 'Tidak ada keterangan tambahan.'}
 								</p>
 							</div>
-							<div>
-								<label
-									class="mb-1 block text-xs font-bold tracking-widest text-gray-400 uppercase dark:text-gray-500"
-								>
-									{m['public_info.detail.desc_label']()}
-								</label>
-								<div
-									class="prose prose-sm max-w-none leading-relaxed text-gray-700 dark:text-gray-300 dark:prose-invert"
-								>
-									{@html data.informasi.ket || m['public_info.detail.no_desc']()}
+
+							<div class="grid grid-cols-2 gap-4">
+								<div class="rounded-2xl bg-slate-50 p-4 dark:bg-slate-900/50">
+									<span class="mb-1 block text-[10px] font-bold text-slate-400 uppercase">Dilihat</span>
+									<span class="text-lg font-black text-slate-900 dark:text-white">{doc.viewers}</span>
+								</div>
+								<div class="rounded-2xl bg-slate-50 p-4 dark:bg-slate-900/50">
+									<span class="mb-1 block text-[10px] font-bold text-slate-400 uppercase">File</span>
+									<span class="text-lg font-black text-slate-900 dark:text-white">{doc.ext?.toUpperCase() || 'PDF'}</span>
 								</div>
 							</div>
 						</div>
-						<div
-							class="self-start rounded-xl border border-gray-100 bg-gray-50 p-6 dark:border-slate-700 dark:bg-slate-900/50"
-						>
-							<label
-								class="mb-4 block text-xs font-bold tracking-widest text-gray-400 uppercase dark:text-gray-500"
-							>
-								{m['public_info.detail.doc_info']()}
-							</label>
-							<ul class="space-y-4 text-sm">
-								<li class="flex items-start gap-3">
-									<div
-										class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-ppid-primary/10"
-									>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											width="16"
-											height="16"
-											viewBox="0 0 24 24"
-											fill="none"
-											stroke="currentColor"
-											stroke-width="2"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											class="text-ppid-primary"
-										>
-											<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-											<polyline points="14 2 14 8 20 8" />
-											<line x1="16" y1="13" x2="8" y2="13" />
-											<line x1="16" y1="17" x2="8" y2="17" />
-											<line x1="10" y1="9" x2="8" y2="9" />
-										</svg>
-									</div>
-									<div>
-										<span class="block text-xs text-gray-500 dark:text-gray-400"
-											>{m['public_info.detail.file_name']()}</span
-										>
-										<span class="font-medium break-all text-gray-900 dark:text-white">
-											{data.informasi.file.split('/').pop()}
-										</span>
-									</div>
-								</li>
-								<li class="flex items-start gap-3">
-									<div
-										class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-ppid-primary/10"
-									>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											width="16"
-											height="16"
-											viewBox="0 0 24 24"
-											fill="none"
-											stroke="currentColor"
-											stroke-width="2"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											class="text-ppid-primary"
-										>
-											<polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-										</svg>
-									</div>
-									<div>
-										<span class="block text-xs text-gray-500 dark:text-gray-400"
-											>{m['public_info.detail.verify_status']()}</span
-										>
-										<span
-											class="inline-flex items-center gap-1.5 text-[10px] font-bold text-green-600 uppercase"
-										>
-											<span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
-											{m['public_info.detail.verified']()} ({data.informasi.tgl_verify ||
-												data.informasi.tgl_upload})
-										</span>
-									</div>
-								</li>
-							</ul>
-						</div>
 					</div>
 
-					<!-- Action Buttons -->
-					<div
-						class="flex flex-col items-center gap-4 border-t border-gray-100 pt-8 sm:flex-row dark:border-slate-700"
-					>
-						{#if data.informasi.file}
-							<a
-								href={getFileUrl(data.informasi.file)}
-								target="_blank"
-								rel="noopener noreferrer"
-								class="flex w-full items-center justify-center gap-2 rounded-xl bg-ppid-primary px-8 py-3 font-bold text-white shadow-lg shadow-ppid-primary/20 transition-all hover:bg-[#2A4A8E] sm:w-auto"
-							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="20"
-									height="20"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								>
-									<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-									<circle cx="12" cy="12" r="3" />
-								</svg>
-								{m['public_info.detail.view_file']()}
-							</a>
-							<a
-								href={getDownloadUrl(data.informasi.id_informasi)}
-								class="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-ppid-primary bg-white px-8 py-3 font-bold text-ppid-primary transition-all hover:bg-gray-50 sm:w-auto dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:hover:bg-slate-600"
-							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="20"
-									height="20"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								>
-									<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-									<polyline points="7 10 12 15 17 10" />
-									<line x1="12" x2="12" y1="15" y2="3" />
-								</svg>
-								{m['public_info.detail.download_file']()}
-							</a>
-						{:else}
-							<div
-								class="w-full rounded-xl border border-red-100 bg-red-50 p-4 text-center font-bold text-red-600"
-							>
-								{m['public_info.detail.no_file']()}
-							</div>
-						{/if}
+					<!-- Social Share -->
+					<div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-800">
+						<h4 class="mb-4 text-sm font-bold text-slate-900 dark:text-white">Bagikan Informasi</h4>
+						<div class="flex gap-2">
+							<button class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition-colors hover:bg-ppid-primary hover:text-white dark:bg-slate-900 dark:text-slate-400">
+								<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+							</button>
+							<button class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600 transition-colors hover:bg-ppid-primary hover:text-white dark:bg-slate-900 dark:text-slate-400">
+								<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.95 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.84 4.996 4.996 0 01-2.212.085 4.936 4.92 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
 
-			<!-- Back Link -->
-			<div class="mt-8 text-center">
+			<div class="mt-8">
 				<button
-					onclick={() => window.history.back()}
-					class="group inline-flex items-center gap-2 font-medium text-gray-500 italic transition-colors hover:text-ppid-primary"
+					onclick={() => history.back()}
+					class="group flex items-center gap-2 font-bold text-slate-500 transition-colors hover:text-ppid-primary"
 				>
 					<svg
-						xmlns="http://www.w3.org/2000/svg"
 						width="20"
 						height="20"
 						viewBox="0 0 24 24"

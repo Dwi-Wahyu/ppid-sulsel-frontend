@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import type { PageData, ActionData } from './$types';
 	import { PUBLIC_API_URL } from '$env/static/public';
+	import { getImageUrl } from '$lib/get-image-url';
 	import TinyMCE from '$lib/components/TinyMCE.svelte';
 	import FilePond from '$lib/components/FilePond.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
@@ -89,7 +90,7 @@
 					{#if data.sambutan?.foto_kepala}
 						<div class="mb-4">
 							<img
-								src={`${PUBLIC_API_URL}/storage/${data.sambutan.foto_kepala}`}
+								src={getImageUrl(data.sambutan.foto_kepala)}
 								alt="Kepala PPID"
 								class="h-80 w-64 rounded-xl object-cover shadow-lg"
 							/>

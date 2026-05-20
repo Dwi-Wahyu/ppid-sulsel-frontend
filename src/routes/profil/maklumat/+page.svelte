@@ -4,7 +4,8 @@
 	import PageTitle from '$lib/components/PageTitle.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { onMount } from 'svelte';
-	import { PUBLIC_API_URL, PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { PUBLIC_API_URL } from '$env/static/public';
+	import { getImageUrl } from '$lib/get-image-url';
 
 	interface ProfilData {
 		deskripsi: string;
@@ -16,6 +17,8 @@
 		file_banner: null
 	});
 
+	let isLoading = $state(true);
+
 	onMount(async () => {
 		try {
 			const response = await fetch(`${PUBLIC_API_URL}/public/profil/maklumat`);
@@ -23,110 +26,77 @@
 			if (result.success && result.data) {
 				profil.deskripsi = result.data.deskripsi || '';
 				if (result.data.file_banner) {
-					// Use /uploads/ prefix for Laravel storage access
-					profil.file_banner = `${PUBLIC_BACKEND_URL}/uploads/${result.data.file_banner}`;
+					profil.file_banner = getImageUrl(result.data.file_banner);
 				}
 			}
 		} catch (error) {
 			console.error('Error fetching Maklumat:', error);
+		} finally {
+			isLoading = false;
 		}
 	});
 </script>
 
-<div
-	class="border-b border-gray-200 bg-white font-['Plus_Jakarta_Sans'] dark:border-slate-700 dark:bg-slate-800"
->
-	<div class="container mx-auto px-4 py-6">
-		<Breadcrumb
-			items={[{ label: 'breadcrumb.profile', href: '#' }, { label: 'profile.service_declaration' }]}
-		/>
-		<div class="mt-4">
-			<PageTitle title={m['profile.service_declaration']()} />
-		</div>
-	</div>
-</div>
+<svelte:head>
+	<title>{m['maklumat.title']()} - PPID Provinsi Sulawesi Selatan</title>
+</svelte:head>
 
-<main class="bg-gray-50 py-10 font-['Plus_Jakarta_Sans'] md:py-16 dark:bg-slate-900">
-	<div class="container mx-auto px-4">
-		<div class="mx-auto max-w-5xl space-y-8">
-			<!-- Maklumat Document -->
-			<div
-				class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
-			>
-				<div
-					class="flex items-center justify-between border-b border-gray-200 bg-gray-50 px-6 py-4 dark:border-slate-700 dark:bg-slate-900"
-				>
-					<h2 class="font-bold text-gray-900 dark:text-white">
-						{m['maklumat.title']()}
-					</h2>
-					{#if profil.file_banner}
-						<a
-							href={profil.file_banner}
-							download
-							target="_blank"
-							class="flex items-center gap-2 text-sm font-medium text-ppid-primary transition-colors hover:text-ppid-accent dark:text-white"
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="16"
-								height="16"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								class="h-4 w-4"
-							>
-								<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-								<polyline points="7 10 12 15 17 10" />
-								<line x1="12" x2="12" y1="15" y2="3" />
-							</svg>
-							{m['common.download']()}
-						</a>
-					{/if}
-				</div>
+<main class="min-h-screen bg-white transition-colors dark:bg-slate-900">
+	<PageTitle title={m['maklumat.title']()} />
 
-				<div class="p-6">
-					<div class="overflow-hidden rounded-lg border border-gray-200 dark:border-slate-700">
-						{#if profil.file_banner}
-							{#if profil.file_banner.endsWith('.pdf')}
-								<iframe
-									src={profil.file_banner}
-									class="h-[600px] w-full"
-									title="Banner Maklumat PDF"
-								></iframe>
-							{:else}
-								<img
-									src={profil.file_banner}
-									alt={m['maklumat.banner_alt']()}
-									class="h-auto w-full"
-								/>
-							{/if}
-						{:else}
-							<img
-								src="/images/20230918134717_Maklumat pelayanan informasi publik.png"
-								alt={m['maklumat.banner_alt']()}
-								class="h-auto w-full"
-							/>
-						{/if}
+	<div class="container mx-auto px-4 py-12">
+		<div class="mx-auto max-w-4xl">
+			<Breadcrumb
+				items={[{ label: m['common.home'](), href: '/' }, { label: m['maklumat.title']() }]}
+				class="mb-10"
+			/>
+
+			<!-- Maklumat Banner -->
+			<div class="mb-12 overflow-hidden rounded-3xl border border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800">
+				{#if isLoading}
+					<div class="flex aspect-video items-center justify-center">
+						<div class="h-10 w-10 animate-spin rounded-full border-4 border-ppid-primary border-t-transparent"></div>
 					</div>
-					<p class="mt-4 text-center text-sm text-gray-600 dark:text-gray-300">
-						{m['maklumat.caption']()}
-					</p>
-				</div>
+				{:else if profil.file_banner}
+					{#if profil.file_banner.toLowerCase().endsWith('.pdf')}
+						<iframe
+							src={profil.file_banner}
+							title="Maklumat Pelayanan"
+							class="h-[800px] w-full"
+						></iframe>
+					{:else}
+						<img
+							src={profil.file_banner}
+							alt="Maklumat Pelayanan"
+							class="h-full w-full object-contain"
+						/>
+					{/if}
+				{:else}
+					<div class="flex aspect-video flex-col items-center justify-center p-12 text-center">
+						<div class="mb-4 text-slate-300">
+							<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+								<path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+							</svg>
+						</div>
+						<p class="font-medium text-slate-400">Gambar maklumat belum tersedia.</p>
+					</div>
+				{/if}
 			</div>
 
-			<!-- Dynamic Content -->
-			<div
-				class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm md:p-8 dark:border-slate-700 dark:bg-slate-800"
-			>
-				<div class="prose max-w-none prose-slate dark:prose-invert">
-					{@html profil.deskripsi}
-				</div>
+			<!-- Maklumat Content -->
+			<div class="prose prose-lg mb-12 max-w-none dark:prose-invert prose-headings:font-black prose-headings:text-ppid-primary prose-a:text-ppid-primary">
+				{#if isLoading}
+					<div class="space-y-4">
+						<div class="h-4 w-full animate-pulse rounded bg-slate-100 dark:bg-slate-800"></div>
+						<div class="h-4 w-5/6 animate-pulse rounded bg-slate-100 dark:bg-slate-800"></div>
+						<div class="h-4 w-4/6 animate-pulse rounded bg-slate-100 dark:bg-slate-800"></div>
+					</div>
+				{:else}
+					{@html profil.deskripsi || '<p class="text-slate-400">Deskripsi belum ditambahkan.</p>'}
+				{/if}
 			</div>
 
-			<!-- Contact Info -->
+			<!-- Additional Info/Notice -->
 			<div
 				class="rounded-xl bg-linear-to-br from-ppid-primary to-ppid-text p-6 text-center text-white md:p-8"
 			>

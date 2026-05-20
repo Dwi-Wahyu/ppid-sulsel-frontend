@@ -4,179 +4,92 @@
 	import TinyMCE from '$lib/components/TinyMCE.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 	import FilePond from '$lib/components/FilePond.svelte';
-	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { getImageUrl } from '$lib/get-image-url';
 
 	let { data } = $props();
 
 	// State management
 	let loading = $state(false);
-	let fetching = $state(true);
-	let nm_skpd = $state('');
+	let showNotification = $state(false);
+	let notificationMessage = $state('');
+	let notificationType = $state<'success' | 'danger'>('success');
 
-	let tupoksiType = $state<'file' | 'text'>('file');
-	let tupoksi_text = $state('');
-	let uploadedTupoksi: any = $state(null);
-	let currentTupoksi = $state(''); // The raw value from DB
+	// Form states
+	let tupoksiType = $state<'text' | 'file'>(data.skpd?.tupoksi_type || 'text');
+	let tupoksi_text = $state(data.skpd?.tupoksi_text || '');
+	let currentTupoksi = $state(data.skpd?.tupoksi || '');
+	let uploadedTupoksi = $state<File | null>(null);
 
-	let notification = $state({
-		show: false,
-		title: '',
-		description: '',
-		theme: 'success' as 'success' | 'error' | 'warning' | 'info'
-	});
-
-	function triggerNotify(theme: 'success' | 'error', title: string, description: string) {
-		notification.theme = theme;
-		notification.title = title;
-		notification.description = description;
-		notification.show = true;
-	}
-
-	async function loadTupoksi() {
-		fetching = true;
-		try {
-			const response = await api.get(`/admin/skpd/${data.user?.id_skpd}/tupoksi`);
-			if (response.success) {
-				currentTupoksi = response.data.tupoksi || '';
-				nm_skpd = response.data.nm_skpd || '';
-
-				if (currentTupoksi && !currentTupoksi.toLowerCase().endsWith('.pdf')) {
-					tupoksiType = 'text';
-					tupoksi_text = currentTupoksi;
-				} else {
-					tupoksiType = 'file';
-				}
-			}
-		} catch (error: any) {
-			triggerNotify('error', 'Gagal Memuat', error.message || 'Data tupoksi tidak dapat diambil');
-		} finally {
-			fetching = false;
-		}
-	}
-
-	async function handleUpdate() {
+	async function handleSubmit(e: SubmitEvent) {
+		e.preventDefault();
 		loading = true;
-		try {
-			const submitFormData = new FormData();
 
-			if (tupoksiType === 'file') {
-				if (uploadedTupoksi) {
-					const file = Array.isArray(uploadedTupoksi) ? uploadedTupoksi[0] : uploadedTupoksi;
-					submitFormData.append('tupoksi', file.file || file);
-				}
-			} else {
-				submitFormData.append('tupoksi', tupoksi_text);
+		try {
+			const formData = new FormData();
+			formData.append('tupoksi_type', tupoksiType);
+
+			if (tupoksiType === 'text') {
+				formData.append('tupoksi_text', tupoksi_text);
+			} else if (uploadedTupoksi) {
+				formData.append('tupoksi', uploadedTupoksi);
 			}
 
-			submitFormData.append('_method', 'PUT');
+			const response = await api.post('/admin/opd/tupoksi', formData);
 
-			const result = await api.post(`/admin/skpd/${data.user?.id_skpd}/tupoksi`, submitFormData);
-
-			if (result.success) {
-				triggerNotify(
-					'success',
-					'Berhasil Diperbarui',
-					result.message || 'Konten tupoksi telah disimpan.'
-				);
-				// Update current reference to uploaded file/text to reflect changes
-				currentTupoksi = result.data.tupoksi || '';
-				uploadedTupoksi = null; // reset filepond
+			if (response.success) {
+				notificationType = 'success';
+				notificationMessage = 'Tupoksi berhasil diperbarui';
+				currentTupoksi = response.data.tupoksi;
 				await invalidateAll();
+			} else {
+				throw new Error(response.message || 'Gagal memperbarui data');
 			}
 		} catch (error: any) {
-			triggerNotify(
-				'error',
-				'Pembaruan Gagal',
-				error.message || 'Terjadi kesalahan saat menyimpan data.'
-			);
+			notificationType = 'danger';
+			notificationMessage = error.message || 'Terjadi kesalahan sistem';
 		} finally {
 			loading = false;
+			showNotification = true;
 		}
 	}
-
-	$effect(() => {
-		loadTupoksi();
-	});
 </script>
 
 <svelte:head>
-	<title>Update Tugas Pokok & Fungsi - {nm_skpd || 'SKPD'}</title>
+	<title>Kelola Tupoksi - OPD Panel</title>
 </svelte:head>
 
-<NotificationDialog
-	bind:show={notification.show}
-	theme={notification.theme}
-	title={notification.title}
-	description={notification.description}
-	autoClose={true}
-	duration={5000}
-/>
-
-<div class="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
-	<h2 class="text-xl font-semibold text-slate-800 dark:text-slate-100">Tugas Pokok & Fungsi</h2>
-
-	<button
-		type="submit"
-		form="tupoksiForm"
-		disabled={loading}
-		class="inline-flex items-center justify-center rounded-lg bg-ppid-primary px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-ppid-primary-hover active:scale-95 disabled:bg-slate-400"
-	>
-		{#if loading}
-			<svg class="mr-2 h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
-				<circle
-					class="opacity-25"
-					cx="12"
-					cy="12"
-					r="10"
-					stroke="currentColor"
-					stroke-width="4"
-				></circle>
-				<path
-					class="opacity-75"
-					fill="currentColor"
-					d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-				></path>
-			</svg>
-			Menyimpan...
-		{:else}
-			Simpan Perubahan
-		{/if}
-	</button>
+<div class="mb-8">
+	<h1 class="text-2xl font-bold text-slate-900 dark:text-white">Tugas & Fungsi (Tupoksi)</h1>
+	<p class="text-slate-500">Kelola konten tugas dan fungsi instansi Anda.</p>
 </div>
 
-<div>
-	{#if fetching}
-		<div class="flex flex-col items-center justify-center py-12">
-			<div class="h-10 w-10 animate-spin rounded-full border-b-2 border-ppid-primary"></div>
-			<p class="mt-4 text-sm text-slate-500">Memuat data...</p>
-		</div>
-	{:else}
-		<form
-			id="tupoksiForm"
-			onsubmit={(e) => {
-				e.preventDefault();
-				handleUpdate();
-			}}
-		>
-			<div class="mb-6 space-y-4">
-				<div class="flex items-center justify-end">
+<div class="rounded-2xl border border-slate-100 bg-white p-8 shadow-sm dark:bg-slate-800">
+	{#if data.skpd}
+		<form onsubmit={handleSubmit} class="space-y-8">
+			<div class="space-y-4">
+				<div class="flex items-center justify-between">
+					<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">
+						Format Konten
+					</label>
 					<div class="flex rounded-lg bg-slate-100 p-1 dark:bg-slate-900">
 						<button
 							type="button"
-							class="rounded-md px-3 py-1 text-[10px] font-bold transition-all {tupoksiType ===
-							'file'
-								? 'bg-white text-ppid-primary shadow-sm'
-								: 'text-slate-500'}"
-							onclick={() => (tupoksiType = 'file')}>FILE PDF</button
+							class="rounded-md px-4 py-1.5 text-xs font-bold transition-all {tupoksiType === 'text'
+								? 'bg-white text-ppid-primary shadow-sm dark:bg-slate-800'
+								: 'text-slate-500 hover:text-slate-700'}"
+							onclick={() => (tupoksiType = 'text')}
 						>
+							Teks Editor
+						</button>
 						<button
 							type="button"
-							class="rounded-md px-3 py-1 text-[10px] font-bold transition-all {tupoksiType ===
-							'text'
-								? 'bg-white text-ppid-primary shadow-sm'
-								: 'text-slate-500'}"
-							onclick={() => (tupoksiType = 'text')}>TEKS HTML</button
+							class="rounded-md px-4 py-1.5 text-xs font-bold transition-all {tupoksiType === 'file'
+								? 'bg-white text-ppid-primary shadow-sm dark:bg-slate-800'
+								: 'text-slate-500 hover:text-slate-700'}"
+							onclick={() => (tupoksiType = 'file')}
 						>
+							File PDF
+						</button>
 					</div>
 				</div>
 
@@ -191,7 +104,7 @@
 					{#if currentTupoksi && currentTupoksi.toLowerCase().endsWith('.pdf') && !uploadedTupoksi}
 						<p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
 							<a
-								href="{PUBLIC_BACKEND_URL}/uploads/{currentTupoksi}"
+								href={getImageUrl(currentTupoksi)}
 								target="_blank"
 								class="text-ppid-primary hover:underline">Lihat PDF saat ini</a
 							>
@@ -201,6 +114,23 @@
 					<TinyMCE bind:value={tupoksi_text} height={500} />
 				{/if}
 			</div>
+
+			<div class="flex justify-end pt-4">
+				<button
+					type="submit"
+					disabled={loading}
+					class="rounded-xl bg-ppid-primary px-8 py-3 font-bold text-white shadow-lg shadow-ppid-primary/20 transition-all hover:bg-ppid-primary/90 active:scale-95 disabled:opacity-50"
+				>
+					{loading ? 'Menyimpan...' : 'Simpan Perubahan'}
+				</button>
+			</div>
 		</form>
 	{/if}
 </div>
+
+<NotificationDialog
+	bind:show={showNotification}
+	theme={notificationType}
+	title={notificationType === 'success' ? 'Berhasil!' : 'Gagal!'}
+	description={notificationMessage}
+/>

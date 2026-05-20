@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { PUBLIC_API_URL, PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { getImageUrl } from '$lib/get-image-url';
 	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 	import FilePond from '$lib/components/FilePond.svelte';
@@ -326,7 +326,7 @@
 						<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
 							{#if item.file}
 								<a
-									href={`${PUBLIC_BACKEND_URL}/uploads/ikphn/${item.file}`}
+									href={getImageUrl(`ikphn/${item.file}`)}
 									target="_blank"
 									class="text-blue-600 hover:underline dark:text-blue-400"
 								>
@@ -575,7 +575,7 @@
 					{#if selectedItem.file}
 						<p class="mb-2 text-sm text-slate-600 dark:text-slate-400">
 							File saat ini: <a
-								href={`${PUBLIC_BACKEND_URL}/uploads/ikphn/${selectedItem.file}`}
+								href={getImageUrl(`ikphn/${selectedItem.file}`)}
 								target="_blank"
 								class="text-blue-600 hover:underline dark:text-blue-400"
 							>
