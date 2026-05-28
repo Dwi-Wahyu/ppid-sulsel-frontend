@@ -36,7 +36,14 @@ export const apiFetch = async (endpoint: string, options: any = {}) => {
 			return;
 		}
 
-		const result = await response.json();
+		let result;
+		const contentType = response.headers.get('content-type');
+		if (contentType && contentType.includes('application/json')) {
+			result = await response.json();
+		} else {
+			result = { message: await response.text() };
+		}
+
 		if (!response.ok) throw result;
 		return result;
 	} catch (error) {

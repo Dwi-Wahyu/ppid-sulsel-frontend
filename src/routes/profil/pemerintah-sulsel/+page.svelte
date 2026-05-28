@@ -4,8 +4,8 @@
 	import PageTitle from '$lib/components/PageTitle.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { onMount } from 'svelte';
-	import { PUBLIC_API_URL } from '$env/static/public';
 	import { getImageUrl } from '$lib/get-image-url';
+	import { api } from '$lib/api';
 
 	interface ProfilData {
 		deskripsi: string;
@@ -23,8 +23,7 @@
 
 	onMount(async () => {
 		try {
-			const response = await fetch(`${PUBLIC_API_URL}/public/profil/pemerintah`);
-			const result = await response.json();
+			const result = await api.get('/public/profil/pemerintah');
 			if (result.success && result.data) {
 				profil.deskripsi = result.data.deskripsi;
 				if (result.data.foto_gubernur) {

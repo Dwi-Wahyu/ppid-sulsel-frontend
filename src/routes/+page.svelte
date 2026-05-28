@@ -10,7 +10,7 @@
 	import FAQ from '$lib/components/FAQ.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import { onMount } from 'svelte';
-	import { env } from '$env/dynamic/public';
+	import { api } from '$lib/api';
 
 	onMount(async () => {
 		const today = new Date().toISOString().split('T')[0];
@@ -18,9 +18,7 @@
 
 		if (lastVisited !== today) {
 			try {
-				await fetch(`${env.PUBLIC_API_URL}/track-visitor`, {
-					method: 'POST'
-				});
+				await api.post('/track-visitor', {});
 				localStorage.setItem('visited_today', today);
 			} catch (error) {
 				console.error('Failed to track visitor', error);

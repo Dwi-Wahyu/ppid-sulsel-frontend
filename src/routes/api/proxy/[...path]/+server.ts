@@ -2,9 +2,20 @@ import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
 
+export const GET: RequestHandler = async (event) => fallback(event);
+export const POST: RequestHandler = async (event) => fallback(event);
+export const PUT: RequestHandler = async (event) => fallback(event);
+export const DELETE: RequestHandler = async (event) => fallback(event);
+
 export const fallback: RequestHandler = async ({ url, params, request, locals }) => {
 	// Ambil API_URL dari dynamic env
 	const API_URL = env.API_URL;
+
+	if (!API_URL) {
+		console.error('Proxy Error: API_URL is not defined in environment variables');
+		throw error(500, 'Konfigurasi API_URL tidak ditemukan');
+	}
+
 	// Ambil token dari locals (yang diisi oleh hooks.server.ts)
 	const token = locals.token;
 
@@ -26,6 +37,8 @@ export const fallback: RequestHandler = async ({ url, params, request, locals })
 
 	// Bangun URL target (menggunakan url.search untuk query params)
 	const targetUrl = `${API_URL}/${params.path}${url.search}`;
+
+	console.log(`Proxying ${request.method} ${url.pathname} -> ${targetUrl}`);
 
 	try {
 		// Lakukan Request ke Laravel

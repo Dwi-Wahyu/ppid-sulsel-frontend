@@ -5,6 +5,7 @@
 	import { env } from '$env/dynamic/public';
 	import SearchModal from './SearchModal.svelte';
 	import { api } from '$lib/api';
+	import { getImageUrl } from '$lib/get-image-url';
 
 	// Define types based on Laravel API contract
 	interface SlideBanner {
@@ -36,21 +37,36 @@
 	async function fetchBanners() {
 		try {
 			const json: ApiResponse = await api.get(`/public/slide-banner`);
+			// console.log('Banners API Response:', json);
 
-			if (json.success && json.data) {
+			if (json.success && json.data && json.data.length > 0) {
 				// Filter active and sort by order
 				const activeSlides = json.data.filter((s) => s.is_active).sort((a, b) => a.order - b.order);
+				// console.log('Active Slides:', activeSlides);
 
 				// Transform filename to full URL
 				slides = activeSlides.map((s) => getImageUrl(`slide-banner/${s.nm_slide}`));
+				// console.log('Generated Slide URLs:', slides);
+
+				// If after filtering we have no slides, use fallback
+				if (slides.length === 0) {
+					console.warn('No active slides found, using fallback.');
+					useFallback();
+				}
+			} else {
+				console.warn('API returned no data or success is false, using fallback.');
+				useFallback();
 			}
 		} catch (e) {
 			console.error('Failed to fetch banners:', e);
-			// Fallback mock data if API fails
-			slides = ['/images/banner1.jpg', '/images/banner2.jpg', '/images/banner3.jpg'];
+			useFallback();
 		} finally {
 			isLoading = false;
 		}
+	}
+
+	function useFallback() {
+		slides = ['/images/welcome1.png', '/images/bannertest.png', '/images/ppid-3.png'];
 	}
 
 	onMount(async () => {
@@ -379,4 +395,6 @@
 <SearchModal bind:isOpen={searchModalOpen} />
 
 <!-- Search Modal Component -->
+<SearchModal bind:isOpen={searchModalOpen} />
+>
 <SearchModal bind:isOpen={searchModalOpen} />

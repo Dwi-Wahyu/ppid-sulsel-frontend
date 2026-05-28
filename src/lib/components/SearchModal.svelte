@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { fade, fly } from 'svelte/transition';
 	import { env } from '$env/dynamic/public';
+	import { api } from '$lib/api';
 
 	// Props
 	interface SearchResult {

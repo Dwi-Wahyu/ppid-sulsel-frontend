@@ -18,7 +18,7 @@
 
 	onMount(async () => {
 		try {
-			const result = await api.get(`/public/profil-pemerintah`);
+			const result = await api.get(`/public/profil/pemerintah`);
 			if (result && result.data) {
 				const d = result.data;
 
@@ -96,6 +96,7 @@
 									<a
 										href={leader.fb}
 										target="_blank"
+										aria-label="Facebook"
 										class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-white backdrop-blur-md transition-colors hover:bg-ppid-primary"
 									>
 										<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"
@@ -109,6 +110,7 @@
 									<a
 										href={leader.ig}
 										target="_blank"
+										aria-label="Instagram"
 										class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-white backdrop-blur-md transition-colors hover:bg-ppid-primary"
 									>
 										<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"

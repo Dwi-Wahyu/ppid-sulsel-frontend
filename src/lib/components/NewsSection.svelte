@@ -22,7 +22,8 @@
 	onMount(async () => {
 		try {
 			const res = await api.get('/public/berita/latest');
-			if (res.success) {
+			// Handle both wrapped {success: true, data: []} and direct {data: []}
+			if (res.data) {
 				news = res.data;
 			}
 		} catch (error) {
