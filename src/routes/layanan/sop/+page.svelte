@@ -89,7 +89,7 @@
 </script>
 
 <svelte:head>
-	<title>{m['sop.title']()} - PPID Provinsi Sulawesi Selatan</title>
+	<title>{m['sop_page.title']()} - PPID Provinsi Sulawesi Selatan</title>
 </svelte:head>
 
 <main class="min-h-screen bg-slate-50 dark:bg-slate-900">
@@ -98,14 +98,14 @@
 			<Breadcrumb
 				items={[
 					{ label: m['common.home'](), href: '/' },
-					{ label: m['common.services']() },
+					{ label: m['layanan.services']() },
 					{ label: 'SOP' }
 				]}
 				class="mb-6 text-white/80"
 			/>
-			<h1 class="text-4xl font-black md:text-5xl">{m['sop.title']()}</h1>
+			<h1 class="text-4xl font-black md:text-5xl">{m['sop_page.title']()}</h1>
 			<p class="mt-4 max-w-2xl text-lg text-white/80">
-				{m['sop.description']()}
+				{m['sop_page.subtitle']()}
 			</p>
 		</div>
 		<div
@@ -123,7 +123,7 @@
 						type="text"
 						bind:value={searchTerm}
 						oninput={handleSearch}
-						placeholder={m['sop.search_placeholder']()}
+						placeholder={m['sop_page.search_placeholder']()}
 						class="w-full rounded-2xl border-none bg-slate-50 py-4 pr-4 pl-12 shadow-inner ring-2 ring-transparent transition-all focus:ring-ppid-primary/20 dark:bg-slate-900 dark:text-white"
 					/>
 					<svg
@@ -145,7 +145,7 @@
 			{#if isLoading}
 				<div class="flex flex-col items-center justify-center py-20">
 					<div class="h-12 w-12 animate-spin rounded-full border-4 border-ppid-primary border-t-transparent"></div>
-					<p class="mt-4 font-medium text-slate-500">{m['common.loading']()}</p>
+					<p class="mt-4 font-medium text-slate-500">{m['form.searching']()}</p>
 				</div>
 			{:else if sopList.length === 0}
 				<div class="py-20 text-center">
@@ -154,7 +154,7 @@
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
 						</svg>
 					</div>
-					<p class="text-lg font-medium text-slate-400">{m['sop.no_data']()}</p>
+					<p class="text-lg font-medium text-slate-400">{m['sop_page.no_data']()}</p>
 				</div>
 			{:else}
 				<div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -184,7 +184,7 @@
 									<svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
 									</svg>
-									{item.jumlah_download} {m['sop.downloads']()}
+									{item.jumlah_download} {m['public_info.detail.downloads']()}
 								</div>
 								<div class="flex gap-2">
 									<button
@@ -211,7 +211,7 @@
 								disabled={currentPage === 1}
 								class="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-xs transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-600 dark:bg-slate-700 dark:text-gray-300 dark:hover:bg-slate-600"
 							>
-								{m['common.previous']()}
+								{m['common.prev']()}
 							</button>
 							<span class="px-4 text-sm font-bold text-slate-600 dark:text-slate-300">
 								{currentPage} / {totalPages}

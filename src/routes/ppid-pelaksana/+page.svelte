@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { untrack } from 'svelte';
 	import { getImageUrl } from '$lib/get-image-url';
 	import * as m from '$lib/paraglide/messages.js';
+	import Footer from '$lib/components/Footer.svelte';
 
 	let { data } = $props();
 
-	let searchQuery = $state(data.search || '');
+	let searchQuery = $state(untrack(() => data.search || ''));
 
 	function handleSearch(e: SubmitEvent) {
 		e.preventDefault();
@@ -24,19 +26,19 @@
 </script>
 
 <svelte:head>
-	<title>{m['ppid_pel.title']()} - PPID Provinsi Sulawesi Selatan</title>
+	<title>{m['ppid_pelaksana.title']()} - PPID Provinsi Sulawesi Selatan</title>
 </svelte:head>
 
 <main class="min-h-screen bg-slate-50 dark:bg-slate-900">
 	<!-- Hero Section -->
-	<div class="relative overflow-hidden bg-ppid-primary py-24 text-white">
-		<div class="container relative z-10 mx-auto px-4">
+	<div class="relative overflow-hidden bg-ppid-primary pt-12 pb-24 text-white">
+		<div class="relative z-10 container mx-auto px-4">
 			<div class="max-w-3xl">
 				<h1 class="mb-6 text-4xl font-black md:text-6xl">
-					{m['ppid_pel.hero_title']()}
+					{m['ppid_pelaksana.title']()}
 				</h1>
 				<p class="text-lg text-white/80 md:text-xl">
-					{m['ppid_pel.hero_desc']()}
+					{m['ppid_pelaksana.description']()}
 				</p>
 			</div>
 		</div>
@@ -53,8 +55,10 @@
 	</div>
 
 	<!-- Content Section -->
-	<div class="container mx-auto -mt-12 px-4 pb-20">
-		<div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-800 dark:bg-slate-800">
+	<div class="relative z-20 container mx-auto -mt-16 px-4 pb-20">
+		<div
+			class="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-800 dark:bg-slate-800"
+		>
 			<!-- Search & Filter -->
 			<div class="mb-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 				<div class="flex-1">
@@ -67,6 +71,7 @@
 						/>
 						<button
 							type="submit"
+							aria-label="Cari"
 							class="absolute top-1/2 right-4 -translate-y-1/2 text-slate-400 hover:text-ppid-primary"
 						>
 							<svg
@@ -86,10 +91,6 @@
 						</button>
 					</form>
 				</div>
-
-				<div class="text-sm font-bold text-slate-400 uppercase tracking-widest">
-					Total: {data.pagination.total} {m['ppid_pel.total_instansi']()}
-				</div>
 			</div>
 
 			<!-- SKPD Grid -->
@@ -101,7 +102,7 @@
 					>
 						<div class="relative mb-6 h-24 w-24">
 							<div
-								class="absolute inset-0 animate-pulse rounded-full bg-ppid-primary/5 group-hover:scale-110 group-hover:bg-ppid-primary/10 transition-all duration-300"
+								class="absolute inset-0 animate-pulse rounded-full bg-ppid-primary/5 transition-all duration-300 group-hover:scale-110 group-hover:bg-ppid-primary/10"
 							></div>
 							<div
 								class="relative flex h-full w-full items-center justify-center rounded-full border-4 border-white bg-white shadow-lg transition-colors duration-300 group-hover:border-ppid-accent/30 dark:border-slate-600 dark:bg-slate-700"
@@ -123,9 +124,9 @@
 						</h3>
 
 						<div
-							class="mt-auto flex items-center text-xs font-bold text-slate-400 uppercase tracking-tighter"
+							class="mt-auto flex items-center text-xs font-bold tracking-tighter text-slate-400 uppercase"
 						>
-							<span>{m['ppid_pel.view_profile']()}</span>
+							<span>{m['public_info.view_detail']()}</span>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								class="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1"
@@ -166,7 +167,7 @@
 							/>
 						</svg>
 					</div>
-					<p class="text-xl font-medium text-slate-400">{m['ppid_pel.no_data']()}</p>
+					<p class="text-xl font-medium text-slate-400">{m['ppid_pel.no_result']()}</p>
 				</div>
 			{/if}
 
@@ -178,7 +179,7 @@
 						disabled={data.pagination.current_page === 1}
 						class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-700 shadow-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-200 dark:hover:bg-slate-700"
 					>
-						&laquo; {m['common.previous']()}
+						&laquo; {m['common.prev']()}
 					</button>
 
 					<span class="px-4 py-2 text-gray-600 dark:text-gray-300">
@@ -200,3 +201,5 @@
 		</div>
 	</div>
 </main>
+
+<Footer />

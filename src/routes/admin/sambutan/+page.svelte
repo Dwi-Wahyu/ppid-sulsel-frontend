@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { untrack } from 'svelte';
 	import type { PageData, ActionData } from './$types';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import { getImageUrl } from '$lib/get-image-url';
@@ -10,10 +11,10 @@
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
 	// Inisialisasi state dari data SSR
-	let formData = $state({
+	let formData = $state(untrack(() => ({
 		nm_profil: data.sambutan?.nm_profil || 'Sambutan',
 		deskripsi: data.sambutan?.deskripsi || ''
-	});
+	})));
 
 	let uploadedFile = $state<any>(null);
 	let isSaving = $state(false);

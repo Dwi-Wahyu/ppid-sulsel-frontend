@@ -109,9 +109,9 @@
 		>
 			<!-- Gambar Banner -->
 			<div>
-				<label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+				<div class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
 					Gambar Banner <span class="text-rose-500">*</span>
-				</label>
+				</div>
 				<FilePond
 					bind:value={nm_slide}
 					name="nm_slide"

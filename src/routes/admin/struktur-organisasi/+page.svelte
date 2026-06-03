@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { api } from '$lib/api'; // Menggunakan helper proxy
-	import { PUBLIC_API_URL, PUBLIC_BACKEND_URL } from '$env/static/public';
 	import FilePond from '$lib/components/FilePond.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
+	import { getImageUrl } from '$lib/get-image-url';
 
 	interface SettingData {
 		struktur_organisasi_path: string | null;
@@ -203,7 +203,5 @@
 	bind:show={showNotification}
 	theme={notificationType}
 	title={notificationType === 'success' ? 'Berhasil!' : 'Gagal!'}
-	description={notificationMessage}
-/>'success' ? 'Berhasil!' : 'Gagal!'}
 	description={notificationMessage}
 />

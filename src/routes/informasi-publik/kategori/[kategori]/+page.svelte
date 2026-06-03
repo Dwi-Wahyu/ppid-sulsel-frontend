@@ -3,194 +3,344 @@
 	import { page } from '$app/state';
 	import * as m from '$lib/paraglide/messages.js';
 	import { getImageUrl } from '$lib/get-image-url';
+	import { api } from '$lib/api';
+	import { untrack } from 'svelte';
+	import type { KategoriResponse } from '$lib/types/informasi';
+	import Footer from '$lib/components/Footer.svelte';
 
-	// Mengambil props dari load function
 	let { data } = $props();
 
-	// State untuk form input
-	let searchQuery = $state('');
+	// State untuk data dan status fetch
+	let kategoriData = $state<KategoriResponse | null>(null);
+	let isLoading = $state(true);
+	let error = $state<string | null>(null);
 
-	// Reaktif terhadap perubahan data filter
-	$effect(() => {
-		searchQuery = data.filters.search || '';
+	// State untuk form input
+	let searchQuery = $state(untrack(() => data.filters.search || ''));
+
+	// Mapping slug kategori ke key paraglide untuk judul halaman reaktif
+	const categoryTitle = $derived.by(() => {
+		const slug = page.params.kategori;
+		switch (slug) {
+			case 'berkala':
+				return m['public_info_types.berkala']();
+			case 'serta-merta':
+				return m['public_info_types.serta_merta']();
+			case 'setiap-saat':
+				return m['public_info_types.setiap_saat']();
+			case 'dikecualikan':
+				return m['public_info_types.dikecualikan']();
+			case 'pengadaan':
+				return m['public_info_types.pengadaan']();
+			case 'daftar-informasi-publik':
+				return m['public_info_types.daftar_informasi_publik']();
+			case 'daftar-informasi-dikecualikan':
+				return m['public_info_types.daftar_informasi_dikecualikan']();
+			default:
+				return kategoriData?.category?.nm_kat_info || 'Informasi Publik';
+		}
 	});
 
-	// Data informasi dari hasil fetch SSR
-	let informasi = $derived(data.informasiData.data.data);
-	let pagination = $derived(data.informasiData.data);
-	let category = $derived(data.informasiData.category);
+	// Fetch data client-side
+	async function fetchData() {
+		isLoading = true;
+		error = null;
 
-	// Fungsi untuk memperbarui pencarian
-	function handleSearch(e: Event) {
-		e.preventDefault();
-		const url = new URL(page.url);
-		url.searchParams.set('search', searchQuery);
-		url.searchParams.set('page', '1'); // Reset ke halaman pertama saat mencari
-		goto(url.toString());
+		try {
+			const currentKategori = page.params.kategori;
+			const currentPage = page.url.searchParams.get('page') || '1';
+			const currentSearch = page.url.searchParams.get('search') || '';
+			const currentTahun = page.url.searchParams.get('tahun') || '';
+
+			const response = await api.get(`/public/informasi/kategori/${currentKategori}`, {
+				page: currentPage,
+				search: currentSearch,
+				tahun: currentTahun
+			});
+
+			if (response && response.data) {
+				kategoriData = response;
+			} else {
+				throw new Error('Gagal mengambil data: Format respon tidak valid');
+			}
+		} catch (err: any) {
+			console.error('Fetch Error:', err);
+			error = err.message || 'Terjadi kesalahan saat memuat data';
+		} finally {
+			isLoading = false;
+		}
 	}
 
-	// Fungsi untuk berpindah halaman
-	function changePage(pageNumber: number | string) {
-		if (typeof pageNumber === 'string' && pageNumber === '...') return;
+	// Trigger fetch saat params atau search params berubah
+	$effect(() => {
+		const _trigger = page.url.href;
+		fetchData();
+	});
 
-		const url = new URL(page.url);
-		url.searchParams.set('page', pageNumber.toString());
-		goto(url.toString());
+	// Derived values dari data yang di-fetch
+	let informasi = $derived(kategoriData?.data?.data || []);
+	let pagination = $derived(kategoriData?.data || { current_page: 1, last_page: 1, links: [] });
+
+	function getFileUrl(file: string) {
+		if (!file) return null;
+		return getImageUrl(`informasi/${encodeURIComponent(file)}`);
 	}
 
-	// Helper untuk format ekstensi file
 	function getFileExt(file: string) {
 		if (!file) return '-';
 		return file.split('.').pop()?.toUpperCase() ?? '-';
 	}
+
+	async function handleSearch(e: SubmitEvent) {
+		e.preventDefault();
+		const params = new URLSearchParams(page.url.searchParams);
+		if (searchQuery) {
+			params.set('search', searchQuery);
+		} else {
+			params.delete('search');
+		}
+		params.set('page', '1');
+		await goto(`?${params.toString()}`, { keepFocus: true, noScroll: true });
+	}
+
+	function handlePageChange(pageNum: number | string | null) {
+		if (!pageNum || pageNum === '...') return;
+		const params = new URLSearchParams(page.url.searchParams);
+		params.set('page', String(pageNum));
+		goto(`?${params.toString()}`);
+	}
 </script>
 
-<svelte:head>
-	<title>{category?.nm_kat_info || 'Informasi Publik'} - PPID Provinsi Sulawesi Selatan</title>
-</svelte:head>
-
-<main class="min-h-screen bg-gray-50 py-12 dark:bg-slate-900">
-	<div class="container mx-auto px-4">
-		<!-- Header Kategori -->
-		<div class="mb-10 text-center">
-			<span
-				class="mb-3 inline-block rounded-full bg-ppid-primary/10 px-4 py-1.5 text-xs font-bold text-ppid-primary uppercase tracking-widest"
+<div
+	class="border-b border-gray-200 bg-white font-['Plus_Jakarta_Sans'] dark:border-slate-700 dark:bg-slate-800"
+>
+	<div class="container mx-auto px-4 py-6">
+		<nav class="mb-4 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+			<a
+				title={m['breadcrumb.home']()}
+				href="/"
+				class="transition-colors hover:text-ppid-primary dark:text-white"
 			>
-				{m['public_info.category_title']()}
-			</span>
-			<h1 class="text-3xl font-black text-gray-900 md:text-4xl dark:text-white">
-				{category?.nm_kat_info}
-			</h1>
-		</div>
-
-		<!-- Search Bar -->
-		<div class="mx-auto mb-10 max-w-2xl">
-			<form onsubmit={handleSearch} class="relative">
-				<input
-					type="text"
-					bind:value={searchQuery}
-					placeholder={m['public_info.search_placeholder']()}
-					class="w-full rounded-2xl border-none bg-white py-4 pr-32 pl-6 shadow-lg shadow-gray-200/50 ring-2 ring-transparent transition-all focus:ring-ppid-primary/20 dark:bg-slate-800 dark:text-white dark:shadow-none"
-				/>
-				<button
-					type="submit"
-					class="absolute top-2 right-2 rounded-xl bg-ppid-primary px-6 py-2.5 font-bold text-white transition-transform hover:bg-ppid-primary/90 active:scale-95"
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="16"
+					height="16"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					class="h-4 w-4"
 				>
-					{m['public_info.search_button']()}
-				</button>
-			</form>
+					<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline
+						points="9 22 9 12 15 12 15 22"
+					/>
+				</svg>
+			</a>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="16"
+				height="16"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				class="h-4 w-4 text-gray-400"
+			>
+				<path d="m9 18 6-6-6-6" />
+			</svg>
+			<span class="font-medium text-ppid-primary dark:text-white">
+				{categoryTitle}
+			</span>
+		</nav>
+
+		<div class="flex items-end justify-between">
+			<div>
+				<h1 class="mb-2 text-3xl font-bold text-ppid-primary md:text-4xl dark:text-white">
+					{categoryTitle}
+				</h1>
+				<p class="text-gray-600 dark:text-gray-300">
+					{m['public_info.desc']()}
+				</p>
+			</div>
+			<div class="hidden md:block">
+				<div class="h-1 w-20 rounded-full bg-linear-to-r from-ppid-primary to-transparent"></div>
+			</div>
 		</div>
+	</div>
+</div>
 
-		<!-- Dokumen Grid/List -->
-		<div class="mx-auto max-w-5xl space-y-4">
-			{#if informasi.length === 0}
-				<div class="rounded-3xl bg-white py-20 text-center dark:bg-slate-800">
-					<p class="text-lg font-medium text-gray-400">
-						{m['public_info.no_data']()}
-					</p>
-				</div>
-			{:else}
-				{#each informasi as item}
-					<div
-						class="group flex flex-col items-start justify-between gap-4 rounded-3xl border border-gray-100 bg-white p-6 transition-all hover:border-ppid-primary/20 hover:shadow-xl hover:shadow-gray-200/40 md:flex-row md:items-center dark:border-slate-800 dark:bg-slate-800 dark:hover:shadow-none"
+<main class="bg-gray-50 py-10 font-['Plus_Jakarta_Sans'] dark:bg-slate-900">
+	<div class="container mx-auto px-4">
+		<div class="mx-auto max-w-7xl">
+			<form onsubmit={handleSearch} class="mb-6 flex gap-4">
+				<div class="relative flex-1">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="20"
+						height="20"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						class="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"
 					>
-						<div class="flex flex-1 items-start gap-4 overflow-hidden">
-							<div
-								class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gray-50 text-gray-400 transition-colors group-hover:bg-ppid-primary/10 group-hover:text-ppid-primary dark:bg-slate-900"
-							>
-								<svg
-									width="24"
-									height="24"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-								>
-									<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-									<polyline points="14 2 14 8 20 8" />
-									<line x1="16" y1="13" x2="8" y2="13" />
-									<line x1="16" y1="17" x2="8" y2="17" />
-									<polyline points="10 9 9 9 8 9" />
-								</svg>
-							</div>
-							<div class="min-w-0 flex-1">
-								<h3
-									class="mb-1 truncate text-lg font-bold text-gray-900 transition-colors group-hover:text-ppid-primary dark:text-white"
-								>
-									{item.judul}
-								</h3>
-								<div class="flex flex-wrap items-center gap-3 text-xs font-medium text-gray-400">
-									<span class="flex items-center gap-1">
-										<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-											<rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-											<line x1="16" y1="2" x2="16" y2="6" />
-											<line x1="8" y1="2" x2="8" y2="6" />
-											<line x1="3" y1="10" x2="21" y2="10" />
-										</svg>
-										{new Date(item.tgl_upload).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
-									</span>
-									<span class="flex items-center gap-1">
-										<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-											<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-											<path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-										</svg>
-										{item.skpd.nm_skpd}
-									</span>
-									<span class="rounded-md bg-gray-100 px-2 py-0.5 text-[10px] font-black uppercase dark:bg-slate-900">
-										{getFileExt(item.file)}
-									</span>
-								</div>
-							</div>
-						</div>
-
-						<div class="flex w-full items-center justify-end gap-2 md:w-auto">
-							<a
-								href="/informasi-publik/detail/{item.id_informasi}"
-								class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gray-50 px-5 py-2.5 text-sm font-bold text-gray-600 transition-all hover:bg-gray-100 md:flex-none dark:bg-slate-900 dark:text-gray-400 dark:hover:bg-slate-700"
-							>
-								{m['public_info.view_details']()}
-							</a>
-							{#if item.file}
-								<a
-									href={item.file.startsWith('http') ? item.file : getImageUrl(item.file)}
-									aria-label={m['public_info.download']()}
-									download
-									class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-ppid-primary px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-ppid-primary/20 transition-all hover:bg-ppid-primary/90 md:flex-none"
-								>
-									<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-										<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-										<polyline points="7 10 12 15 17 10" />
-										<line x1="12" y1="15" x2="12" y2="3" />
-									</svg>
-									{m['public_info.download']()}
-								</a>
-							{/if}
-						</div>
-					</div>
-				{/each}
-			{/if}
-
-			<!-- Paginasi -->
-			{#if pagination.last_page > 1}
-				<div class="mt-12 flex justify-center">
-					<div class="flex flex-wrap items-center gap-2 rounded-2xl bg-white p-2 shadow-lg dark:bg-slate-800">
-						{#each pagination.links as link}
-							<button
-								onclick={() => changePage(link.url ? new URL(link.url).searchParams.get('page') || 1 : '...')}
-								disabled={!link.url || link.active}
-								class="flex h-10 min-w-[2.5rem] items-center justify-center rounded-xl px-3 text-sm font-bold transition-all
-                {link.active 
-									? 'bg-ppid-primary text-white shadow-md shadow-ppid-primary/20' 
-									: 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-slate-800 dark:text-gray-200'}"
-							>
-								{@html link.label}
-							</button>
-						{/each}
-					</div>
+						<circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
+					</svg>
+					<input
+						type="text"
+						bind:value={searchQuery}
+						placeholder={m['public_info.search_placeholder_general']()}
+						class="w-full rounded-lg border border-gray-300 py-2.5 pr-4 pl-10 focus:ring-2 focus:ring-ppid-primary focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+					/>
 				</div>
-			{/if}
+				<div class="flex gap-2">
+					<button
+						type="submit"
+						class="hover:bg-opacity-90 rounded-lg bg-ppid-accent px-6 py-2 font-semibold text-white transition-colors"
+					>
+						{m['public_info.search_btn']()}
+					</button>
+					{#if searchQuery || data.filters.search}
+						<a
+							href={page.url.pathname}
+							class="flex items-center justify-center rounded-lg bg-gray-200 px-6 py-2 font-medium text-gray-700 transition-colors hover:bg-gray-300 dark:bg-slate-700 dark:text-gray-200"
+						>
+							{m['public_info.clear_btn']()}
+						</a>
+					{/if}
+				</div>
+			</form>
+
+			<div
+				class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
+			>
+				<div class="overflow-x-auto">
+					<table class="w-full border-collapse text-left">
+						<thead class="bg-ppid-primary text-white">
+							<tr>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
+									>{m['public_info.table.no']()}</th
+								>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
+									>{m['public_info.table.title']()}</th
+								>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
+									>{m['public_info.table.opd']()}</th
+								>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
+									>{m['public_info.table.year']()}</th
+								>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
+									>{m['public_info.table.format']()}</th
+								>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
+									>{m['public_info.table.action']()}</th
+								>
+							</tr>
+						</thead>
+						<tbody class="divide-y divide-gray-100 dark:divide-slate-700">
+							{#if isLoading}
+								{#each Array(5) as _}
+									<tr>
+										<td colspan="6" class="px-4 py-4">
+											<div
+												class="h-6 w-full animate-pulse rounded-md bg-gray-100 dark:bg-slate-700"
+											></div>
+										</td>
+									</tr>
+								{/each}
+							{:else if error}
+								<tr>
+									<td colspan="6" class="py-20 text-center">
+										<p class="mb-4 text-red-500">{error}</p>
+										<button
+											onclick={fetchData}
+											class="rounded-lg bg-ppid-primary px-4 py-2 text-white"
+										>
+											Coba Lagi
+										</button>
+									</td>
+								</tr>
+							{:else}
+								{#each informasi as item, i (item.id_informasi)}
+									<tr class="transition-colors hover:bg-ppid-primary/5 dark:hover:bg-slate-700/50">
+										<td class="px-4 py-4 text-sm font-medium text-gray-600 dark:text-gray-300">
+											{((pagination?.current_page || 1) - 1) * (pagination?.per_page || 1) + i + 1}
+										</td>
+										<td
+											class="min-w-50 px-4 py-4 text-sm leading-relaxed text-gray-800 dark:text-gray-200"
+										>
+											{item.judul}
+										</td>
+										<td class="min-w-62 px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
+											{item.skpd?.nm_skpd ?? '-'}
+										</td>
+										<td
+											class="px-4 py-4 text-sm whitespace-nowrap text-gray-600 dark:text-gray-300"
+										>
+											{new Date(item.tgl_upload).getFullYear()}
+										</td>
+										<td
+											class="px-4 py-4 text-sm whitespace-nowrap text-gray-600 dark:text-gray-300"
+										>
+											{getFileExt(item.file)}
+										</td>
+										<td class="px-4 py-4 text-sm">
+											{#if item.file && getFileUrl(item.file)}
+												<a
+													href={getFileUrl(item.file)}
+													target="_blank"
+													rel="noopener noreferrer"
+													class="font-medium text-ppid-primary hover:underline dark:text-blue-400"
+												>
+													{m['public_info.view']()}
+												</a>
+											{:else}
+												<span class="text-gray-400 italic">Tidak tersedia</span>
+											{/if}
+										</td>
+									</tr>
+								{:else}
+									<tr>
+										<td colspan="6" class="py-20 text-center text-gray-500">
+											{m['public_info.no_data']()}
+										</td>
+									</tr>
+								{/each}
+							{/if}
+						</tbody>
+					</table>
+				</div>
+
+				{#if pagination && pagination.last_page > 1}
+					<div
+						class="border-t border-gray-200 bg-gray-50 px-6 py-4 dark:border-slate-700 dark:bg-slate-900"
+					>
+						<div class="flex flex-wrap justify-center gap-2">
+							{#each pagination.links as link}
+								<button
+									onclick={() => handlePageChange(link.page)}
+									disabled={!link.page || link.active}
+									class="rounded-md border px-4 py-1.5 text-sm font-medium transition-all
+								{link.active
+										? 'border-ppid-primary bg-ppid-primary text-white shadow-md'
+										: 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-200'}"
+								>
+									{@html link.label}
+								</button>
+							{/each}
+						</div>
+					</div>
+				{/if}
+			</div>
 		</div>
 	</div>
 </main>
+
+<Footer />

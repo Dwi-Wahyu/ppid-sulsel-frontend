@@ -25,8 +25,6 @@ export const load: PageServerLoad = async ({ params, fetch, cookies, locals }) =
 
 	const result = await response.json();
 
-	console.log(result.data.disposisi);
-
 	return {
 		pengajuan: result.data,
 		extra: result.extra

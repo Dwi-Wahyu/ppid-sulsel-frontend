@@ -41,15 +41,25 @@
 	<title>{m['maklumat.title']()} - PPID Provinsi Sulawesi Selatan</title>
 </svelte:head>
 
-<main class="min-h-screen bg-white transition-colors dark:bg-slate-900">
-	<PageTitle title={m['maklumat.title']()} />
+<!-- Breadcrumb + Title Section -->
+<div
+	class="border-b border-gray-200 bg-white font-['Plus_Jakarta_Sans'] dark:border-slate-700 dark:bg-slate-800"
+>
+	<div class="container mx-auto px-4 py-6">
+		<Breadcrumb
+			items={[{ label: m['common.home'](), href: '/' }, { label: m['maklumat.title']() }]}
+		/>
 
-	<div class="container mx-auto px-4 py-12">
+		<div class="mt-4">
+			<PageTitle title={m['maklumat.title']()} />
+		</div>
+	</div>
+</div>
+
+<!-- Main Content -->
+<main class="bg-gray-50 py-10 font-['Plus_Jakarta_Sans'] md:py-16 dark:bg-slate-900">
+	<div class="container mx-auto px-4">
 		<div class="mx-auto max-w-4xl">
-			<Breadcrumb
-				items={[{ label: m['common.home'](), href: '/' }, { label: m['maklumat.title']() }]}
-				class="mb-10"
-			/>
 
 			<!-- Maklumat Banner -->
 			<div class="mb-12 overflow-hidden rounded-3xl border border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-800">

@@ -217,10 +217,10 @@
 						</div>
 
 						<!-- Tipe -->
-						<div>
-							<label class="mb-3 block text-sm font-semibold text-gray-800 dark:text-gray-200">
+						<fieldset>
+							<legend class="mb-3 block text-sm font-semibold text-gray-800 dark:text-gray-200">
 								Tipe Jawaban <span class="text-red-500">*</span>
-							</label>
+							</legend>
 							<div class="grid grid-cols-2 gap-4">
 								<label
 									class="group relative flex cursor-pointer items-center gap-3 rounded-lg border-2 border-gray-300 p-4 transition-all hover:border-ppid-primary hover:bg-blue-50 dark:border-slate-600 dark:hover:bg-slate-700"
@@ -264,7 +264,7 @@
 									</div>
 								</label>
 							</div>
-						</div>
+						</fieldset>
 
 						<!-- Actions -->
 						<div

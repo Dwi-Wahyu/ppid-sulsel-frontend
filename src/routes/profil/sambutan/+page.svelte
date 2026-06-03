@@ -38,18 +38,28 @@
 </script>
 
 <svelte:head>
-	<title>{m['profile.welcome_title']()} - PPID Provinsi Sulawesi Selatan</title>
+	<title>{m['profile.greeting_title']()} - PPID Provinsi Sulawesi Selatan</title>
 </svelte:head>
 
-<main class="min-h-screen bg-white transition-colors dark:bg-slate-900">
-	<PageTitle title={m['profile.welcome_title']()} />
+<!-- Breadcrumb + Title Section -->
+<div
+	class="border-b border-gray-200 bg-white font-['Plus_Jakarta_Sans'] dark:border-slate-700 dark:bg-slate-800"
+>
+	<div class="container mx-auto px-4 py-6">
+		<Breadcrumb
+			items={[{ label: m['common.home'](), href: '/' }, { label: m['profile.greeting_title']() }]}
+		/>
 
-	<div class="container mx-auto px-4 py-12">
+		<div class="mt-4">
+			<PageTitle title={m['profile.greeting_title']()} />
+		</div>
+	</div>
+</div>
+
+<!-- Main Content -->
+<main class="bg-gray-50 py-10 font-['Plus_Jakarta_Sans'] md:py-16 dark:bg-slate-900">
+	<div class="container mx-auto px-4">
 		<div class="mx-auto max-w-5xl">
-			<Breadcrumb
-				items={[{ label: m['common.home'](), href: '/' }, { label: m['profile.welcome_title']() }]}
-				class="mb-10"
-			/>
 
 			<div class="grid grid-cols-1 gap-12 lg:grid-cols-3">
 				<!-- Main Content -->
@@ -91,7 +101,7 @@
 							</div>
 							<div class="p-6">
 								<h3 class="mb-1 text-lg font-black text-ppid-primary dark:text-white">
-									{m['leadership.head_ppid_name']()}
+									{m['profile.head_main_ppid']()}
 								</h3>
 								<div class="mb-2 h-0.5 w-12 rounded-full bg-ppid-accent"></div>
 								<p class="text-xs leading-relaxed text-gray-600 dark:text-gray-400">

@@ -1,97 +1,89 @@
 <script lang="ts">
+	import { api } from '$lib/api';
+	import { invalidateAll } from '$app/navigation';
+	import { getImageUrl } from '$lib/get-image-url';
 	import TrackingCardPengajuan from '$lib/components/TrackingCardPengajuan.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
-	import { invalidateAll } from '$app/navigation';
-	import { api } from '$lib/api.js';
-	import { getImageUrl } from '$lib/get-image-url';
+	import FilePond from '$lib/components/FilePond.svelte';
 
 	let { data } = $props();
-	const pengajuan = $derived(data.pengajuan);
 
-	// Form States untuk Respon OPD
+	// Temukan disposisi untuk OPD ini
+	const myDisposisi = $derived(
+		data.pengajuan.disposisi?.find((d: any) => d.id_skpd === data.user?.id_skpd)
+	);
+
+	// Ambil respon terbaru dari OPD ini (jika ada)
+	const myRespon = $derived(
+		myDisposisi?.respon && myDisposisi.respon.length > 0
+			? myDisposisi.respon[myDisposisi.respon.length - 1]
+			: null
+	);
+
+	// State
 	let showOpdResponseModal = $state(false);
-	let opdResponseText = $state('');
-	let opdStatus = $state('selesai');
-	let opdFile = $state<File | null>(null);
+	let opdResponseFile = $state<File | null>(null);
+	let opdResponseNote = $state('');
+	let opdResponseStatus = $state('selesai');
 	let isSubmitting = $state(false);
 
 	// Notification State
 	let showNotification = $state(false);
-	let notificationType = $state<'success' | 'error'>('success');
-	let notificationMessage = $state('');
+	let notificationTheme = $state<'success' | 'error'>('success');
+	let notificationTitle = $state('');
+	let notificationDescription = $state('');
 
-	// Mencari data disposisi yang spesifik untuk SKPD user saat ini
-	const userDisposisi = $derived(
-		pengajuan.disposisi.find((d: any) => d.id_skpd === data.user?.id_skpd)
-	);
+	function closeOpdResponseModal() {
+		showOpdResponseModal = false;
+		opdResponseFile = null;
+		opdResponseNote = '';
+	}
 
-	async function handleOpdResponse(e: Event) {
+	async function handleSubmitOpdResponse(e: SubmitEvent) {
 		e.preventDefault();
-		if (!opdResponseText) return alert('Isi pesan respon terlebih dahulu');
-		if (!userDisposisi) return alert('Data disposisi tidak ditemukan.');
+		if (!myDisposisi) return;
 
 		isSubmitting = true;
 
-		const formData = new FormData();
-		formData.append('respon', opdResponseText);
-		formData.append('status', opdStatus);
-		if (opdFile) {
-			formData.append('file', opdFile);
-		}
-
 		try {
-			await api.post(
-				`/admin/pengajuan-keberatan/disposisi/${userDisposisi.id_disposisi}/respon`,
+			const formData = new FormData();
+			formData.append('respon', opdResponseNote);
+			formData.append('status', opdResponseStatus);
+			if (opdResponseFile) {
+				formData.append('file', opdResponseFile);
+			}
+
+			const response = await api.post(
+				`/admin/pengajuan-keberatan/disposisi/${myDisposisi.id_disposisi}/respon`,
 				formData
 			);
 
-			closeOpdResponseModal();
-			notificationType = 'success';
-			notificationMessage = 'Respon/Jawaban berhasil dikirim ke Admin Utama';
-			showNotification = true;
-
-			await invalidateAll();
-		} catch (err: any) {
-			notificationType = 'error';
-			notificationMessage = err.message || 'Gagal mengirim respon';
-			showNotification = true;
+			if (response.success) {
+				notificationTheme = 'success';
+				notificationTitle = 'Berhasil!';
+				notificationDescription = 'Jawaban Anda telah berhasil dikirim.';
+				closeOpdResponseModal();
+				await invalidateAll();
+			} else {
+				throw new Error(response.message || 'Gagal mengirim jawaban.');
+			}
+		} catch (error: any) {
+			notificationTheme = 'error';
+			notificationTitle = 'Gagal!';
+			notificationDescription = error.message || 'Terjadi kesalahan sistem.';
 		} finally {
 			isSubmitting = false;
+			showNotification = true;
 		}
 	}
 
-    function closeOpdResponseModal() {
-        showOpdResponseModal = false;
-        opdResponseText = '';
-        opdFile = null;
-    }
-
-    function handleBackdropClick(event: MouseEvent, closeFunc: () => void) {
-		if (event.target === event.currentTarget) {
-			closeFunc();
+	function handleBackdropClick(e: MouseEvent, closeFn: () => void) {
+		if (e.target === e.currentTarget) {
+			closeFn();
 		}
 	}
 
-	function getStatusConfig(status: string) {
-		switch (status) {
-			case 'n':
-				return { label: 'Baru', color: 'bg-slate-100 text-slate-700' };
-			case 'p':
-				return { label: 'Menunggu Verifikasi', color: 'bg-amber-100 text-amber-700' };
-			case 'y':
-				return { label: 'Disetujui', color: 'bg-emerald-100 text-emerald-700' };
-			case 'd':
-				return { label: 'Disposisi', color: 'bg-purple-100 text-purple-700' };
-			case 'a':
-				return { label: 'Dijawab', color: 'bg-blue-100 text-blue-700' };
-			case 't':
-				return { label: 'Ditolak', color: 'bg-red-100 text-red-700' };
-			default:
-				return { label: 'Unknown', color: 'bg-slate-100 text-slate-700' };
-		}
-	}
-
-    function formatDate(dateString: string): string {
+	function formatDate(dateString: string): string {
 		const date = new Date(dateString);
 		return new Intl.DateTimeFormat('id-ID', {
 			day: 'numeric',
@@ -103,323 +95,212 @@
 	}
 </script>
 
-<svelte:window
-	onkeydown={(e) => {
-		if (e.key === 'Escape') {
-			if (showOpdResponseModal) closeOpdResponseModal();
-		}
-	}}
-/>
-
 <svelte:head>
-	<title>Detail Pengajuan Keberatan - OPD</title>
+	<title>Detail Pengajuan Keberatan - OPD Panel</title>
 </svelte:head>
 
-<!-- Header -->
-<div
-	class="mb-6 overflow-hidden rounded-2xl bg-linear-to-br from-ppid-primary to-ppid-primary-dark p-8 text-white shadow-xl"
->
-	<div class="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-		<div class="flex flex-1 items-start gap-4">
-			<a
-				href="/opd/pengajuan-keberatan"
-				class="mt-1 shrink-0 rounded-lg p-2 transition-colors hover:bg-white/10"
-				aria-label="Kembali ke daftar pengajuan"
-			>
-				<svg
-					class="h-5 w-5"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-					aria-hidden="true"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M15 19l-7-7 7-7"
-					/>
-				</svg>
-			</a>
-			<div>
-				<h1 class="text-2xl font-bold">Detail Pengajuan Keberatan</h1>
-				<p class="mt-1 font-mono text-sm tracking-wider text-white/80 uppercase">
-					Ref: {pengajuan.no_pendaftaran} — {pengajuan.nama_pemohon}
-				</p>
-			</div>
-		</div>
-		<div class="flex shrink-0 items-center gap-3">
-			<span class="rounded-full border border-white/30 bg-white/20 px-4 py-1.5 text-sm font-bold">
-				{getStatusConfig(pengajuan.status).label}
-			</span>
-			{#if userDisposisi && userDisposisi.status !== 'selesai'}
-				<button
-					type="button"
-					onclick={() => (showOpdResponseModal = true)}
-					class="rounded-lg border border-white/30 bg-white/10 px-4 py-1.5 text-sm font-bold transition-colors hover:bg-white/20"
-				>
-					Kirim Jawaban OPD
-				</button>
-			{/if}
+<div class="mb-8">
+	<div class="flex items-center gap-3">
+		<button
+			onclick={() => history.back()}
+			aria-label="Kembali"
+			class="rounded-xl bg-white p-2 text-slate-500 shadow-sm transition-all hover:text-ppid-primary dark:bg-slate-800"
+		>
+			<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+				<path
+					d="M19 12H5M12 19l-7-7 7-7"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+				/>
+			</svg>
+		</button>
+		<div>
+			<h1 class="text-2xl font-bold text-slate-900 dark:text-white">Detail Pengajuan Keberatan</h1>
+			<p class="text-slate-500">Kelola dan tinjau detail pengajuan keberatan informasi.</p>
 		</div>
 	</div>
 </div>
 
-<!-- Main Content -->
-<div class="grid gap-6 lg:grid-cols-3">
-	<!-- Left: Details -->
-	<div class="space-y-6 lg:col-span-2">
-		<!-- Identitas Pemohon -->
-		<div
-			class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
-		>
-			<div
-				class="border-b border-white/10 bg-linear-to-r from-ppid-primary to-ppid-primary-light p-4"
-			>
-				<h2 class="flex items-center gap-2 text-lg font-bold text-white">
-					<svg
-						class="h-5 w-5"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						aria-hidden="true"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-						/>
-					</svg>
-					Identitas Pemohon
-				</h2>
-			</div>
-			<div class="p-6">
-				<dl class="grid gap-4 md:grid-cols-2">
-					<div>
-						<dt class="text-sm font-semibold text-slate-600 dark:text-slate-400">Nama Lengkap</dt>
-						<dd class="mt-1 text-base text-slate-900 dark:text-slate-100">
-							{pengajuan.nama_pemohon}
-						</dd>
-					</div>
-					<div>
-						<dt class="text-sm font-semibold text-slate-600 dark:text-slate-400">Email</dt>
-						<dd class="mt-1 text-base text-slate-900 dark:text-slate-100">
-							{pengajuan.email_pemohon}
-						</dd>
-					</div>
-					<div>
-						<dt class="text-sm font-semibold text-slate-600 dark:text-slate-400">Pekerjaan</dt>
-						<dd class="mt-1 text-base text-slate-900 dark:text-slate-100">
-							{pengajuan.pekerjaan?.nama_pekerjaan || '-'}
-						</dd>
-					</div>
-					<div class="md:col-span-2">
-						<dt class="text-sm font-semibold text-slate-600 dark:text-slate-400">Alamat</dt>
-						<dd class="mt-1 text-base text-slate-900 dark:text-slate-100">
-							{pengajuan.alamat_pemohon}
-						</dd>
-					</div>
-				</dl>
-			</div>
-		</div>
-
+<div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+	<!-- Main Info -->
+	<div class="space-y-8 lg:col-span-2">
 		<!-- Detail Keberatan -->
-		<div
-			class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
-		>
-			<div
-				class="border-b border-white/10 bg-linear-to-r from-ppid-primary to-ppid-primary-light p-4"
-			>
-				<h2 class="flex items-center gap-2 text-lg font-bold text-white">
-					<svg
-						class="h-5 w-5"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						aria-hidden="true"
+		<div class="rounded-2xl border border-slate-100 bg-white p-8 shadow-sm dark:bg-slate-800">
+			<div class="mb-6 flex items-center justify-between">
+				<h2 class="text-xl font-bold text-slate-900 dark:text-white">Informasi Pengajuan</h2>
+				<span
+					class="rounded-full bg-slate-100 px-4 py-1.5 text-xs font-bold text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+				>
+					{data.pengajuan.no_pendaftaran}
+				</span>
+			</div>
+
+			<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+				<div class="space-y-1">
+					<p class="text-xs font-bold tracking-wider text-slate-400 uppercase">Nama Pemohon</p>
+					<p class="text-base font-semibold text-slate-900 dark:text-white">
+						{data.pengajuan.nama_pemohon}
+					</p>
+				</div>
+				<div class="space-y-1">
+					<p class="text-xs font-bold tracking-wider text-slate-400 uppercase">Tujuan Penggunaan</p>
+					<p class="text-base font-semibold text-slate-900 dark:text-white">
+						{data.pengajuan.tujuan || '-'}
+					</p>
+				</div>
+				<div class="space-y-1 md:col-span-2">
+					<p class="text-xs font-bold tracking-wider text-slate-400 uppercase">Alasan Keberatan</p>
+					<div class="mt-2">
+						<ul class="space-y-2">
+							{#each data.pengajuan.alasan_pengajuan || [] as alasan}
+								<li class="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-300">
+									<svg
+										class="mt-0.5 h-5 w-5 shrink-0 text-red-500"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+										><path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+										/></svg
+									>
+									<span>{alasan.alasan}</span>
+								</li>
+							{/each}
+						</ul>
+					</div>
+				</div>
+				<div class="space-y-1 md:col-span-2">
+					<p class="text-xs font-bold tracking-wider text-slate-400 uppercase">Kasus Posisi</p>
+					<p
+						class="mt-2 rounded-lg bg-slate-50 p-4 whitespace-pre-wrap text-base font-semibold text-slate-900 dark:bg-slate-700/50 dark:text-white"
 					>
+						{data.pengajuan.kasus || '-'}
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- Respon Admin -->
+		{#if data.pengajuan.feedback}
+			<div
+				class="rounded-2xl border border-blue-100 bg-blue-50/50 p-8 dark:border-blue-900/30 dark:bg-blue-900/10"
+			>
+				<div class="mb-4 flex items-center gap-3 text-blue-700 dark:text-blue-400">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
 						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
+							d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
 							stroke-width="2"
-							d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
 						/>
 					</svg>
-					Isi Keberatan
-				</h2>
-			</div>
-			<div class="p-6">
-				<dl class="space-y-6">
-					<div>
-						<dt class="text-sm font-semibold text-slate-600 dark:text-slate-400">
-							Alasan Pengajuan Keberatan
-						</dt>
-						<dd class="mt-2">
-							<ul class="space-y-2">
-								{#each pengajuan.alasan_pengajuan as alasan}
-									<li class="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-300">
-										<svg
-											class="mt-0.5 h-5 w-5 shrink-0 text-ppid-primary"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-											><path
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												stroke-width="2"
-												d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-											/></svg
-										>
-										<span>{alasan.alasan}</span>
-									</li>
-								{/each}
-							</ul>
-						</dd>
-					</div>
-					<div>
-						<dt class="text-sm font-semibold text-slate-600 dark:text-slate-400">
-							Kasus Posisi
-						</dt>
-						<dd
-							class="mt-2 rounded-lg bg-slate-50 p-4 whitespace-pre-wrap text-slate-900 dark:bg-slate-700/50 dark:text-slate-100"
-						>
-							{pengajuan.kasus}
-						</dd>
-					</div>
-				</dl>
-			</div>
-		</div>
-
-		<!-- Tracking Disposisi OPD -->
-		<TrackingCardPengajuan disposisi={pengajuan.disposisi} id_skpd={data.user?.id_skpd} />
-	</div>
-
-	<!-- Right: Actions & Info -->
-	<div class="space-y-6">
-		<div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800">
-			<h3 class="mb-4 text-sm font-bold tracking-widest text-slate-400 uppercase">Informasi Waktu</h3>
-			<div class="space-y-4">
-				<div class="flex justify-between border-b border-slate-100 pb-4 text-sm dark:border-slate-700">
-					<span class="text-slate-500 dark:text-slate-400">Dikirim Pada</span>
-					<span class="font-semibold text-slate-900 dark:text-slate-100"
-						>{formatDate(pengajuan.created_at)}</span
-					>
+					<h2 class="text-lg font-bold">Instruksi Admin PPID</h2>
 				</div>
-                <div class="flex justify-between text-sm">
-					<span class="text-slate-500 dark:text-slate-400">Metode Respon</span>
-					<span class="font-semibold text-slate-900 capitalize dark:text-slate-100">{pengajuan.metode_respon}</span>
-				</div>
+				<p class="leading-relaxed text-blue-900/80 dark:text-blue-200/80">
+					{data.pengajuan.feedback}
+				</p>
 			</div>
-		</div>
+		{/if}
 
-		<!-- Tindakan OPD -->
-		{#if userDisposisi && userDisposisi.status !== 'selesai'}
-			<div
-				class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
-			>
-				<div
-					class="border-b border-white/10 bg-linear-to-r from-ppid-primary to-ppid-primary-light p-4"
-				>
-					<h3 class="flex items-center gap-2 text-lg font-bold text-white">
-						<svg
-							class="h-5 w-5"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-							aria-hidden="true"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M13 10V3L4 14h7v7l9-11h-7z"
-							/>
-						</svg>
-						Tindakan Unit
-					</h3>
-				</div>
-				<div class="p-4">
-					<p class="mb-4 text-sm text-slate-600 dark:text-slate-400">
-						Kirimkan jawaban atau respon resmi dari unit Anda:
-					</p>
+		<!-- Jawaban OPD -->
+		<div class="rounded-2xl border border-slate-100 bg-white p-8 shadow-sm dark:bg-slate-800">
+			<div class="mb-6 flex items-center justify-between">
+				<h2 class="text-xl font-bold text-slate-900 dark:text-white">Jawaban/Respon Anda</h2>
+				{#if !myRespon}
 					<button
-						type="button"
 						onclick={() => (showOpdResponseModal = true)}
-						class="group relative w-full overflow-hidden rounded-xl border-2 border-emerald-100 bg-white p-1 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500 hover:shadow-lg dark:border-emerald-900/50 dark:bg-slate-800"
+						class="rounded-xl bg-ppid-primary px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-ppid-primary/20 transition-all hover:bg-ppid-primary/90"
 					>
+						Kirim Jawaban
+					</button>
+				{/if}
+			</div>
+
+			{#if myRespon}
+				<div class="space-y-6">
+					<div class="rounded-xl bg-slate-50 p-6 dark:bg-slate-900/50">
+						<p class="leading-relaxed text-slate-700 dark:text-slate-300">
+							{myRespon.isi_respon}
+						</p>
+					</div>
+					{#if myRespon.file}
 						<div
-							class="absolute inset-0 bg-linear-to-r from-emerald-50 to-transparent opacity-0 transition-opacity group-hover:opacity-100 dark:from-emerald-900/20"
-						></div>
-						<div class="relative flex items-center gap-4 p-4">
+							class="flex items-center gap-4 rounded-xl border border-slate-100 p-4 dark:border-slate-700"
+						>
 							<div
-								class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 transition-colors group-hover:bg-emerald-600 group-hover:text-white dark:bg-emerald-900/50 dark:text-emerald-400"
+								class="flex h-12 w-12 items-center justify-center rounded-lg bg-ppid-primary/10 text-ppid-primary"
 							>
-								<svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
 									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
+										d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
 										stroke-width="2"
-										d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
 									/>
+									<path d="M14 2v6h6" stroke-width="2" />
 								</svg>
 							</div>
-							<div>
-								<h4 class="font-bold text-slate-900 dark:text-white">Kirim Jawaban</h4>
-								<p class="text-xs text-slate-500 dark:text-slate-400">
-									Berikan tanggapan resmi dari unit/OPD.
+							<div class="flex-1">
+								<p class="text-sm font-bold text-slate-900 dark:text-white">
+									Dokumen Lampiran Jawaban
 								</p>
+								<p class="text-xs text-slate-500">File PDF/Dokumen Pendukung</p>
 							</div>
+							<a
+								href={getImageUrl(`respon-disposisi/${myRespon.file}`)}
+								target="_blank"
+								class="rounded-lg bg-ppid-primary px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-ppid-primary/90"
+							>
+								Unduh File
+							</a>
 						</div>
-					</button>
+					{/if}
 				</div>
-			</div>
-		{/if}
+			{:else}
+				<div class="py-12 text-center">
+					<div
+						class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 text-slate-300 dark:bg-slate-900"
+					>
+						<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+							<path
+								d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-10.6 8.38 8.38 0 0 1 3.8.9"
+								stroke-width="2"
+							/>
+							<path d="M16 5l-2 2h4" stroke-width="2" />
+						</svg>
+					</div>
+					<p class="text-slate-500">Belum ada jawaban yang dikirimkan untuk pengajuan ini.</p>
+				</div>
+			{/if}
+		</div>
+	</div>
 
-        <!-- Jawaban Unit (Jika Sudah Ada) -->
-		{#if userDisposisi && userDisposisi.respon && userDisposisi.respon.length > 0}
-            <div
-                class="overflow-hidden rounded-xl border border-emerald-200 bg-white shadow-sm dark:border-emerald-800/50 dark:bg-slate-800"
-            >
-                <div
-                    class="border-b border-emerald-200 bg-linear-to-r from-emerald-600 to-emerald-700 p-4 dark:border-emerald-800/50"
-                >
-                    <h3 class="flex items-center gap-2 text-sm font-bold text-white uppercase">
-                        Jawaban Unit Anda
-                    </h3>
-                </div>
-                <div class="p-6">
-                    <div class="space-y-4">
-                        <p class="text-sm leading-relaxed text-slate-700 dark:text-slate-300">
-                            {userDisposisi.respon[0].isi_respon}
-                        </p>
-                        {#if userDisposisi.respon[0].file}
-                            <a
-                                href={getImageUrl(`respon-disposisi/${userDisposisi.respon[0].file}`)}
-                                target="_blank"
-                                class="inline-flex items-center gap-2 rounded-lg bg-emerald-50 px-4 py-2 text-xs font-bold text-emerald-700 transition-colors hover:bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400"
-                            >
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                    ><path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
-                                    /></svg
-                                >
-                                Lihat Dokumen Lampiran
-                            </a>
-                        {/if}
-                        <div class="mt-4 flex items-center gap-2 border-t border-slate-100 pt-4 dark:border-slate-700">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase">Status Tindak Lanjut:</span>
-                            <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-black text-emerald-700 uppercase"
-                                >{userDisposisi.status}</span
-                            >
-                        </div>
-                    </div>
-                </div>
-            </div>
-		{/if}
+	<!-- Sidebar -->
+	<div class="space-y-8">
+		<!-- Tracking Card -->
+		<TrackingCardPengajuan
+			disposisi={data.pengajuan.disposisi}
+			id_skpd={data.user?.id_skpd}
+		/>
+
+		<!-- Quick Actions -->
+		<div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:bg-slate-800">
+			<h3 class="mb-4 text-sm font-bold tracking-widest text-slate-400 uppercase">Aksi Cepat</h3>
+			<div class="space-y-3">
+				<a
+					href="/ppid-pelaksana/{data.pengajuan.id_skpd}"
+					target="_blank"
+					class="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-slate-100 py-2.5 text-sm font-bold text-slate-600 transition-all hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-900"
+				>
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+						<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke-width="2" />
+						<polyline points="15 3 21 3 21 9" stroke-width="2" />
+						<line x1="10" y1="14" x2="21" y2="3" stroke-width="2" />
+					</svg>
+					Lihat Profil SKPD
+				</a>
+			</div>
+		</div>
 	</div>
 </div>
 
@@ -428,13 +309,17 @@
 	<div
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
 		onclick={(e) => handleBackdropClick(e, closeOpdResponseModal)}
+		onkeydown={(e) => e.key === 'Escape' && closeOpdResponseModal()}
 		role="dialog"
 		aria-modal="true"
+		tabindex="-1"
 		aria-labelledby="response-modal-title"
 	>
 		<div
-			class="w-full max-w-2xl overflow-hidden animate-[scale-in_0.2s_ease-out] rounded-2xl bg-white shadow-2xl dark:bg-slate-800"
+			class="w-full max-w-2xl animate-[scale-in_0.2s_ease-out] overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-slate-800"
 			onclick={(e) => e.stopPropagation()}
+			onkeydown={(e) => e.stopPropagation()}
+			role="presentation"
 		>
 			<div
 				class="flex items-center justify-between border-b border-emerald-200 bg-linear-to-r from-emerald-600 to-emerald-700 p-6"
@@ -478,69 +363,94 @@
 					</svg>
 				</button>
 			</div>
-			<form onsubmit={handleOpdResponse} class="p-6">
-				<div class="space-y-5">
-                    <div>
-                        <label for="opd-status" class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                            Status Penyelesaian <span class="text-red-500">*</span>
-                        </label>
-                        <select
-                            id="opd-status"
-                            bind:value={opdStatus}
-                            class="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-                        >
-                            <option value="selesai">Selesai / Sudah Dijawab</option>
-                            <option value="diproses">Masih Dalam Proses</option>
-                            <option value="ditolak">Bukan Kewenangan Kami</option>
-                        </select>
-                    </div>
+
+			<form onsubmit={handleSubmitOpdResponse} class="p-6">
+				<div class="space-y-6">
+					<div
+						class="rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900/30 dark:bg-amber-900/10"
+					>
+						<div class="flex gap-3">
+							<svg
+								class="h-5 w-5 text-amber-600"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+									stroke-width="2"
+								/>
+							</svg>
+							<p class="text-sm text-amber-800 dark:text-amber-200">
+								Pastikan jawaban yang Anda berikan sudah lengkap dan menyertakan dokumen pendukung
+								jika diperlukan.
+							</p>
+						</div>
+					</div>
 
 					<div>
 						<label
-							for="opd-feedback"
+							for="opd-note"
 							class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300"
 						>
-							Isi Tanggapan Resmi <span class="text-red-500">*</span>
+							Catatan/Isi Jawaban <span class="text-red-500">*</span>
 						</label>
 						<textarea
-							id="opd-feedback"
-							bind:value={opdResponseText}
-							rows="6"
+							id="opd-note"
+							bind:value={opdResponseNote}
+							rows="5"
 							required
-							placeholder="Berikan penjelasan detail terkait tindak lanjut keberatan ini..."
-							class="w-full rounded-lg border border-slate-300 px-4 py-3 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
+							placeholder="Tuliskan jawaban atau respon resmi dari OPD Anda..."
+							class="w-full rounded-xl border border-slate-200 px-4 py-3 ring-ppid-primary/20 transition-all outline-none focus:border-ppid-primary focus:ring-4 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
 						></textarea>
 					</div>
 
 					<div>
 						<label
-							for="file-upload"
+							for="opd-status"
 							class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300"
 						>
-							Unggah Bukti/Dokumen (Opsional, Max 5MB)
+							Status Akhir <span class="text-red-500">*</span>
 						</label>
-						<input
-							type="file"
-							id="file-upload"
-							accept=".pdf,.doc,.docx,.jpg,.png"
-							onchange={(e) => (opdFile = e.currentTarget.files?.[0] || null)}
-							class="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-emerald-50 file:px-4 file:py-2 file:font-semibold file:text-emerald-700 hover:file:bg-emerald-100 focus:border-emerald-500 focus:outline-none dark:border-slate-600 dark:bg-slate-700"
-						/>
-						<p class="mt-1 text-xs text-slate-500">Format: PDF, DOC, JPG, PNG</p>
+						<select
+							id="opd-status"
+							bind:value={opdResponseStatus}
+							class="w-full rounded-xl border border-slate-200 px-4 py-3 ring-ppid-primary/20 transition-all outline-none focus:border-ppid-primary focus:ring-4 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+						>
+							<option value="diproses">Masih Diproses</option>
+							<option value="selesai">Selesai / Terjawab</option>
+							<option value="ditolak">Ditolak</option>
+						</select>
 					</div>
 
-					<div class="flex gap-3 pt-4">
+					<div>
+						<label
+							for="opd-file"
+							class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300"
+						>
+							Upload Dokumen Lampiran (Opsional)
+						</label>
+						<FilePond
+							id="opd-file"
+							bind:value={opdResponseFile}
+							acceptedFileTypes={['application/pdf', 'application/zip', 'image/jpeg', 'image/png']}
+							label="Seret dokumen atau <span class='filepond--label-action'>Telusuri</span>"
+						/>
+						<p class="mt-2 text-xs text-slate-500">Format: PDF, ZIP, JPG, PNG (Max 10MB)</p>
+					</div>
+
+					<div class="flex gap-3 pt-2">
 						<button
 							type="button"
 							onclick={closeOpdResponseModal}
-							class="flex-1 rounded-lg border-2 border-slate-300 px-6 py-3 font-semibold text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300"
+							class="flex-1 rounded-xl border-2 border-slate-100 py-3 font-bold text-slate-600 transition-all hover:bg-slate-50 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-900"
 						>
 							Batal
 						</button>
 						<button
 							type="submit"
-                            disabled={isSubmitting}
-							class="flex-1 rounded-lg bg-linear-to-r from-emerald-600 to-emerald-700 px-6 py-3 font-semibold text-white shadow-md transition-all hover:from-emerald-700 hover:to-emerald-800 disabled:opacity-50"
+							disabled={isSubmitting || !opdResponseNote}
+							class="flex-1 rounded-xl bg-ppid-primary py-3 font-bold text-white shadow-lg shadow-ppid-primary/20 transition-all hover:bg-ppid-primary/90 disabled:opacity-50"
 						>
 							{isSubmitting ? 'Mengirim...' : 'Kirim Jawaban'}
 						</button>
@@ -553,20 +463,7 @@
 
 <NotificationDialog
 	bind:show={showNotification}
-	theme={notificationType}
-	title={notificationType === 'success' ? 'BERHASIL' : 'GAGAL'}
-	description={notificationMessage}
+	theme={notificationTheme}
+	title={notificationTitle}
+	description={notificationDescription}
 />
-
-<style>
-	@keyframes scale-in {
-		from {
-			opacity: 0;
-			transform: scale(0.95);
-		}
-		to {
-			opacity: 1;
-			transform: scale(1);
-		}
-	}
-</style>

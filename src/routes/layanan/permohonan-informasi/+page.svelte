@@ -7,11 +7,12 @@
 	import * as m from '$lib/paraglide/messages.js';
 
 	import { superForm } from 'sveltekit-superforms/client';
+	import { untrack } from 'svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 
-	const { form, errors, enhance, delayed, message, validate } = superForm(data.form, {
+	const { form, errors, enhance, delayed, message, validate } = superForm(untrack(() => data.form), {
 		taintedMessage: null,
 		scrollToError: 'smooth',
 		validationMethod: 'onInput',

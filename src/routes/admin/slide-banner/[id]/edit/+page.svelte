@@ -163,9 +163,9 @@
 				<!-- Current Image Preview -->
 				{#if currentImage && !nm_slide}
 					<div>
-						<label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+						<div class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
 							Gambar Saat Ini
-						</label>
+						</div>
 						<div
 							class="relative rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-600 dark:bg-slate-700/50"
 						>
@@ -180,9 +180,9 @@
 
 				<!-- Gambar Banner Baru -->
 				<div>
-					<label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+					<div class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
 						{currentImage ? 'Gambar Baru (Opsional)' : 'Gambar Banner'}
-					</label>
+					</div>
 					<FilePond
 						bind:value={nm_slide}
 						name="nm_slide"

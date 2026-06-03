@@ -1,22 +1,26 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { untrack } from 'svelte';
 	import type { PageData, ActionData } from './$types';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import TinyMCE from '$lib/components/TinyMCE.svelte';
 	import FilePond from '$lib/components/FilePond.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
+	import { getImageUrl } from '$lib/get-image-url';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
 	// State form terikat dengan data dari SSR
-	let formData = $state({
-		nm_profil: data.profil?.nm_profil || 'Profil Pemerintah Provinsi',
-		deskripsi: data.profil?.deskripsi || '',
-		ig_gubernur: data.profil?.ig_gubernur || '',
-		fb_gubernur: data.profil?.fb_gubernur || '',
-		ig_wakil: data.profil?.ig_wakil || '',
-		fb_wakil: data.profil?.fb_wakil || ''
-	});
+	let formData = $state(
+		untrack(() => ({
+			nm_profil: data.profil?.nm_profil || 'Profil Pemerintah Provinsi',
+			deskripsi: data.profil?.deskripsi || '',
+			ig_gubernur: data.profil?.ig_gubernur || '',
+			fb_gubernur: data.profil?.fb_gubernur || '',
+			ig_wakil: data.profil?.ig_wakil || '',
+			fb_wakil: data.profil?.fb_wakil || ''
+		}))
+	);
 
 	// File state untuk FilePond
 	let uploadedGubernur = $state<any>(null);
@@ -194,6 +198,5 @@
 	title={notificationType === 'success' ? 'Berhasil!' : 'Gagal!'}
 	description={notificationMessage}
 />
-notificationType === 'success' ? 'Berhasil!' : 'Gagal!'}
-	description={notificationMessage}
+notificationType === 'success' ? 'Berhasil!' : 'Gagal!'} description={notificationMessage}
 />

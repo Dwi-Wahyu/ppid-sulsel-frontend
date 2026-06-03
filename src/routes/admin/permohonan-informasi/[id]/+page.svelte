@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
+	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import { getImageUrl } from '$lib/get-image-url';
 	import type { PageData, ActionData } from './$types';
 
@@ -829,13 +830,17 @@
 	<div
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
 		onclick={(e) => handleBackdropClick(e, closeUpdateModal)}
+		onkeydown={(e) => e.key === 'Escape' && closeUpdateModal()}
 		role="dialog"
 		aria-modal="true"
+		tabindex="-1"
 		aria-labelledby="update-modal-title"
 	>
 		<div
 			class="w-full max-w-2xl animate-[scale-in_0.2s_ease-out] rounded-2xl bg-white shadow-2xl dark:bg-slate-800"
 			onclick={(e) => e.stopPropagation()}
+			onkeydown={(e) => e.stopPropagation()}
+			role="presentation"
 		>
 			<div
 				class="flex items-center justify-between border-b border-emerald-200 bg-linear-to-r from-emerald-600 to-emerald-700 p-6"
@@ -967,13 +972,17 @@
 	<div
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
 		onclick={(e) => handleBackdropClick(e, closeRejectModal)}
+		onkeydown={(e) => e.key === 'Escape' && closeRejectModal()}
 		role="dialog"
 		aria-modal="true"
+		tabindex="-1"
 		aria-labelledby="reject-modal-title"
 	>
 		<div
 			class="w-full max-w-2xl animate-[scale-in_0.2s_ease-out] rounded-2xl bg-white shadow-2xl dark:bg-slate-800"
 			onclick={(e) => e.stopPropagation()}
+			onkeydown={(e) => e.stopPropagation()}
+			role="presentation"
 		>
 			<div
 				class="flex items-center justify-between border-b border-red-200 bg-linear-to-r from-red-600 to-red-700 p-6"
@@ -1106,13 +1115,17 @@
 	<div
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
 		onclick={(e) => handleBackdropClick(e, closeDispositionModal)}
+		onkeydown={(e) => e.key === 'Escape' && closeDispositionModal()}
 		role="dialog"
 		aria-modal="true"
+		tabindex="-1"
 		aria-labelledby="disposition-modal-title"
 	>
 		<div
 			class="w-full max-w-2xl animate-[scale-in_0.2s_ease-out] rounded-2xl bg-white shadow-2xl dark:bg-slate-800"
 			onclick={(e) => e.stopPropagation()}
+			onkeydown={(e) => e.stopPropagation()}
+			role="presentation"
 		>
 			<div
 				class="flex items-center justify-between border-b border-white/10 bg-linear-to-r from-ppid-primary to-ppid-primary-light p-6"
@@ -1197,7 +1210,7 @@
 						</div>
 					{:else}
 						<div>
-							<label class="mb-3 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+							<div class="mb-3 block text-sm font-semibold text-slate-700 dark:text-slate-300">
 								Pilih OPD/SKPD Tujuan <span class="text-red-500">*</span>
 								{#if selectedSkpd.length > 0}
 									<span
@@ -1206,7 +1219,7 @@
 										{selectedSkpd.length} dipilih
 									</span>
 								{/if}
-							</label>
+							</div>
 							<div
 								class="max-h-72 space-y-2 overflow-y-auto rounded-lg border border-slate-200 p-3 dark:border-slate-600"
 							>

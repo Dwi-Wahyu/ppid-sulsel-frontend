@@ -4,6 +4,7 @@
 	import Footer from '$lib/components/Footer.svelte';
 	import * as m from '$lib/paraglide/messages.js';
 	import { PUBLIC_API_URL } from '$env/static/public';
+	import SearchableSelect from '$lib/components/SearchableSelect.svelte';
 
 	// --- Type Definitions ---
 	interface Category {
@@ -47,6 +48,12 @@
 		category: '',
 		page: 1
 	});
+
+	// Hitung options yang digunakan di select
+	let categoryOptions = $derived([
+		{ id: '', name: m['common.categories']() },
+		...categories.map(cat => ({ id: String(cat.id), name: cat.name }))
+	]);
 
 	// Fungsi untuk berpindah halaman
 	function changePage(newPage: number | string) {
@@ -179,22 +186,21 @@
 					</span>
 				</div>
 
-				<div class="w-full md:w-72">
+				<div class="w-full md:w-96">
 					<label for="category-filter" class="sr-only">Filter Kategori</label>
-					<select
-						id="category-filter"
+					<SearchableSelect
+						name="category-filter"
+						options={categoryOptions}
 						bind:value={params.category}
+						idKey="id"
+						labelKey="name"
+						placeholder={m['common.categories']()}
+						extraClass="!bg-slate-50 dark:!bg-slate-900 !rounded-xl !py-3 !border-slate-200 dark:!border-slate-700"
 						onchange={() => {
 							params.page = 1;
 							fetchBerita();
 						}}
-						class="w-full cursor-pointer rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-700 outline-hidden focus:border-ppid-accent dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
-					>
-						<option value="">{m['common.categories']()}</option>
-						{#each categories as cat}
-							<option value={cat.id}>{cat.name}</option>
-						{/each}
-					</select>
+					/>
 				</div>
 
 				<button

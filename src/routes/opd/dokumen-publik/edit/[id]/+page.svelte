@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { enhance } from '$app/forms';
+	import { untrack } from 'svelte';
 	import { PUBLIC_API_URL, PUBLIC_BACKEND_URL } from '$env/static/public';
 	import FilePond from '$lib/components/FilePond.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
@@ -13,11 +14,11 @@
 	const isAdmin = $derived(user && user.id_skpd === null);
 
 	// Form state - initialize with existing data
-	let judul = $state(data.dokumen.judul);
-	let id_kat_info = $state(String(data.dokumen.id_kat_info));
-	let id_skpd = $state(data.dokumen.id_skpd);
-	let ket = $state(data.dokumen.ket);
-	let verify = $state(data.dokumen.verify);
+	let judul = $state(untrack(() => data.dokumen.judul));
+	let id_kat_info = $state(untrack(() => String(data.dokumen.id_kat_info)));
+	let id_skpd = $state(untrack(() => data.dokumen.id_skpd));
+	let ket = $state(untrack(() => data.dokumen.ket));
+	let verify = $state(untrack(() => data.dokumen.verify));
 	let uploadedFile: File | null = $state(null);
 	let isSubmitting = $state(false);
 

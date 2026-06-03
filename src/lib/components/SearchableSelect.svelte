@@ -114,7 +114,6 @@
 		onclick={toggleDropdown}
 		aria-haspopup="listbox"
 		aria-expanded={isOpen}
-		aria-invalid={isInvalid ? 'true' : undefined}
 		class={`flex w-full items-center justify-between rounded-lg border bg-white px-4 py-3 text-left text-gray-700 transition-all outline-none focus:ring-2 dark:bg-slate-800 dark:text-gray-300 ${
 			isInvalid
 				? 'border-red-500 focus:border-red-500 focus:ring-red-500/20'

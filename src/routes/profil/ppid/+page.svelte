@@ -49,7 +49,7 @@
 <main class="bg-gray-50 py-10 font-['Plus_Jakarta_Sans'] md:py-16 dark:bg-slate-900">
 	<div class="container mx-auto px-4">
 		<!-- Intro Section with Sidebar Layout -->
-		<div class="mx-auto mb-12 grid max-w-6xl gap-8 lg:grid-cols-2">
+		<div class="mx-auto mb-12 max-w-6xl gap-8">
 			<!-- Dynamic Content -->
 			<div
 				class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm md:p-8 dark:border-slate-700 dark:bg-slate-800"
@@ -60,8 +60,7 @@
 			</div>
 
 			<!-- Sidebar -->
-			<div class="space-y-6">
-				<!-- Feature Cards -->
+			<!-- <div class="space-y-6">
 				<div
 					class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800"
 				>
@@ -165,7 +164,6 @@
 					</div>
 				</div>
 
-				<!-- Landasan Hukum -->
 				<div class="rounded-xl bg-ppid-primary p-6 text-white shadow-sm">
 					<h3 class="mb-4 text-sm font-bold tracking-wide uppercase">
 						{m['profile.legal_basis']()}
@@ -189,7 +187,7 @@
 						</div>
 					</div>
 				</div>
-			</div>
+			</div> -->
 		</div>
 	</div>
 </main>

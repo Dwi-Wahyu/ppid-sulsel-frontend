@@ -375,6 +375,7 @@
 		<div
 			role="presentation"
 			onclick={(e) => e.stopPropagation()}
+			onkeydown={(e) => e.stopPropagation()}
 			class="relative max-h-[90vh] w-full max-w-7xl"
 		>
 			<img
@@ -392,9 +393,4 @@
 {/if}
 
 <!-- Search Modal Component -->
-<SearchModal bind:isOpen={searchModalOpen} />
-
-<!-- Search Modal Component -->
-<SearchModal bind:isOpen={searchModalOpen} />
->
 <SearchModal bind:isOpen={searchModalOpen} />

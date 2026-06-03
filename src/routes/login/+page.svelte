@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms';
+	import { untrack } from 'svelte';
 	import type { PageData } from './$types';
 	import { onMount } from 'svelte';
 	import { PUBLIC_RECAPTCHA_SITE_KEY } from '$env/static/public';
@@ -20,7 +21,7 @@
 	import toast, { Toaster } from 'svelte-5-french-toast';
 
 	// Setup Superforms
-	const { form, errors, enhance, delayed, message } = superForm(data.form, {
+	const { form, errors, enhance, delayed, message } = superForm(untrack(() => data.form), {
 		onUpdate: async ({ result }) => {
 			if (result.type === 'success') {
 				toast.success('Login Berhasil! Mengalihkan...');

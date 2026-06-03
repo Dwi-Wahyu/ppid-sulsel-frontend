@@ -5,6 +5,7 @@
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 	import type { PageData } from './$types';
+	import { getImageUrl } from '$lib/get-image-url';
 
 	let { data }: { data: PageData } = $props();
 
@@ -444,10 +445,13 @@
 
 					<!-- Status Filter -->
 					<div>
-						<label class="mb-1 block text-xs font-medium text-slate-700 dark:text-slate-300"
+						<label
+							for="filter-verify"
+							class="mb-1 block text-xs font-medium text-slate-700 dark:text-slate-300"
 							>Status Verifikasi</label
 						>
 						<select
+							id="filter-verify"
 							name="verify"
 							value={data.filters.verify}
 							class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-ppid-accent focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300"
@@ -461,10 +465,13 @@
 
 					<!-- Date Range -->
 					<div>
-						<label class="mb-1 block text-xs font-medium text-slate-700 dark:text-slate-300"
+						<label
+							for="filter-start-date"
+							class="mb-1 block text-xs font-medium text-slate-700 dark:text-slate-300"
 							>Tanggal Mulai</label
 						>
 						<input
+							id="filter-start-date"
 							type="date"
 							name="start_date"
 							value={data.filters.start_date}
@@ -473,10 +480,13 @@
 					</div>
 
 					<div>
-						<label class="mb-1 block text-xs font-medium text-slate-700 dark:text-slate-300"
+						<label
+							for="filter-end-date"
+							class="mb-1 block text-xs font-medium text-slate-700 dark:text-slate-300"
 							>Tanggal Akhir</label
 						>
 						<input
+							id="filter-end-date"
 							type="date"
 							name="end_date"
 							value={data.filters.end_date}
@@ -486,10 +496,13 @@
 
 					<!-- Sort -->
 					<div>
-						<label class="mb-1 block text-xs font-medium text-slate-700 dark:text-slate-300"
+						<label
+							for="filter-sort"
+							class="mb-1 block text-xs font-medium text-slate-700 dark:text-slate-300"
 							>Urutkan</label
 						>
 						<select
+							id="filter-sort"
 							name="sort"
 							value={data.filters.sort}
 							class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 focus:border-ppid-accent focus:outline-none dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300"
@@ -652,6 +665,7 @@
 									<div class="flex items-center justify-end gap-2">
 										<a
 											href="/admin/dokumen-publik/edit/{info.id_informasi}"
+											aria-label="Edit"
 											class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-50 hover:text-ppid-primary dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-blue-400"
 										>
 											<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -666,6 +680,7 @@
 										<button
 											type="button"
 											onclick={() => confirmDelete(info.id_informasi)}
+											aria-label="Hapus"
 											class="rounded-lg p-2 text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-slate-400 dark:hover:bg-red-900/20 dark:hover:text-red-400"
 										>
 											<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -751,8 +766,5 @@
 	bind:show={showNotification}
 	title={notificationTitle}
 	description={notificationDescription}
-	theme={notificationTheme}
-/>
-cription={notificationDescription}
 	theme={notificationTheme}
 />

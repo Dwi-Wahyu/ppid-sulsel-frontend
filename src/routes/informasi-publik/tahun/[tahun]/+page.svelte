@@ -2,19 +2,59 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import * as m from '$lib/paraglide/messages.js';
-	import { env } from '$env/dynamic/public';
 	import { getImageUrl } from '$lib/get-image-url';
+	import { api } from '$lib/api';
+	import { untrack } from 'svelte';
+	import type { TahunResponse } from '$lib/types/informasi';
+	import Footer from '$lib/components/Footer.svelte';
 
 	let { data } = $props();
 
-	let searchQuery = $state('');
+	// State untuk data dan status fetch
+	let informasiData = $state<TahunResponse | null>(null);
+	let isLoading = $state(true);
+	let error = $state<string | null>(null);
 
+	// State untuk form input
+	let searchQuery = $state(untrack(() => data.filters.search || ''));
+
+	// Fetch data client-side
+	async function fetchData() {
+		isLoading = true;
+		error = null;
+
+		try {
+			const currentTahun = page.params.tahun;
+			const currentPage = page.url.searchParams.get('page') || '1';
+			const currentSearch = page.url.searchParams.get('search') || '';
+
+			const response = await api.get(`/public/informasi/tahun/${currentTahun}`, {
+				page: currentPage,
+				search: currentSearch
+			});
+
+			if (response && response.data) {
+				informasiData = response;
+			} else {
+				throw new Error('Gagal mengambil data: Format respon tidak valid');
+			}
+		} catch (err: any) {
+			console.error('Fetch Error:', err);
+			error = err.message || 'Terjadi kesalahan saat memuat data';
+		} finally {
+			isLoading = false;
+		}
+	}
+
+	// Trigger fetch saat params atau search params berubah
 	$effect(() => {
-		searchQuery = data.filters.search || '';
+		const _trigger = page.url.href;
+		fetchData();
 	});
 
-	let informasi = $derived(data.informasiData.data.data);
-	let pagination = $derived(data.informasiData.data);
+	// Derived values dari data yang di-fetch
+	let informasi = $derived(informasiData?.data?.data || []);
+	let pagination = $derived(informasiData?.data || { current_page: 1, last_page: 1, links: [] });
 
 	function getFileUrl(file: string) {
 		if (!file) return null;
@@ -168,87 +208,123 @@
 					<table class="w-full border-collapse text-left">
 						<thead class="bg-ppid-primary text-white">
 							<tr>
-								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase">No</th>
-								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase">Judul</th>
 								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
-									>Nama OPD / SKPD</th
+									>{m['public_info.table.no']()}</th
 								>
-								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase">Kategori</th>
 								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
-									>Tanggal Upload</th
+									>{m['public_info.table.title']()}</th
 								>
-								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase">Format</th>
-								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase">Aksi</th>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
+									>{m['public_info.table.opd']()}</th
+								>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
+									>{m['public_info.table.year']()}</th
+								>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
+									>{m['public_info.table.format']()}</th
+								>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
+									>{m['public_info.table.action']()}</th
+								>
 							</tr>
 						</thead>
 						<tbody class="divide-y divide-gray-100 dark:divide-slate-700">
-							{#each informasi as item, i (item.id_informasi)}
-								<tr class="transition-colors hover:bg-ppid-primary/5 dark:hover:bg-slate-700/50">
-									<td class="px-4 py-4 text-sm font-medium text-gray-600 dark:text-gray-300">
-										{(pagination.current_page - 1) * pagination.per_page + i + 1}
-									</td>
-									<td
-										class="min-w-50 px-4 py-4 text-sm leading-relaxed text-gray-800 dark:text-gray-200"
-									>
-										{item.judul}
-									</td>
-									<td class="min-w-62 px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
-										{item.skpd?.nm_skpd ?? '-'}
-									</td>
-									<td class="px-4 py-4 text-sm whitespace-nowrap text-gray-600 dark:text-gray-300">
-										{item.kategori?.nm_kat_info ?? '-'}
-									</td>
-									<td class="px-4 py-4 text-sm whitespace-nowrap text-gray-600 dark:text-gray-300">
-										{formatDate(item.tgl_upload)}
-									</td>
-									<td class="px-4 py-4 text-sm whitespace-nowrap text-gray-600 dark:text-gray-300">
-										{getFileExt(item.file)}
-									</td>
-									<td class="px-4 py-4 text-sm">
-										{#if item.file && getFileUrl(item.file)}
-											<a
-												href={getFileUrl(item.file)}
-												target="_blank"
-												rel="noopener noreferrer"
-												class="font-medium text-ppid-primary hover:underline dark:text-blue-400"
-											>
-												{m['public_info.view']()}
-											</a>
-										{:else}
-											<span class="text-gray-400 italic">Tidak tersedia</span>
-										{/if}
+							{#if isLoading}
+								{#each Array(5) as _}
+									<tr>
+										<td colspan="6" class="px-4 py-4">
+											<div
+												class="h-6 w-full animate-pulse rounded-md bg-gray-100 dark:bg-slate-700"
+											></div>
+										</td>
+									</tr>
+								{/each}
+							{:else if error}
+								<tr>
+									<td colspan="6" class="py-20 text-center">
+										<p class="mb-4 text-red-500">{error}</p>
+										<button
+											onclick={fetchData}
+											class="rounded-lg bg-ppid-primary px-4 py-2 text-white"
+										>
+											Coba Lagi
+										</button>
 									</td>
 								</tr>
 							{:else}
-								<tr>
-									<td colspan="7" class="py-20 text-center text-gray-500">
-										{m['public_info.no_data']()}
-									</td>
-								</tr>
-							{/each}
+								{#each informasi as item, i (item.id_informasi)}
+									<tr class="transition-colors hover:bg-ppid-primary/5 dark:hover:bg-slate-700/50">
+										<td class="px-4 py-4 text-sm font-medium text-gray-600 dark:text-gray-300">
+											{((pagination?.current_page || 1) - 1) * (pagination?.per_page || 1) + i + 1}
+										</td>
+										<td
+											class="min-w-50 px-4 py-4 text-sm leading-relaxed text-gray-800 dark:text-gray-200"
+										>
+											{item.judul}
+										</td>
+										<td class="min-w-62 px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
+											{item.skpd?.nm_skpd ?? '-'}
+										</td>
+										<td
+											class="px-4 py-4 text-sm whitespace-nowrap text-gray-600 dark:text-gray-300"
+										>
+											{new Date(item.tgl_upload).getFullYear()}
+										</td>
+										<td
+											class="px-4 py-4 text-sm whitespace-nowrap text-gray-600 dark:text-gray-300"
+										>
+											{getFileExt(item.file)}
+										</td>
+										<td class="px-4 py-4 text-sm">
+											{#if item.file && getFileUrl(item.file)}
+												<a
+													href={getFileUrl(item.file)}
+													target="_blank"
+													rel="noopener noreferrer"
+													class="font-medium text-ppid-primary hover:underline dark:text-blue-400"
+												>
+													{m['public_info.view']()}
+												</a>
+											{:else}
+												<span class="text-gray-400 italic">Tidak tersedia</span>
+											{/if}
+										</td>
+									</tr>
+								{:else}
+									<tr>
+										<td colspan="6" class="py-20 text-center text-gray-500">
+											{m['public_info.no_data']()}
+										</td>
+									</tr>
+								{/each}
+							{/if}
 						</tbody>
 					</table>
 				</div>
 
-				<div
-					class="border-t border-gray-200 bg-gray-50 px-6 py-4 dark:border-slate-700 dark:bg-slate-900"
-				>
-					<div class="flex flex-wrap justify-center gap-2">
-						{#each pagination.links as link}
-							<button
-								onclick={() => handlePageChange(link.page ?? null)}
-								disabled={!link.url || link.active}
-								class="rounded-md border px-4 py-1.5 text-sm font-medium transition-all
+				{#if pagination && pagination.last_page > 1}
+					<div
+						class="border-t border-gray-200 bg-gray-50 px-6 py-4 dark:border-slate-700 dark:bg-slate-900"
+					>
+						<div class="flex flex-wrap justify-center gap-2">
+							{#each pagination.links as link}
+								<button
+									onclick={() => handlePageChange(link.page)}
+									disabled={!link.page || link.active}
+									class="rounded-md border px-4 py-1.5 text-sm font-medium transition-all
 								{link.active
-									? 'border-ppid-primary bg-ppid-primary text-white shadow-md'
-									: 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-200'}"
-							>
-								{@html link.label}
-							</button>
-						{/each}
+										? 'border-ppid-primary bg-ppid-primary text-white shadow-md'
+										: 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-200'}"
+								>
+									{@html link.label}
+								</button>
+							{/each}
+						</div>
 					</div>
-				</div>
+				{/if}
 			</div>
 		</div>
 	</div>
 </main>
+
+<Footer />

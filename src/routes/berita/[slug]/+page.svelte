@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { PUBLIC_API_URL } from '$env/static/public';
 	import Footer from '$lib/components/Footer.svelte';
 	import { getImageUrl } from '$lib/get-image-url';
 	import * as m from '$lib/paraglide/messages.js';
+	import { api } from '$lib/api';
 
 	// --- Type Definitions ---
 	interface Skpd {
-		id: string;
+		id: number;
 		name: string;
 	}
 
@@ -27,7 +27,13 @@
 		title: string;
 		slug: string;
 		date: string;
-		category: string | null;
+		category: Skpd | null;
+	}
+
+	interface Category {
+		id: number;
+		name: string;
+		count: number;
 	}
 
 	// --- States (Svelte 5) ---
@@ -35,7 +41,7 @@
 	let error = $state<string | null>(null);
 	let news = $state<NewsDetail | null>(null);
 	let recent_news = $state<RecentNews[]>([]);
-	let categories = $state<{ id: string; name: string; count: number }[]>([]);
+	let categories = $state<Category[]>([]);
 
 	// Ambil slug secara reaktif dari URL
 	const slug = $derived(page.params.slug);
@@ -46,18 +52,21 @@
 		error = null;
 		try {
 			// Fetch detail berita berdasarkan slug
-			const response = await fetch(`${PUBLIC_API_URL}/public/berita/${slug}`);
-			if (!response.ok) throw new Error('Berita tidak ditemukan');
+			const res = await api.get(`/public/berita/${slug}`);
 
-			const res = await response.json();
 			if (res.success) {
 				news = res.data;
-				// Jika API mengirimkan data tambahan di response yang sama
-				recent_news = res.recent || [];
-				categories = res.categories || [];
+				// Backend sends recent news in 'recent_news' key
+				recent_news = res.recent_news || [];
+			}
+
+			// Fetch categories from news index endpoint
+			const categoriesRes = await api.get('/public/berita');
+			if (categoriesRes.success) {
+				categories = categoriesRes.categories || [];
 			}
 		} catch (e: any) {
-			error = e.message;
+			error = e.message || 'Gagal memuat berita';
 		} finally {
 			loading = false;
 		}
@@ -259,10 +268,10 @@
 							Berita Terbaru
 						</h2>
 						<div class="space-y-6">
-							{#each recent_news as item}
+								{#each recent_news as item}
 								<a href="/berita/{item.slug}" class="group block">
 									<p class="mb-1 text-[10px] font-bold text-ppid-accent uppercase">
-										{item.category || 'Berita'}
+										{item.category?.name || 'Berita'}
 									</p>
 									<h3
 										class="line-clamp-2 text-sm leading-snug font-bold transition-colors group-hover:text-ppid-primary dark:text-slate-200 dark:group-hover:text-ppid-accent"

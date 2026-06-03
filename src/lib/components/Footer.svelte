@@ -1,7 +1,6 @@
 <script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
 	import { env } from '$env/dynamic/public';
-	import { getImageUrl } from '$lib/get-image-url';
 	import { api } from '$lib/api';
 	import Sosmed from './Sosmed.svelte';
 	import { browser } from '$app/environment';
@@ -117,7 +116,7 @@
 							src={footerData?.footer_logo
 								? `${BACKEND_URL}/storage/${footerData.footer_logo}`
 								: '/images/ppid-4.png'}
-							class="h-16 w-auto md:h-20"
+							class="h-16 w-auto"
 							alt="Logo PPID"
 						/>
 					</a>

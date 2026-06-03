@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { goto, invalidateAll } from '$app/navigation';
+	import { untrack } from 'svelte';
 	import { api } from '$lib/api.js';
 	import toast, { Toaster } from 'svelte-5-french-toast';
 
 	const { data } = $props();
 
-	let activeTab = $state(data.activeTab);
+	let activeTab = $state(untrack(() => data.activeTab));
 	let showAll: Record<string, boolean> = $state({
 		kategori: false,
 		tahun: false,

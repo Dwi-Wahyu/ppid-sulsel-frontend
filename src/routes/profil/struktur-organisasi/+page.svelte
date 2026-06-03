@@ -36,18 +36,28 @@
 </script>
 
 <svelte:head>
-	<title>{m['org_struct.title']()} - PPID Provinsi Sulawesi Selatan</title>
+	<title>{m['profile.org_structure']()} - PPID Provinsi Sulawesi Selatan</title>
 </svelte:head>
 
-<main class="min-h-screen bg-white transition-colors dark:bg-slate-900">
-	<PageTitle title={m['org_struct.title']()} />
+<!-- Breadcrumb + Title Section -->
+<div
+	class="border-b border-gray-200 bg-white font-['Plus_Jakarta_Sans'] dark:border-slate-700 dark:bg-slate-800"
+>
+	<div class="container mx-auto px-4 py-6">
+		<Breadcrumb
+			items={[{ label: m['common.home'](), href: '/' }, { label: m['profile.org_structure']() }]}
+		/>
 
-	<div class="container mx-auto px-4 py-12">
+		<div class="mt-4">
+			<PageTitle title={m['profile.org_structure']()} />
+		</div>
+	</div>
+</div>
+
+<!-- Main Content -->
+<main class="bg-gray-50 py-10 font-['Plus_Jakarta_Sans'] md:py-16 dark:bg-slate-900">
+	<div class="container mx-auto px-4">
 		<div class="mx-auto max-w-5xl">
-			<Breadcrumb
-				items={[{ label: m['common.home'](), href: '/' }, { label: m['org_struct.title']() }]}
-				class="mb-10"
-			/>
 
 			<!-- Organization Chart Viewer -->
 			<div
@@ -55,7 +65,7 @@
 			>
 				<div class="flex items-center justify-between border-b border-slate-100 p-6 dark:border-slate-700">
 					<h2 class="font-bold text-ppid-primary dark:text-white">
-						{m['org_struct.viewer_title']()}
+						{m['org_struct.chart_title']()}
 					</h2>
 					{#if profil.struktur_organisasi_path}
 						<a
@@ -68,7 +78,7 @@
 								<polyline points="15 3 21 3 21 9" />
 								<line x1="10" y1="14" x2="21" y2="3" />
 							</svg>
-							{m['org_struct.open_new_tab']()}
+							Buka di Tab Baru
 						</a>
 					{/if}
 				</div>

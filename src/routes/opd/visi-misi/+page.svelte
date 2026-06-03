@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { api } from '$lib/api';
 	import { invalidateAll } from '$app/navigation';
+	import { untrack } from 'svelte';
 	import TinyMCE from '$lib/components/TinyMCE.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 	import FilePond from '$lib/components/FilePond.svelte';
@@ -15,9 +16,9 @@
 	let notificationType = $state<'success' | 'danger'>('success');
 
 	// Form states
-	let visimisiType = $state<'text' | 'file'>(data.skpd?.visimisi_type || 'text');
-	let visimisi_text = $state(data.skpd?.visimisi_text || '');
-	let currentVisimisi = $state(data.skpd?.visimisi || '');
+	let visimisiType = $state<'text' | 'file'>(untrack(() => data.skpd?.visimisi_type || 'text'));
+	let visimisi_text = $state(untrack(() => data.skpd?.visimisi_text || ''));
+	let currentVisimisi = $state(untrack(() => data.skpd?.visimisi || ''));
 	let uploadedVisimisi = $state<File | null>(null);
 
 	async function handleSubmit(e: SubmitEvent) {
@@ -68,10 +69,10 @@
 		<form onsubmit={handleSubmit} class="space-y-8">
 			<div class="space-y-4">
 				<div class="flex items-center justify-between">
-					<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">
+					<div id="format-label" class="text-sm font-semibold text-slate-700 dark:text-slate-300">
 						Format Konten
-					</label>
-					<div class="flex rounded-lg bg-slate-100 p-1 dark:bg-slate-900">
+					</div>
+					<div role="group" aria-labelledby="format-label" class="flex rounded-lg bg-slate-100 p-1 dark:bg-slate-900">
 						<button
 							type="button"
 							class="rounded-md px-4 py-1.5 text-xs font-bold transition-all {visimisiType === 'text'
@@ -94,13 +95,19 @@
 				</div>
 
 				{#if visimisiType === 'file'}
-					<FilePond
-						name="visimisi"
-						allowMultiple={false}
-						acceptedFileTypes={['application/pdf']}
-						bind:value={uploadedVisimisi}
-						label={'Seret PDF visi misi atau <span class="filepond--label-action">Telusuri</span>'}
-					/>
+					<div class="space-y-2">
+						<label for="visimisi-file" class="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+							Unggah File PDF
+						</label>
+						<FilePond
+							id="visimisi-file"
+							name="visimisi"
+							allowMultiple={false}
+							acceptedFileTypes={['application/pdf']}
+							bind:value={uploadedVisimisi}
+							label={'Seret PDF visi misi atau <span class="filepond--label-action">Telusuri</span>'}
+						/>
+					</div>
 					{#if currentVisimisi && currentVisimisi.toLowerCase().endsWith('.pdf') && !uploadedVisimisi}
 						<p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
 							<a

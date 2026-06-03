@@ -152,48 +152,48 @@
 
 				<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 					<div>
-						<label class="mb-2 block text-sm font-semibold text-slate-600 dark:text-slate-400"
-							>Nama Lengkap</label
+						<div class="mb-2 block text-sm font-semibold text-slate-600 dark:text-slate-400"
+							>Nama Lengkap</div
 						>
 						<p class="text-base font-medium text-slate-900 dark:text-white">
 							{respondent.nama}
 						</p>
 					</div>
 					<div>
-						<label class="mb-2 block text-sm font-semibold text-slate-600 dark:text-slate-400"
-							>Email</label
+						<div class="mb-2 block text-sm font-semibold text-slate-600 dark:text-slate-400"
+							>Email</div
 						>
 						<p class="text-base font-medium text-slate-900 dark:text-white">
 							{respondent.email}
 						</p>
 					</div>
 					<div>
-						<label class="mb-2 block text-sm font-semibold text-slate-600 dark:text-slate-400"
-							>Lembaga</label
+						<div class="mb-2 block text-sm font-semibold text-slate-600 dark:text-slate-400"
+							>Lembaga</div
 						>
 						<p class="text-base font-medium text-slate-900 dark:text-white">
 							{respondent.lembaga}
 						</p>
 					</div>
 					<div>
-						<label class="mb-2 block text-sm font-semibold text-slate-600 dark:text-slate-400"
-							>Tanggal Permintaan Informasi</label
+						<div class="mb-2 block text-sm font-semibold text-slate-600 dark:text-slate-400"
+							>Tanggal Permintaan Informasi</div
 						>
 						<p class="text-base font-medium text-slate-900 dark:text-white">
 							{formatDate(respondent.tanggal)}
 						</p>
 					</div>
 					<div class="md:col-span-2">
-						<label class="mb-2 block text-sm font-semibold text-slate-600 dark:text-slate-400"
-							>Alamat</label
+						<div class="mb-2 block text-sm font-semibold text-slate-600 dark:text-slate-400"
+							>Alamat</div
 						>
 						<p class="text-base font-medium text-slate-900 dark:text-white">
 							{respondent.alamat}
 						</p>
 					</div>
 					<div class="md:col-span-2">
-						<label class="mb-2 block text-sm font-semibold text-slate-600 dark:text-slate-400"
-							>Waktu Pengisian Survey</label
+						<div class="mb-2 block text-sm font-semibold text-slate-600 dark:text-slate-400"
+							>Waktu Pengisian Survey</div
 						>
 						<p class="text-base font-medium text-slate-900 dark:text-white">
 							{formatDateTime(respondent.created_at)} WIB

@@ -6,6 +6,7 @@
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 	import SuccessModal from '$lib/components/SuccessModal.svelte';
 	import { PUBLIC_BACKEND_URL } from '$env/static/public';
+	import { getImageUrl } from '$lib/get-image-url';
 
 	let { data }: { data: PageData } = $props();
 
@@ -26,17 +27,11 @@
 	let showSuccess = $state(false);
 	let successMessage = $state('');
 
-	type AsyncVoidFunction = () => Promise<void>;
-
 	// Derived values
 	// Find disposition assigned to current user's SKPD
 	let myDisposition = $derived.by(() => {
 		const userSkpd = String(data.user?.id_skpd || '').trim();
 		if (!data.permohonan?.disposisi || !userSkpd) return undefined;
-
-		console.log('Finding disposition for user SKPD:', userSkpd);
-		console.log('Available dispositions:', data.permohonan.disposisi);
-
 		return data.permohonan.disposisi.find((d: any) => String(d.id_skpd).trim() === userSkpd);
 	});
 
@@ -365,15 +360,6 @@
 								<h3 class="text-sm font-medium text-red-800 dark:text-red-200">Akses Ditolak</h3>
 								<div class="mt-2 text-sm text-red-700 dark:text-red-300">
 									<p>Anda tidak memiliki akses ke disposisi ini.</p>
-									<div class="mt-2 rounded bg-white/50 p-2 font-mono text-xs dark:bg-black/20">
-										<p><strong>Debug Info:</strong></p>
-										<p>User SKPD: {data.user?.id_skpd ? `"${data.user.id_skpd}"` : '(kosong)'}</p>
-										<p>
-											Disposisi SKPDs: {data.permohonan?.disposisi
-												?.map((d) => `"${d.id_skpd}"`)
-												.join(', ') || '(tidak ada)'}
-										</p>
-									</div>
 								</div>
 							</div>
 						</div>
@@ -438,17 +424,24 @@
 		class="fixed inset-0 z-50 flex items-center justify-center p-4"
 		role="dialog"
 		aria-modal="true"
+		tabindex="-1"
+		onkeydown={(e) => e.key === 'Escape' && closeResponseModal()}
 		aria-labelledby="response-modal-title"
 	>
 		<div
 			class="fixed inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity"
 			onclick={closeResponseModal}
-			aria-hidden="true"
+			onkeydown={(e) => e.key === 'Enter' && closeResponseModal()}
+			role="button"
+			tabindex="0"
+			aria-label="Tutup modal"
 		></div>
 
 		<div
 			class="relative w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all dark:bg-slate-800"
 			onclick={(e) => e.stopPropagation()}
+			onkeydown={(e) => e.stopPropagation()}
+			role="presentation"
 		>
 			<div class="relative bg-ppid-primary px-6 py-6 dark:bg-slate-900">
 				<div
@@ -590,4 +583,3 @@
 />
 
 <SuccessModal bind:isOpen={showSuccess} title="Berhasil!" message={successMessage} />
-:isOpen={showSuccess} title="Berhasil!" message={successMessage} />

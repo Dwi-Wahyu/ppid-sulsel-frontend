@@ -233,9 +233,9 @@
 				<!-- Current Icon -->
 				{#if currentIcon && !icon}
 					<div>
-						<label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+						<div class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
 							Icon Saat Ini
-						</label>
+						</div>
 						<div class="mb-2">
 							<img
 								src={getImageUrl(`integrated_services/${currentIcon}`)}
@@ -248,9 +248,9 @@
 
 				<!-- Icon Upload -->
 				<div>
-					<label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+					<div class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
 						{currentIcon ? 'Icon Baru (Opsional)' : 'Icon (Gambar)'}
-					</label>
+					</div>
 					<FilePond
 						bind:value={icon}
 						name="icon"

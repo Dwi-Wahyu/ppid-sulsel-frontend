@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { api } from '$lib/api';
 	import { goto } from '$app/navigation';
+	import { untrack } from 'svelte';
 	import FilePond from '$lib/components/FilePond.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 	import type { PageData } from './$types';
@@ -15,13 +16,13 @@
 	let isLoadingData = $state(true);
 
 	// Get user dari data load
-	const user = data.user;
-	const isAdmin = user && user.id_skpd === null;
+	const user = $derived(data.user);
+	const isAdmin = $derived(user && user.id_skpd === null);
 
 	// Form state
 	let judul = $state('');
 	let id_kat_info = $state('');
-	let id_skpd = $state(user?.id_skpd || '');
+	let id_skpd = $state(untrack(() => data.user?.id_skpd || ''));
 	let ket = $state('');
 	let verify = $state('n');
 	let uploadedFile: any = $state(null);

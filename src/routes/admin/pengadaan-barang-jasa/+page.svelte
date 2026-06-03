@@ -2,6 +2,7 @@
 	import { getImageUrl } from '$lib/get-image-url';
 	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { untrack } from 'svelte';
 	import FilePond from '$lib/components/FilePond.svelte';
 	import { api } from '$lib/api';
 
@@ -9,10 +10,10 @@
 
 	// State management
 	let loading = $state(false);
-	let searchQuery = $state(data.search || '');
-	let sortFilter = $state(data.sort || '');
-	let startDate = $state(data.startDate || '');
-	let endDate = $state(data.endDate || '');
+	let searchQuery = $state(untrack(() => data.search || ''));
+	let sortFilter = $state(untrack(() => data.sort || ''));
+	let startDate = $state(untrack(() => data.startDate || ''));
+	let endDate = $state(untrack(() => data.endDate || ''));
 
 	// Modal states
 	let showCreateModal = $state(false);

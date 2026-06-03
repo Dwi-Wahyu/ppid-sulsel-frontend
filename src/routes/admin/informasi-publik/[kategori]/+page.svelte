@@ -6,6 +6,7 @@
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 	import type { PageData } from './$types';
 	import SearchableSelect from '$lib/components/SearchableSelect.svelte';
+	import { getImageUrl } from '$lib/get-image-url';
 
 	let { data }: { data: PageData } = $props();
 
@@ -715,9 +716,6 @@
 <NotificationDialog
 	bind:show={showNotification}
 	title={notificationTitle}
-	description={notificationDescription}
-	theme={notificationTheme}
-/>
 	description={notificationDescription}
 	theme={notificationTheme}
 />

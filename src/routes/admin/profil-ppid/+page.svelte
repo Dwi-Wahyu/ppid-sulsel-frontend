@@ -1,14 +1,15 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { untrack } from 'svelte';
 	import TinyMCE from '$lib/components/TinyMCE.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 
 	let { data, form } = $props();
 
-	let formData = $state({
+	let formData = $state(untrack(() => ({
 		nm_profil: data.profil?.nm_profil || 'Profil PPID',
 		deskripsi: data.profil?.deskripsi || ''
-	});
+	})));
 
 	let isSaving = $state(false);
 	let showNotification = $state(false);

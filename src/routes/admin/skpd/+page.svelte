@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import { goto, invalidateAll } from '$app/navigation';
+	import { untrack } from 'svelte';
 
 	let { data } = $props();
 
 	// State management
 	let loading = $state(false);
-	let searchQuery = $state(data.search || '');
+	let searchQuery = $state(untrack(() => data.search || ''));
 	let showDeleteModal = $state(false);
 	let selectedSkpd: any = $state(null);
 

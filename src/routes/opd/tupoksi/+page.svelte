@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { api } from '$lib/api';
 	import { invalidateAll } from '$app/navigation';
+	import { untrack } from 'svelte';
 	import TinyMCE from '$lib/components/TinyMCE.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 	import FilePond from '$lib/components/FilePond.svelte';
@@ -15,9 +16,9 @@
 	let notificationType = $state<'success' | 'danger'>('success');
 
 	// Form states
-	let tupoksiType = $state<'text' | 'file'>(data.skpd?.tupoksi_type || 'text');
-	let tupoksi_text = $state(data.skpd?.tupoksi_text || '');
-	let currentTupoksi = $state(data.skpd?.tupoksi || '');
+	let tupoksiType = $state<'text' | 'file'>(untrack(() => data.skpd?.tupoksi_type || 'text'));
+	let tupoksi_text = $state(untrack(() => data.skpd?.tupoksi_text || ''));
+	let currentTupoksi = $state(untrack(() => data.skpd?.tupoksi || ''));
 	let uploadedTupoksi = $state<File | null>(null);
 
 	async function handleSubmit(e: SubmitEvent) {
@@ -68,10 +69,10 @@
 		<form onsubmit={handleSubmit} class="space-y-8">
 			<div class="space-y-4">
 				<div class="flex items-center justify-between">
-					<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">
+					<div id="format-label" class="text-sm font-semibold text-slate-700 dark:text-slate-300">
 						Format Konten
-					</label>
-					<div class="flex rounded-lg bg-slate-100 p-1 dark:bg-slate-900">
+					</div>
+					<div role="group" aria-labelledby="format-label" class="flex rounded-lg bg-slate-100 p-1 dark:bg-slate-900">
 						<button
 							type="button"
 							class="rounded-md px-4 py-1.5 text-xs font-bold transition-all {tupoksiType === 'text'
@@ -94,13 +95,19 @@
 				</div>
 
 				{#if tupoksiType === 'file'}
-					<FilePond
-						name="tupoksi"
-						allowMultiple={false}
-						acceptedFileTypes={['application/pdf']}
-						bind:value={uploadedTupoksi}
-						label={'Seret PDF tupoksi atau <span class="filepond--label-action">Telusuri</span>'}
-					/>
+					<div class="space-y-2">
+						<label for="tupoksi-file" class="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+							Unggah File PDF
+						</label>
+						<FilePond
+							id="tupoksi-file"
+							name="tupoksi"
+							allowMultiple={false}
+							acceptedFileTypes={['application/pdf']}
+							bind:value={uploadedTupoksi}
+							label={'Seret PDF tupoksi atau <span class="filepond--label-action">Telusuri</span>'}
+						/>
+					</div>
 					{#if currentTupoksi && currentTupoksi.toLowerCase().endsWith('.pdf') && !uploadedTupoksi}
 						<p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
 							<a

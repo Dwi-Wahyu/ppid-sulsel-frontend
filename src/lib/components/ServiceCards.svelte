@@ -1,5 +1,35 @@
-<script>
+<script lang="ts">
 	import * as m from '$lib/paraglide/messages.js';
+
+	type MessageKey = keyof typeof m;
+
+	interface ServiceCard {
+		title: MessageKey;
+		desc: MessageKey;
+		icon: string;
+		url: string;
+	}
+
+	const services: ServiceCard[] = [
+		{
+			title: 'service.info_public_title',
+			desc: 'service.public_info_desc',
+			icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10',
+			url: '/informasi-publik'
+		},
+		{
+			title: 'footer.info_request',
+			desc: 'service.request_desc',
+			icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+			url: '/layanan/permohonan-informasi'
+		},
+		{
+			title: 'footer.objection',
+			desc: 'service.objection_desc',
+			icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z',
+			url: '/layanan/pengajuan-keberatan'
+		}
+	];
 </script>
 
 <section
@@ -30,10 +60,10 @@
 
 		<!-- Cards Grid -->
 		<div class="mx-auto grid max-w-7xl grid-cols-1 gap-6 md:grid-cols-3 md:gap-8">
-			{#each [{ title: 'service.info_public_title', desc: 'service.public_info_desc', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10', url: '/informasi-publik' }, { title: 'footer.info_request', desc: 'service.request_desc', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', url: '/layanan/permohonan-informasi' }, { title: 'footer.objection', desc: 'service.objection_desc', icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z', url: '/layanan/pengajuan-keberatan' }] as s, index}
+			{#each services as s, index}
 				<a href={s.url} class="group block h-full" data-aos="fade-up" data-aos-delay={index * 150}>
 					<div
-						class="hover:shadow-[0_20px_40px_-10px_theme('colors.ppid-primary_/_10%')] relative flex h-full flex-col overflow-hidden rounded-2xl border border-gray-100/80 bg-white p-6 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] transition-all duration-700 ease-out hover:-translate-y-1 sm:p-8 dark:border-slate-700 dark:bg-slate-800"
+						class="hover:shadow-[0_20px_40px_-10px_theme('colors.ppid-primary\_/\_10%')] relative flex h-full flex-col overflow-hidden rounded-2xl border border-gray-100/80 bg-white p-6 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.05)] transition-all duration-700 ease-out hover:-translate-y-1 sm:p-8 dark:border-slate-700 dark:bg-slate-800"
 					>
 						<!-- Hover Accent Line -->
 						<div
@@ -57,14 +87,14 @@
 							</div>
 
 							<!-- Content Container -->
-							<div class="flex flex-grow flex-col">
+							<div class="flex grow flex-col">
 								<h3
 									class="mb-2 text-base font-bold text-ppid-primary transition-colors group-hover:text-ppid-accent md:mb-3 md:text-lg lg:text-xl dark:text-white"
 								>
 									{m[s.title]()}
 								</h3>
 								<p
-									class="mb-4 flex-grow text-sm leading-relaxed text-ppid-text md:mb-8 md:text-base dark:text-gray-300"
+									class="mb-4 grow text-sm leading-relaxed text-ppid-text md:mb-8 md:text-base dark:text-gray-300"
 								>
 									{m[s.desc]()}
 								</p>
@@ -99,3 +129,4 @@
 		</div>
 	</div>
 </section>
+

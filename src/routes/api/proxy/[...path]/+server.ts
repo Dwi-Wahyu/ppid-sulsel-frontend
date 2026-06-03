@@ -38,7 +38,7 @@ export const fallback: RequestHandler = async ({ url, params, request, locals })
 	// Bangun URL target (menggunakan url.search untuk query params)
 	const targetUrl = `${API_URL}/${params.path}${url.search}`;
 
-	console.log(`Proxying ${request.method} ${url.pathname} -> ${targetUrl}`);
+	// console.log(`Proxying ${request.method} ${url.pathname} -> ${targetUrl}`);
 
 	try {
 		// Lakukan Request ke Laravel
@@ -56,6 +56,8 @@ export const fallback: RequestHandler = async ({ url, params, request, locals })
 		const responseHeaders = new Headers(response.headers);
 		responseHeaders.delete('content-encoding'); // Hapus ini untuk mencegah ERR_CONTENT_DECODING_FAILED
 		responseHeaders.delete('content-length'); // Biarkan SvelteKit menghitung ulang panjang data
+		responseHeaders.delete('access-control-allow-origin');
+		responseHeaders.delete('access-control-allow-credentials');
 
 		return new Response(response.body, {
 			status: response.status,

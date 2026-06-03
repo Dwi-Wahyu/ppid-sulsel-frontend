@@ -183,9 +183,9 @@
 				<!-- Current File Info -->
 				{#if currentFile && !file}
 					<div>
-						<label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+						<div class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
 							File Saat Ini
-						</label>
+						</div>
 						<div
 							class="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-700 dark:bg-slate-700/50"
 						>
@@ -225,9 +225,9 @@
 
 				<!-- File Upload -->
 				<div>
-					<label class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+					<div class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
 						{currentFile ? 'File Baru (Opsional)' : 'File Dokumen'}
-					</label>
+					</div>
 					<FilePond
 						bind:value={file}
 						name="file"
