@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
+	import { api } from '$lib/api';
 	import { getImageUrl } from '$lib/get-image-url';
 	import FilePond from '$lib/components/FilePond.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
@@ -11,7 +13,7 @@
 		nm_slide: string;
 	}
 
-	let bannerId = $state('');
+	let bannerId = $derived($page.params.id);
 	let nm_slide = $state<any>(null);
 	let currentImage = $state<string | null>(null);
 	let isLoading = $state(true);
@@ -26,18 +28,16 @@
 	let showConfirm = $state(false);
 
 	onMount(async () => {
-		bannerId = window.location.pathname.split('/')[3]; // Extract ID from URL
 		await fetchBanner();
 	});
 
 	async function fetchBanner() {
 		try {
-			const response = await fetch(`${PUBLIC_API_URL}/admin/slide-banner/${bannerId}`, {
-				credentials: 'include'
-			});
-			const result = await response.json();
+			const result = await api.get(`/admin/slide-banner/${bannerId}`);
 
-			if (result.success) {
+			console.log(result);
+
+			if (result.data) {
 				const data: Banner = result.data;
 				currentImage = data.nm_slide;
 			}
@@ -61,15 +61,9 @@
 				formData.append('nm_slide', nm_slide);
 			}
 
-			const response = await fetch(`${PUBLIC_API_URL}/admin/slide-banner/${bannerId}`, {
-				method: 'POST',
-				credentials: 'include',
-				body: formData
-			});
+			const result = await api.post(`/admin/slide-banner/${bannerId}`, formData);
 
-			const result = await response.json();
-
-			if (response.ok) {
+			if (result.success) {
 				notificationType = 'success';
 				notificationMessage = 'Banner berhasil diperbarui';
 				showNotification = true;
@@ -77,14 +71,10 @@
 				setTimeout(() => {
 					goto('/admin/slide-banner');
 				}, 1500);
-			} else {
-				notificationType = 'error';
-				notificationMessage = result.message || 'Gagal memperbarui banner';
-				showNotification = true;
 			}
-		} catch (error) {
+		} catch (error: any) {
 			notificationType = 'error';
-			notificationMessage = 'Terjadi kesalahan saat menyimpan data';
+			notificationMessage = error.message || 'Terjadi kesalahan saat menyimpan data';
 			showNotification = true;
 		} finally {
 			isSaving = false;
@@ -181,17 +171,13 @@
 				<!-- Gambar Banner Baru -->
 				<div>
 					<div class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
-						{currentImage ? 'Gambar Baru (Opsional)' : 'Gambar Banner'}
+						{currentImage ? 'Gambar Baru' : 'Gambar Banner'}
 					</div>
 					<FilePond
 						bind:value={nm_slide}
 						name="nm_slide"
 						acceptedFileTypes={['image/png', 'image/jpeg', 'image/gif']}
 						label="Seret & Letakkan file atau <span class='filepond--label-action'>Telusuri</span>"
-						imagePreviewHeight={300}
-						imageCropAspectRatio="2752:1536"
-						imageValidateSizeMinWidth={2752}
-						imageValidateSizeMinHeight={1536}
 					/>
 					<p class="mt-2 text-xs text-slate-500 dark:text-slate-400">
 						Biarkan kosong jika tidak ingin mengubah gambar. Format: JPG, PNG, GIF (Max: 5MB).
@@ -212,7 +198,7 @@
 					type="submit"
 					disabled={isSaving}
 					aria-busy={isSaving}
-					class="rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+					class="rounded-xl bg-ppid-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-ppid-primary-hover focus:ring-2 focus:ring-ppid-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 				>
 					{isSaving ? 'Menyimpan...' : 'Perbarui Banner'}
 				</button>

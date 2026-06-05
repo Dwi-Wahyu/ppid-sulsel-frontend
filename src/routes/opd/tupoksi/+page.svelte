@@ -23,19 +23,21 @@
 
 	async function handleSubmit(e: SubmitEvent) {
 		e.preventDefault();
+		if (!data.skpd) return;
 		loading = true;
 
 		try {
 			const formData = new FormData();
+			formData.append('_method', 'PUT');
 			formData.append('tupoksi_type', tupoksiType);
 
 			if (tupoksiType === 'text') {
-				formData.append('tupoksi_text', tupoksi_text);
+				formData.append('tupoksi', tupoksi_text);
 			} else if (uploadedTupoksi) {
 				formData.append('tupoksi', uploadedTupoksi);
 			}
 
-			const response = await api.post('/admin/opd/tupoksi', formData);
+			const response = await api.post(`/admin/skpd/${data.skpd.id_skpd}/tupoksi`, formData);
 
 			if (response.success) {
 				notificationType = 'success';
@@ -60,7 +62,7 @@
 </svelte:head>
 
 <div class="mb-8">
-	<h1 class="text-2xl font-bold text-slate-900 dark:text-white">Tugas & Fungsi (Tupoksi)</h1>
+	<h1 class="text-2xl font-bold text-slate-900 dark:text-white">Tugas Pokok & Fungsi</h1>
 	<p class="text-slate-500">Kelola konten tugas dan fungsi instansi Anda.</p>
 </div>
 
@@ -72,7 +74,11 @@
 					<div id="format-label" class="text-sm font-semibold text-slate-700 dark:text-slate-300">
 						Format Konten
 					</div>
-					<div role="group" aria-labelledby="format-label" class="flex rounded-lg bg-slate-100 p-1 dark:bg-slate-900">
+					<!-- <div
+						role="group"
+						aria-labelledby="format-label"
+						class="flex rounded-lg bg-slate-100 p-1 dark:bg-slate-900"
+					>
 						<button
 							type="button"
 							class="rounded-md px-4 py-1.5 text-xs font-bold transition-all {tupoksiType === 'text'
@@ -91,12 +97,15 @@
 						>
 							File PDF
 						</button>
-					</div>
+					</div> -->
 				</div>
 
 				{#if tupoksiType === 'file'}
 					<div class="space-y-2">
-						<label for="tupoksi-file" class="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+						<label
+							for="tupoksi-file"
+							class="block text-sm font-semibold text-slate-700 dark:text-slate-300"
+						>
 							Unggah File PDF
 						</label>
 						<FilePond
@@ -111,7 +120,7 @@
 					{#if currentTupoksi && currentTupoksi.toLowerCase().endsWith('.pdf') && !uploadedTupoksi}
 						<p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
 							<a
-								href={getImageUrl(currentTupoksi)}
+								href={getImageUrl('tupoksi-skpd/' + currentTupoksi)}
 								target="_blank"
 								class="text-ppid-primary hover:underline">Lihat PDF saat ini</a
 							>

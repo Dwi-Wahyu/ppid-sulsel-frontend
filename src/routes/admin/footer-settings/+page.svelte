@@ -123,11 +123,7 @@
 					<div
 						class="mb-8 flex items-center justify-between border-b border-slate-50 pb-6 dark:border-slate-700"
 					>
-						<h2 class="text-sm font-black tracking-widest text-slate-800 uppercase dark:text-white">
-							Branding & Logo
-						</h2>
-
-						<label class="flex cursor-pointer items-center gap-3">
+						<label class="flex cursor-pointer flex-col gap-3">
 							<span class="text-xs font-bold text-slate-500 uppercase">Tampilkan Statistik</span>
 							<div class="relative inline-flex items-center">
 								<input
@@ -143,22 +139,6 @@
 					</div>
 
 					<div class="grid grid-cols-1 gap-10 lg:grid-cols-3">
-						<div class="space-y-4">
-							<h1 class="block text-[10px] font-black tracking-widest text-slate-500 uppercase">
-								Logo Footer
-							</h1>
-							<div
-								class="rounded-3xl border-2 border-dashed border-slate-200 p-2 dark:border-slate-700"
-							>
-								<FilePond
-									bind:value={logoFile}
-									name="footer_logo"
-									acceptedFileTypes={['image/png', 'image/jpeg']}
-									label="Seret Logo"
-								/>
-							</div>
-						</div>
-
 						<div class="space-y-2 lg:col-span-2">
 							<label
 								for="footer_description"

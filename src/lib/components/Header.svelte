@@ -7,6 +7,7 @@
 	import Sosmed from './Sosmed.svelte';
 	import { theme } from '$lib/state/theme.svelte';
 	import { afterNavigate } from '$app/navigation';
+	import { page } from '$app/state';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import { api } from '$lib/api';
 
@@ -103,6 +104,46 @@
 		openLang = false;
 		searchModalOpen = false;
 	});
+
+	function toggleProfil() {
+		openProfil = !openProfil;
+		openDaftar = false;
+		openInformasi = false;
+		openLayanan = false;
+		openService = false;
+	}
+
+	function toggleDaftar() {
+		openDaftar = !openDaftar;
+		openProfil = false;
+		openInformasi = false;
+		openLayanan = false;
+		openService = false;
+	}
+
+	function toggleInformasi() {
+		openInformasi = !openInformasi;
+		openProfil = false;
+		openDaftar = false;
+		openLayanan = false;
+		openService = false;
+	}
+
+	function toggleLayanan() {
+		openLayanan = !openLayanan;
+		openProfil = false;
+		openDaftar = false;
+		openInformasi = false;
+		openService = false;
+	}
+
+	function toggleService() {
+		openService = !openService;
+		openProfil = false;
+		openDaftar = false;
+		openInformasi = false;
+		openLayanan = false;
+	}
 </script>
 
 <header
@@ -266,7 +307,12 @@
 				class="flex flex-col items-stretch justify-center text-xs font-medium text-white/90 lg:flex-row lg:items-center lg:text-sm"
 			>
 				<li class="border-b border-white/10 lg:border-none">
-					<a href="/" class="group relative block px-6 py-4 hover:text-[#D4AF37] lg:px-4">
+					<a
+						href="/"
+						class="group relative block px-6 py-4 lg:px-4 {page.url.pathname === '/'
+							? 'text-ppid-accent'
+							: 'hover:text-[#D4AF37]'}"
+					>
 						{m['header.home']()}
 						<span
 							class="absolute bottom-0 left-0 hidden h-0.75 w-full scale-x-0 bg-ppid-accent transition-transform group-hover:scale-x-100 lg:block"
@@ -280,8 +326,12 @@
 					onmouseleave={() => (window.innerWidth >= 1024 ? (openProfil = false) : null)}
 				>
 					<button
-						onclick={() => (window.innerWidth < 1024 ? (openProfil = !openProfil) : null)}
-						class="flex w-full items-center justify-between px-6 py-4 hover:text-ppid-accent lg:px-4"
+						onclick={() => (window.innerWidth < 1024 ? toggleProfil() : null)}
+						class="flex w-full items-center justify-between px-6 py-4 lg:px-4 {page.url.pathname.startsWith(
+							'/profil'
+						)
+							? 'text-ppid-accent'
+							: 'hover:text-ppid-accent'}"
 					>
 						<span>{m['header.profile']()}</span>
 						<svg
@@ -351,7 +401,11 @@
 				</li>
 
 				<li class="border-b border-white/10 lg:border-none">
-					<a href="/berita" class="block px-6 py-4 hover:text-[#D4AF37] lg:px-4"
+					<a
+						href="/berita"
+						class="block px-6 py-4 lg:px-4 {page.url.pathname.startsWith('/berita')
+							? 'text-ppid-accent'
+							: 'hover:text-[#D4AF37]'}"
 						>{m['header.news']()}</a
 					>
 				</li>
@@ -362,8 +416,12 @@
 					onmouseleave={() => (window.innerWidth >= 1024 ? (openDaftar = false) : null)}
 				>
 					<button
-						onclick={() => (window.innerWidth < 1024 ? (openDaftar = !openDaftar) : null)}
-						class="flex w-full items-center justify-between px-6 py-4 hover:text-ppid-accent lg:px-4"
+						onclick={() => (window.innerWidth < 1024 ? toggleDaftar() : null)}
+						class="flex w-full items-center justify-between px-6 py-4 lg:px-4 {page.url.pathname.startsWith(
+							'/informasi-publik/tahun'
+						)
+							? 'text-ppid-accent'
+							: 'hover:text-ppid-accent'}"
 					>
 						<span>{m['header.data_info']()}</span>
 						<svg
@@ -406,8 +464,12 @@
 					onmouseleave={() => (window.innerWidth >= 1024 ? (openInformasi = false) : null)}
 				>
 					<button
-						onclick={() => (window.innerWidth < 1024 ? (openInformasi = !openInformasi) : null)}
-						class="flex w-full items-center justify-between px-6 py-4 hover:text-ppid-accent lg:px-4"
+						onclick={() => (window.innerWidth < 1024 ? toggleInformasi() : null)}
+						class="flex w-full items-center justify-between px-6 py-4 lg:px-4 {page.url.pathname.startsWith(
+							'/informasi-publik/kategori'
+						)
+							? 'text-ppid-accent'
+							: 'hover:text-ppid-accent'}"
 					>
 						<span>{m['header.public_info']()}</span>
 						<svg
@@ -450,7 +512,11 @@
 				</li>
 
 				<li class="border-b border-white/10 lg:border-none">
-					<a href="/ppid-pelaksana" class="block px-6 py-4 hover:text-[#D4AF37] lg:px-4"
+					<a
+						href="/ppid-pelaksana"
+						class="block px-6 py-4 lg:px-4 {page.url.pathname.startsWith('/ppid-pelaksana')
+							? 'text-ppid-accent'
+							: 'hover:text-[#D4AF37]'}"
 						>{m['header.ppid_implementing']()}</a
 					>
 				</li>
@@ -461,8 +527,12 @@
 					onmouseleave={() => (window.innerWidth >= 1024 ? (openLayanan = false) : null)}
 				>
 					<button
-						onclick={() => (window.innerWidth < 1024 ? (openLayanan = !openLayanan) : null)}
-						class="flex w-full items-center justify-between px-6 py-4 hover:text-ppid-accent lg:px-4"
+						onclick={() => (window.innerWidth < 1024 ? toggleLayanan() : null)}
+						class="flex w-full items-center justify-between px-6 py-4 lg:px-4 {page.url.pathname.startsWith(
+							'/layanan'
+						)
+							? 'text-ppid-accent'
+							: 'hover:text-ppid-accent'}"
 					>
 						<span>{m['header.services']()}</span>
 						<svg
@@ -523,8 +593,12 @@
 					onmouseleave={() => (window.innerWidth >= 1024 ? (openService = false) : null)}
 				>
 					<button
-						onclick={() => (window.innerWidth < 1024 ? (openService = !openService) : null)}
-						class="flex w-full items-center justify-between px-6 py-4 hover:text-ppid-accent lg:px-4"
+						onclick={() => (window.innerWidth < 1024 ? toggleService() : null)}
+						class="flex w-full items-center justify-between px-6 py-4 lg:px-4 {page.url.pathname.startsWith(
+							'/survey'
+						)
+							? 'text-ppid-accent'
+							: 'hover:text-ppid-accent'}"
 					>
 						<span>{m['header.survey']()}</span>
 						<svg

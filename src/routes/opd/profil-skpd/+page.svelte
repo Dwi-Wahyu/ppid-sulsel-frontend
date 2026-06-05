@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { api } from '$lib/api';
 	import { untrack } from 'svelte';
+	import { invalidateAll } from '$app/navigation';
 	import FilePond from '$lib/components/FilePond.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
-	import TinyMCE from '$lib/components/TinyMCE.svelte';
-	import { PUBLIC_BACKEND_URL } from '$env/static/public';
 	import { getImageUrl } from '$lib/get-image-url';
 
 	let { data } = $props();
@@ -19,18 +18,22 @@
 	let skpd = $state(untrack(() => data.skpd || null));
 	let uploadedLogo = $state<File | null>(null);
 	let alamat = $state(untrack(() => data.skpd?.alamat || ''));
-	let no_telp = $state(untrack(() => data.skpd?.no_telp || ''));
+	let no_telp = $state(untrack(() => data.skpd?.no_tlp || ''));
 	let website = $state(untrack(() => data.skpd?.website || ''));
 	let email = $state(untrack(() => data.skpd?.email || ''));
 
 	async function handleSubmit(e: SubmitEvent) {
 		e.preventDefault();
+		if (!skpd) return;
 		loading = true;
 
 		try {
 			const formData = new FormData();
+			formData.append('_method', 'PUT');
+			formData.append('nm_skpd', skpd.nm_skpd || '');
+			formData.append('is_active', skpd.is_active || '1');
 			formData.append('alamat', alamat);
-			formData.append('no_telp', no_telp);
+			formData.append('no_tlp', no_telp);
 			formData.append('website', website);
 			formData.append('email', email);
 
@@ -38,7 +41,7 @@
 				formData.append('logo', uploadedLogo);
 			}
 
-			const response = await api.post('/admin/opd/profil-skpd', formData);
+			const response = await api.post(`/admin/skpd/${skpd.id_skpd}`, formData);
 
 			if (response.success) {
 				notificationType = 'success';
@@ -46,9 +49,10 @@
 				skpd = response.data;
 				// Update form states with new data from server
 				alamat = response.data.alamat || '';
-				no_telp = response.data.no_telp || '';
+				no_telp = response.data.no_tlp || '';
 				website = response.data.website || '';
 				email = response.data.email || '';
+				await invalidateAll();
 			} else {
 				throw new Error(response.message || 'Gagal memperbarui profil');
 			}
@@ -77,7 +81,10 @@
 			<!-- Logo Section -->
 			<div class="grid grid-cols-1 gap-8 md:grid-cols-3">
 				<div class="space-y-4">
-					<label for="logo-upload" class="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+					<label
+						for="logo-upload"
+						class="block text-sm font-semibold text-slate-700 dark:text-slate-300"
+					>
 						Logo Instansi
 					</label>
 					<FilePond
@@ -88,10 +95,8 @@
 					/>
 					{#if skpd.logo && !uploadedLogo}
 						<p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
-							<a
-								href={getImageUrl(skpd.logo)}
-								target="_blank"
-								class="text-blue-600 hover:underline">Lihat logo saat ini</a
+							<a href={getImageUrl('logo-skpd/' + skpd.logo)} target="_blank" class="text-blue-600 hover:underline"
+								>Lihat logo saat ini</a
 							>
 						</p>
 					{/if}
@@ -100,7 +105,10 @@
 				<div class="space-y-6 md:col-span-2">
 					<!-- Nama SKPD (Read Only) -->
 					<div>
-						<label for="nama-instansi" class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+						<label
+							for="nama-instansi"
+							class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300"
+						>
 							Nama Instansi
 						</label>
 						<input
@@ -114,14 +122,17 @@
 
 					<!-- Alamat -->
 					<div>
-						<label for="alamat-kantor" class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+						<label
+							for="alamat-kantor"
+							class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300"
+						>
 							Alamat Kantor
 						</label>
 						<textarea
 							id="alamat-kantor"
 							bind:value={alamat}
 							rows="3"
-							class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none ring-ppid-primary/20 transition-all focus:border-ppid-primary focus:ring-4 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+							class="w-full rounded-xl border border-slate-200 px-4 py-3 ring-ppid-primary/20 transition-all outline-none focus:border-ppid-primary focus:ring-4 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
 						></textarea>
 					</div>
 				</div>
@@ -132,31 +143,40 @@
 			<!-- Kontak Grid -->
 			<div class="grid grid-cols-1 gap-6 md:grid-cols-2">
 				<div>
-					<label for="no-telp" class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+					<label
+						for="no-telp"
+						class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300"
+					>
 						Nomor Telepon
 					</label>
 					<input
 						id="no-telp"
 						type="text"
 						bind:value={no_telp}
-						class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none ring-ppid-primary/20 transition-all focus:border-ppid-primary focus:ring-4 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+						class="w-full rounded-xl border border-slate-200 px-4 py-3 ring-ppid-primary/20 transition-all outline-none focus:border-ppid-primary focus:ring-4 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
 					/>
 				</div>
 
 				<div>
-					<label for="email-resmi" class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+					<label
+						for="email-resmi"
+						class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300"
+					>
 						Email Resmi
 					</label>
 					<input
 						id="email-resmi"
 						type="email"
 						bind:value={email}
-						class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none ring-ppid-primary/20 transition-all focus:border-ppid-primary focus:ring-4 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+						class="w-full rounded-xl border border-slate-200 px-4 py-3 ring-ppid-primary/20 transition-all outline-none focus:border-ppid-primary focus:ring-4 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
 					/>
 				</div>
 
 				<div class="md:col-span-2">
-					<label for="website-resmi" class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+					<label
+						for="website-resmi"
+						class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300"
+					>
 						Alamat Website
 					</label>
 					<input
@@ -164,7 +184,7 @@
 						type="url"
 						bind:value={website}
 						placeholder="https://..."
-						class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none ring-ppid-primary/20 transition-all focus:border-ppid-primary focus:ring-4 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+						class="w-full rounded-xl border border-slate-200 px-4 py-3 ring-ppid-primary/20 transition-all outline-none focus:border-ppid-primary focus:ring-4 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
 					/>
 				</div>
 			</div>
@@ -193,7 +213,6 @@
 
 <NotificationDialog
 	bind:show={showNotification}
-	theme={notificationType}
 	title={notificationType === 'success' ? 'Berhasil!' : 'Gagal!'}
 	description={notificationMessage}
 />

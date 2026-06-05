@@ -176,7 +176,7 @@
 				<div class="space-y-1 md:col-span-2">
 					<p class="text-xs font-bold tracking-wider text-slate-400 uppercase">Kasus Posisi</p>
 					<p
-						class="mt-2 rounded-lg bg-slate-50 p-4 whitespace-pre-wrap text-base font-semibold text-slate-900 dark:bg-slate-700/50 dark:text-white"
+						class="mt-2 rounded-lg bg-slate-50 p-4 text-base font-semibold whitespace-pre-wrap text-slate-900 dark:bg-slate-700/50 dark:text-white"
 					>
 						{data.pengajuan.kasus || '-'}
 					</p>
@@ -278,29 +278,7 @@
 	<!-- Sidebar -->
 	<div class="space-y-8">
 		<!-- Tracking Card -->
-		<TrackingCardPengajuan
-			disposisi={data.pengajuan.disposisi}
-			id_skpd={data.user?.id_skpd}
-		/>
-
-		<!-- Quick Actions -->
-		<div class="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:bg-slate-800">
-			<h3 class="mb-4 text-sm font-bold tracking-widest text-slate-400 uppercase">Aksi Cepat</h3>
-			<div class="space-y-3">
-				<a
-					href="/ppid-pelaksana/{data.pengajuan.id_skpd}"
-					target="_blank"
-					class="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-slate-100 py-2.5 text-sm font-bold text-slate-600 transition-all hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-900"
-				>
-					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-						<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke-width="2" />
-						<polyline points="15 3 21 3 21 9" stroke-width="2" />
-						<line x1="10" y1="14" x2="21" y2="3" stroke-width="2" />
-					</svg>
-					Lihat Profil SKPD
-				</a>
-			</div>
-		</div>
+		<TrackingCardPengajuan disposisi={data.pengajuan.disposisi} id_skpd={data.user?.id_skpd} />
 	</div>
 </div>
 

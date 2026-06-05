@@ -67,7 +67,14 @@ export const actions: Actions = {
 		// Create multipart form data for API
 		const apiFormData = new FormData();
 		apiFormData.append('status', status);
-		apiFormData.append('jawaban', jawaban);
+		
+		// Map 'pesan' to 'alasan' if status is 3 (Tolak), otherwise to 'jawaban'
+		if (status === '3') {
+			apiFormData.append('alasan', jawaban);
+		} else {
+			apiFormData.append('jawaban', jawaban);
+		}
+		
 		apiFormData.append('_method', 'PUT'); // Laravel method spoofing
 
 		// Add file if provided and not empty

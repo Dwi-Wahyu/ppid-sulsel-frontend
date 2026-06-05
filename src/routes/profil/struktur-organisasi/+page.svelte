@@ -6,6 +6,7 @@
 	import { onMount } from 'svelte';
 	import { PUBLIC_API_URL } from '$env/static/public';
 	import { getImageUrl } from '$lib/get-image-url';
+	import { api } from '$lib/api';
 
 	interface ProfilData {
 		struktur_organisasi_path: string | null;
@@ -19,8 +20,8 @@
 
 	onMount(async () => {
 		try {
-			const response = await fetch(`${PUBLIC_API_URL}/public/profil/struktur-organisasi`);
-			const result = await response.json();
+			const result = await api.get('/public/profil/struktur-organisasi');
+
 			if (result.success && result.data) {
 				const path = result.data.struktur_organisasi_path;
 				if (path) {
@@ -58,12 +59,13 @@
 <main class="bg-gray-50 py-10 font-['Plus_Jakarta_Sans'] md:py-16 dark:bg-slate-900">
 	<div class="container mx-auto px-4">
 		<div class="mx-auto max-w-5xl">
-
 			<!-- Organization Chart Viewer -->
 			<div
 				class="mb-12 overflow-hidden rounded-3xl border border-slate-100 bg-slate-50 shadow-sm dark:border-slate-800 dark:bg-slate-800"
 			>
-				<div class="flex items-center justify-between border-b border-slate-100 p-6 dark:border-slate-700">
+				<div
+					class="flex items-center justify-between border-b border-slate-100 p-6 dark:border-slate-700"
+				>
 					<h2 class="font-bold text-ppid-primary dark:text-white">
 						{m['org_struct.chart_title']()}
 					</h2>
@@ -73,7 +75,14 @@
 							target="_blank"
 							class="flex items-center gap-2 text-sm font-bold text-ppid-primary hover:underline"
 						>
-							<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<svg
+								width="18"
+								height="18"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+							>
 								<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
 								<polyline points="15 3 21 3 21 9" />
 								<line x1="10" y1="14" x2="21" y2="3" />
@@ -86,7 +95,9 @@
 				<div class="bg-slate-100 dark:bg-slate-900">
 					{#if isLoading}
 						<div class="flex h-150 items-center justify-center">
-							<div class="h-10 w-10 animate-spin rounded-full border-4 border-ppid-primary border-t-transparent"></div>
+							<div
+								class="h-10 w-10 animate-spin rounded-full border-4 border-ppid-primary border-t-transparent"
+							></div>
 						</div>
 					{:else if profil.struktur_organisasi_path}
 						{#if profil.struktur_organisasi_path.toLowerCase().endsWith('.pdf')}
@@ -107,7 +118,14 @@
 					{:else}
 						<div class="flex h-80 flex-col items-center justify-center p-12 text-center">
 							<div class="mb-4 text-slate-300">
-								<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+								<svg
+									width="64"
+									height="64"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="1.5"
+								>
 									<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
 									<polyline points="14 2 14 8 20 8" />
 								</svg>
@@ -120,7 +138,9 @@
 
 			<!-- Additional Details -->
 			<div class="grid grid-cols-1 gap-8 md:grid-cols-2">
-				<div class="rounded-3xl border border-slate-100 bg-white p-8 shadow-xs dark:border-slate-800 dark:bg-slate-800">
+				<div
+					class="rounded-3xl border border-slate-100 bg-white p-8 shadow-xs dark:border-slate-800 dark:bg-slate-800"
+				>
 					<div class="mb-6 flex items-center gap-3">
 						<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-ppid-primary/10">
 							<svg

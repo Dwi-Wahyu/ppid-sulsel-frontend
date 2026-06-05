@@ -229,7 +229,7 @@
 					<div class="mt-4">
 						<dt class="mb-2 text-sm font-semibold text-slate-600 dark:text-slate-400">Foto KTP</dt>
 						<a
-							href={PUBLIC_BACKEND_URL + `permohonan/ktp/${data.permohonan.foto_ktp}`}
+							href={getImageUrl(data.permohonan.foto_ktp)}
 							target="_blank"
 							rel="noopener noreferrer"
 							class="inline-flex items-center gap-2 text-sm text-ppid-primary hover:text-ppid-accent dark:text-blue-400 dark:hover:text-blue-300"
@@ -321,6 +321,141 @@
 				</dl>
 			</div>
 		</div>
+
+		<!-- Respon Admin / Hasil Jawaban & Penolakan -->
+		{#if data.permohonan.status === 2 && data.permohonan.jawaban}
+			<div
+				class="overflow-hidden rounded-xl border border-emerald-200 bg-white shadow-sm dark:border-emerald-800 dark:bg-slate-800"
+			>
+				<div
+					class="border-b border-white/10 bg-linear-to-r from-emerald-600 to-emerald-700 p-4"
+				>
+					<h2 class="flex items-center gap-2 text-lg font-bold text-white">
+						<svg
+							class="h-5 w-5"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+							aria-hidden="true"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+							/>
+						</svg>
+						Jawaban Permohonan
+					</h2>
+				</div>
+				<div class="p-6 space-y-4">
+					<div>
+						<dt class="text-sm font-semibold text-slate-500 dark:text-slate-400">
+							Dijawab Oleh
+						</dt>
+						<dd class="mt-1 text-base font-medium text-slate-900 dark:text-slate-100">
+							{data.permohonan.responded_by || 'Admin'}
+						</dd>
+					</div>
+					<div>
+						<dt class="text-sm font-semibold text-slate-500 dark:text-slate-400">
+							Isi Jawaban
+						</dt>
+						<dd class="mt-2 rounded-lg bg-emerald-50/50 border border-emerald-100 p-4 whitespace-pre-wrap text-slate-950 dark:bg-emerald-950/20 dark:border-emerald-900/50 dark:text-slate-100">
+							{data.permohonan.jawaban}
+						</dd>
+					</div>
+					{#if data.permohonan.file}
+						<div class="pt-2">
+							<a
+								href={getImageUrl(data.permohonan.file)}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-emerald-700 hover:shadow-lg"
+							>
+								<svg
+									class="h-4 w-4"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+									aria-hidden="true"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+									/>
+								</svg>
+								Unduh Lampiran Jawaban
+							</a>
+						</div>
+					{/if}
+				</div>
+			</div>
+		{:else if data.permohonan.status === 3 && data.permohonan.alasan}
+			<div
+				class="overflow-hidden rounded-xl border border-red-200 bg-white shadow-sm dark:border-red-800 dark:bg-slate-800"
+			>
+				<div
+					class="border-b border-white/10 bg-linear-to-r from-red-600 to-red-700 p-4"
+				>
+					<h2 class="flex items-center gap-2 text-lg font-bold text-white">
+						<svg
+							class="h-5 w-5"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+							aria-hidden="true"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+							/>
+						</svg>
+						Penolakan Permohonan
+					</h2>
+				</div>
+				<div class="p-6 space-y-4">
+					<div>
+						<dt class="text-sm font-semibold text-slate-500 dark:text-slate-400">
+							Alasan Penolakan
+						</dt>
+						<dd class="mt-2 rounded-lg bg-red-50/50 border border-red-100 p-4 whitespace-pre-wrap text-slate-950 dark:bg-red-950/20 dark:border-red-900/50 dark:text-slate-100">
+							{data.permohonan.alasan}
+						</dd>
+					</div>
+					{#if data.permohonan.file}
+						<div class="pt-2">
+							<a
+								href={getImageUrl(data.permohonan.file)}
+								target="_blank"
+								rel="noopener noreferrer"
+								class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:bg-red-700 hover:shadow-lg"
+							>
+								<svg
+									class="h-4 w-4"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+									aria-hidden="true"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+									/>
+								</svg>
+								Unduh Lampiran Penolakan
+							</a>
+						</div>
+					{/if}
+				</div>
+			</div>
+		{/if}
 
 		<!-- Tracking Disposisi OPD -->
 		{#if data.permohonan.disposisi && data.permohonan.disposisi.length > 0}
@@ -484,7 +619,7 @@
 											<p
 												class="text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400"
 											>
-												💼 Pesan Disposisi:
+												Pesan Disposisi:
 											</p>
 											<p
 												class="mt-1 rounded-lg bg-white p-3 text-sm text-slate-700 italic shadow-sm dark:bg-slate-800 dark:text-slate-300"
@@ -846,20 +981,6 @@
 				class="flex items-center justify-between border-b border-emerald-200 bg-linear-to-r from-emerald-600 to-emerald-700 p-6"
 			>
 				<h3 id="update-modal-title" class="flex items-center gap-2 text-xl font-bold text-white">
-					<svg
-						class="h-6 w-6"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						aria-hidden="true"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-						/>
-					</svg>
 					Form Jawaban Langsung
 				</h3>
 				<button
@@ -889,10 +1010,12 @@
 				action="?/updateStatus"
 				enctype="multipart/form-data"
 				use:enhance={() => {
-					return async ({ result }) => {
+					return async ({ result, update }) => {
 						if (result.type === 'success') {
 							await invalidateAll();
 							closeUpdateModal();
+						} else {
+							await update({ reset: false });
 						}
 					};
 				}}
@@ -906,7 +1029,7 @@
 						class="rounded-lg border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-900/20"
 					>
 						<p class="text-sm text-emerald-800 dark:text-emerald-200">
-							<span class="font-semibold">ℹ️ Info:</span> Status otomatis akan berubah menjadi
+							<span class="font-semibold">Info:</span> Status otomatis akan berubah menjadi
 							<span class="font-bold">"Dijawab"</span> setelah Anda memberikan jawaban.
 						</p>
 					</div>
@@ -988,20 +1111,6 @@
 				class="flex items-center justify-between border-b border-red-200 bg-linear-to-r from-red-600 to-red-700 p-6"
 			>
 				<h3 id="reject-modal-title" class="flex items-center gap-2 text-xl font-bold text-white">
-					<svg
-						class="h-6 w-6"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						aria-hidden="true"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M6 18L18 6M6 6l12 12"
-						/>
-					</svg>
 					Form Penolakan Permohonan
 				</h3>
 				<button
@@ -1031,10 +1140,12 @@
 				action="?/updateStatus"
 				enctype="multipart/form-data"
 				use:enhance={() => {
-					return async ({ result }) => {
+					return async ({ result, update }) => {
 						if (result.type === 'success') {
 							await invalidateAll();
 							closeRejectModal();
+						} else {
+							await update({ reset: false });
 						}
 					};
 				}}
@@ -1048,7 +1159,7 @@
 						class="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20"
 					>
 						<p class="text-sm text-red-800 dark:text-red-200">
-							<span class="font-semibold">⚠️ Perhatian:</span> Status akan berubah menjadi
+							<span class="font-semibold">Perhatian:</span> Status akan berubah menjadi
 							<span class="font-bold">"Ditolak"</span>. Pastikan Anda memberikan alasan penolakan
 							yang jelas.
 						</p>
@@ -1134,20 +1245,6 @@
 					id="disposition-modal-title"
 					class="flex items-center gap-2 text-xl font-bold text-white"
 				>
-					<svg
-						class="h-6 w-6"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-						aria-hidden="true"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-						/>
-					</svg>
 					Form Disposisi
 				</h3>
 				<button
@@ -1176,10 +1273,12 @@
 				method="POST"
 				action="?/createDisposition"
 				use:enhance={() => {
-					return async ({ result }) => {
+					return async ({ result, update }) => {
 						if (result.type === 'success') {
 							await invalidateAll();
 							closeDispositionModal();
+						} else {
+							await update({ reset: false });
 						}
 					};
 				}}
@@ -1260,7 +1359,7 @@
 								for="dispositionMessage"
 								class="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300"
 							>
-								Pesan Disposisi (Opsional)
+								Pesan Disposisi
 							</label>
 							<textarea
 								id="dispositionMessage"

@@ -208,7 +208,7 @@
 			<button
 				type="submit"
 				disabled={isSaving}
-				class="rounded-2xl bg-ppid-primary px-12 py-4 text-xs font-black text-white shadow-xl shadow-ppid-primary/30 transition-all hover:opacity-90 active:scale-95 disabled:opacity-50"
+				class="inline-flex items-center gap-2 rounded-xl bg-ppid-primary px-6 py-2.5 text-sm font-black text-white shadow-lg shadow-ppid-primary/20 transition-all hover:opacity-90"
 			>
 				{isSaving ? 'MEMPROSES...' : 'SIMPAN FAQ'}
 			</button>

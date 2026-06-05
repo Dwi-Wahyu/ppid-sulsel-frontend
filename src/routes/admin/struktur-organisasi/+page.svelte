@@ -22,11 +22,10 @@
 	let notificationType = $state<'success' | 'error'>('success');
 	let notificationMessage = $state('');
 
-	// Transform storage/ path to uploads/ prefix based on web.php route
+	// Transform path to URL using helper
 	const display_url = $derived.by(() => {
 		if (!currentData.struktur_organisasi_path) return null;
-		const cleanPath = currentData.struktur_organisasi_path.replace('storage/', '');
-		return getImageUrl(cleanPath);
+		return getImageUrl(currentData.struktur_organisasi_path);
 	});
 
 	onMount(async () => {
@@ -104,7 +103,7 @@
 			</div>
 		{:else}
 			<div
-				class="mb-8 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+				class="mb-8 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition-colors dark:border-slate-700 dark:bg-slate-800"
 			>
 				<div class="mb-6 flex items-center gap-3">
 					<div
@@ -138,7 +137,9 @@
 							acceptedFileTypes={['application/pdf']}
 							label="Seret & Letakkan file PDF atau <span class='filepond--label-action'>Telusuri</span>"
 						/>
-						<p class="mt-2 text-xs text-slate-500">Format: PDF • Ukuran maksimal: 5MB</p>
+						<p class="mt-2 text-xs text-slate-500 dark:text-slate-400">
+							Format: PDF • Ukuran maksimal: 5MB
+						</p>
 					</div>
 
 					<div class="flex justify-end">
@@ -162,7 +163,7 @@
 
 			{#if display_url}
 				<div
-					class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800"
+					class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-colors dark:border-slate-700 dark:bg-slate-800"
 				>
 					<div
 						class="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-8 py-5 dark:border-slate-700 dark:bg-slate-900"
@@ -170,18 +171,18 @@
 						<h2 class="text-lg font-bold text-slate-900 dark:text-white">Preview Saat Ini</h2>
 						<a
 							href={display_url}
-							download
-							class="rounded-lg bg-ppid-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-700"
+							target="_blank"
+							class="rounded-lg bg-ppid-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:opacity-90"
 						>
 							Download PDF
 						</a>
 					</div>
 
-					<div class="p-8">
-						<div class="overflow-hidden rounded-xl border-2 border-slate-200">
+					<div class="p-8 dark:bg-slate-900">
+						<div class="overflow-hidden rounded-xl border-2 border-slate-200 dark:border-slate-700">
 							<iframe
 								src={display_url}
-								class="w-full bg-white"
+								class="w-full bg-white dark:bg-slate-800"
 								style="height: 800px;"
 								title="Preview Struktur Organisasi"
 							></iframe>
@@ -190,8 +191,23 @@
 				</div>
 			{:else}
 				<div
-					class="rounded-2xl border border-dashed border-slate-300 p-20 text-center text-slate-500"
+					class="rounded-2xl border border-dashed border-slate-300 p-20 text-center text-slate-500 transition-colors dark:border-slate-600 dark:text-slate-400"
 				>
+					<div class="mb-4 flex justify-center">
+						<svg
+							class="h-12 w-12 opacity-20"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+							/>
+						</svg>
+					</div>
 					<p class="italic">Belum ada file struktur organisasi yang diunggah.</p>
 				</div>
 			{/if}

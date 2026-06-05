@@ -23,19 +23,21 @@
 
 	async function handleSubmit(e: SubmitEvent) {
 		e.preventDefault();
+		if (!data.skpd) return;
 		loading = true;
 
 		try {
 			const formData = new FormData();
+			formData.append('_method', 'PUT');
 			formData.append('visimisi_type', visimisiType);
 
 			if (visimisiType === 'text') {
-				formData.append('visimisi_text', visimisi_text);
+				formData.append('visimisi', visimisi_text);
 			} else if (uploadedVisimisi) {
 				formData.append('visimisi', uploadedVisimisi);
 			}
 
-			const response = await api.post('/admin/opd/visi-misi', formData);
+			const response = await api.post(`/admin/skpd/${data.skpd.id_skpd}/visi-misi`, formData);
 
 			if (response.success) {
 				notificationType = 'success';
@@ -72,7 +74,7 @@
 					<div id="format-label" class="text-sm font-semibold text-slate-700 dark:text-slate-300">
 						Format Konten
 					</div>
-					<div role="group" aria-labelledby="format-label" class="flex rounded-lg bg-slate-100 p-1 dark:bg-slate-900">
+					<!-- <div role="group" aria-labelledby="format-label" class="flex rounded-lg bg-slate-100 p-1 dark:bg-slate-900">
 						<button
 							type="button"
 							class="rounded-md px-4 py-1.5 text-xs font-bold transition-all {visimisiType === 'text'
@@ -91,12 +93,15 @@
 						>
 							File PDF
 						</button>
-					</div>
+					</div> -->
 				</div>
 
 				{#if visimisiType === 'file'}
 					<div class="space-y-2">
-						<label for="visimisi-file" class="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+						<label
+							for="visimisi-file"
+							class="block text-sm font-semibold text-slate-700 dark:text-slate-300"
+						>
 							Unggah File PDF
 						</label>
 						<FilePond
@@ -108,10 +113,12 @@
 							label={'Seret PDF visi misi atau <span class="filepond--label-action">Telusuri</span>'}
 						/>
 					</div>
-					{#if currentVisimisi && currentVisimisi.toLowerCase().endsWith('.pdf') && !uploadedVisimisi}
+					{#if currentVisimisi && currentVisimisi
+							.toLowerCase()
+							.endsWith('.pdf') && !uploadedVisimisi}
 						<p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
 							<a
-								href={getImageUrl(currentVisimisi)}
+								href={getImageUrl('visimisi-skpd/' + currentVisimisi)}
 								target="_blank"
 								class="text-ppid-primary hover:underline">Lihat PDF saat ini</a
 							>

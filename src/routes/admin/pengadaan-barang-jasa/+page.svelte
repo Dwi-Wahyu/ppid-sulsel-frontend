@@ -258,9 +258,7 @@
 >
 	<div class="grid grid-cols-1 gap-4 md:grid-cols-4">
 		<div class="md:col-span-2">
-			<label class="block text-sm font-medium text-slate-700 dark:text-slate-300"
-				>Pencarian
-
+			<label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
 				<input
 					type="text"
 					bind:value={searchQuery}

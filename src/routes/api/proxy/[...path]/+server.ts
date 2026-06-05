@@ -21,35 +21,27 @@ export const fallback: RequestHandler = async ({ url, params, request, locals })
 
 	// Siapkan Header
 	const headers = new Headers();
+	const contentType = request.headers.get("content-type");
 
-	// Hanya teruskan header yang memang diperlukan
-	if (request.headers.get('content-type')) {
-		headers.set('content-type', request.headers.get('content-type')!);
+	if (contentType) {
+		headers.set("content-type", contentType);
 	}
 
-	headers.delete('host'); // Keamanan: hapus host agar tidak bentrok
-	headers.set('Accept', 'application/json');
+	headers.set("Accept", "application/json");
 
-	// Injeksi Token Bearer secara aman di sisi server
 	if (token) {
-		headers.set('Authorization', `Bearer ${token}`);
+		headers.set("Authorization", `Bearer ${token}`);
 	}
 
-	// Bangun URL target (menggunakan url.search untuk query params)
 	const targetUrl = `${API_URL}/${params.path}${url.search}`;
 
-	// console.log(`Proxying ${request.method} ${url.pathname} -> ${targetUrl}`);
-
 	try {
-		// Lakukan Request ke Laravel
 		const response = await fetch(targetUrl, {
 			method: request.method,
 			headers,
-			// Body hanya dikirim jika bukan metode GET/HEAD
-			body:
-				request.method !== 'GET' && request.method !== 'HEAD' ? await request.blob() : undefined,
-			// @ts-ignore - duplex diperlukan untuk streaming body di Node/Undici
-			duplex: 'half'
+			body: request.method !== "GET" && request.method !== "HEAD" ? request.body : undefined,
+			// @ts-ignore
+			duplex: "half"
 		});
 
 		// Buat response baru untuk membersihkan header yang bermasalah

@@ -290,18 +290,10 @@
 		</div>
 	</div>
 
-	<button type="button" class="text-sm hover:underline" onclick={() => (showPrivacyModal = true)}>
-		Kebijakan Privasi
-	</button>
-
-	<button type="button" class="text-sm hover:underline" onclick={() => (showTermsModal = true)}>
-		Syarat & Ketentuan
-	</button>
-
 	<FooterDialog
 		open={showPrivacyModal}
 		title="Kebijakan Privasi"
-		on:close={() => (showPrivacyModal = false)}
+		onClose={() => (showPrivacyModal = false)}
 	>
 		<div class="prose max-w-none text-ppid-text dark:text-gray-300">
 			{@html footerData?.privacy_policy || '<p>Memuat kebijakan privasi...</p>'}
@@ -311,9 +303,8 @@
 	<FooterDialog
 		open={showTermsModal}
 		title="Syarat & Ketentuan"
-		on:close={() => (showTermsModal = false)}
+		onClose={() => (showTermsModal = false)}
 	>
-		<p>Isi syarat dan ketentuan di sini...</p>
 		<div class="prose max-w-none text-ppid-text dark:text-gray-300">
 			{@html footerData?.terms_conditions || '<p>Memuat syarat dan ketentuan...</p>'}
 		</div>

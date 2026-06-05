@@ -164,7 +164,7 @@
 					>
 						<h3 class="font-bold text-slate-800 dark:text-white">Notifikasi</h3>
 						<a
-							href="/admin/notifikasi"
+							href={isAdmin ? '/admin/notifikasi' : '/opd/notifikasi'}
 							onclick={closeMenus}
 							class="text-xs font-semibold text-blue-600 hover:underline">Lihat Semua</a
 						>

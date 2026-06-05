@@ -179,8 +179,8 @@
 		<Breadcrumb
 			items={[
 				{ label: 'breadcrumb.home', href: '/' },
-				{ label: 'header.survey' },
-				{ label: 'Isi Survey' }
+				{ label: 'breadcrumb.survey' },
+				{ label: 'breadcrumb.fill_survey' }
 			]}
 		/>
 
@@ -200,18 +200,7 @@
 <main class="bg-gray-50 pt-6 pb-12 font-['Plus_Jakarta_Sans'] md:py-16 dark:bg-slate-900">
 	<div class="container mx-auto px-4">
 		<div class="mx-auto max-w-4xl">
-			<div
-				class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:p-8 dark:border-slate-700 dark:bg-slate-800"
-			>
-				<div class="mb-8 border-b border-gray-200 pb-6 dark:border-slate-700">
-					<h2 class="mb-3 text-2xl font-bold text-ppid-primary dark:text-white">
-						Isi Formulir Survey
-					</h2>
-					<p class="text-base text-gray-600 dark:text-gray-300">
-						Mohon isi data diri dan berikan penilaian Anda terhadap pelayanan kami.
-					</p>
-				</div>
-
+			<div class="space-y-8">
 				{#if errorMsg}
 					<div
 						class="mb-6 rounded-lg bg-red-50 p-4 text-red-600 dark:bg-red-900/20 dark:text-red-400"
@@ -259,7 +248,7 @@
 
 						<!-- Section 1: Data Responden -->
 						<div
-							class="md:rounded-2xl md:border-2 md:border-gray-200 md:bg-linear-to-br md:from-blue-50 md:to-white md:p-8 md:shadow-sm md:dark:border-slate-700 md:dark:from-slate-900 md:dark:to-slate-800"
+							class="rounded-2xl border-2 border-gray-200 bg-linear-to-br from-blue-50 to-white p-6 shadow-sm md:p-8 dark:border-slate-700 dark:from-slate-900 dark:to-slate-800"
 						>
 							<div class="mb-6 flex items-center gap-3">
 								<div
@@ -363,7 +352,7 @@
 
 						<!-- Section 2: Penilaian -->
 						<div
-							class="md:rounded-2xl md:border-2 md:border-gray-200 md:bg-linear-to-br md:from-amber-50 md:to-white md:p-8 md:shadow-sm md:dark:border-slate-700 md:dark:from-slate-900 md:dark:to-slate-800"
+							class="rounded-2xl border-2 border-gray-200 bg-linear-to-br from-amber-50 to-white p-6 shadow-sm md:p-8 dark:border-slate-700 dark:from-slate-900 dark:to-slate-800"
 						>
 							<div class="mb-6 flex items-center gap-3">
 								<div
@@ -391,10 +380,7 @@
 
 							<div class="space-y-8">
 								{#each questions as question, index (question.id)}
-									<div
-										class="md:rounded-xl md:border md:border-gray-200 md:bg-white md:p-6 md:transition-shadow md:hover:shadow-md md:dark:border-slate-700 md:dark:bg-slate-800"
-										id={`question-${question.id}`}
-									>
+									<div id={`question-${question.id}`}>
 										<p
 											class="mb-5 text-base leading-relaxed font-semibold text-gray-900 dark:text-white"
 										>
@@ -443,7 +429,7 @@
 
 						<!-- Section 3: Masukan -->
 						<div
-							class="rounded-2xl border-2 border-gray-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+							class="rounded-2xl border-2 border-gray-200 bg-white p-6 shadow-sm md:p-8 dark:border-slate-700 dark:bg-slate-800"
 						>
 							<div class="mb-4 flex items-center gap-3">
 								<svg

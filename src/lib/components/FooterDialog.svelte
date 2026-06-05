@@ -1,10 +1,14 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { createEventDispatcher } from 'svelte';
 
-	let { open = false, title = '', children } = $props();
+	interface Props {
+		open?: boolean;
+		title?: string;
+		children?: any;
+		onClose?: () => void;
+	}
 
-	const dispatch = createEventDispatcher();
+	let { open = false, title = '', children, onClose }: Props = $props();
 
 	let dialog: HTMLDialogElement | null = null;
 
@@ -32,7 +36,7 @@
 	});
 
 	function handleClose() {
-		dispatch('close');
+		if (onClose) onClose();
 	}
 
 	function handleBackdropClick(event: MouseEvent) {
@@ -63,36 +67,27 @@
 
 <dialog
 	bind:this={dialog}
-	class="w-full max-w-2xl rounded-2xl p-0 shadow-2xl backdrop:bg-black/50"
+	class="fixed inset-0 z-50 m-auto h-fit w-[calc(100%-2rem)] max-w-2xl overflow-hidden rounded-2xl border-none bg-white p-0 shadow-2xl backdrop:bg-slate-900/60 backdrop:backdrop-blur-sm dark:bg-slate-800"
 	onclick={handleBackdropClick}
 >
-	<div class="relative rounded-2xl bg-white p-6 dark:bg-slate-800">
+	<div class="relative p-6">
 		<!-- Header -->
 		<div class="mb-4 flex items-center justify-between">
-			<h2 class="text-lg font-semibold text-gray-800 dark:text-white">
+			<h2 class="text-xl font-bold text-gray-900 dark:text-white">
 				{title}
 			</h2>
-
-			<button
-				type="button"
-				aria-label="Close dialog"
-				class="focus:ring-primary rounded-lg p-2 hover:bg-gray-100 focus:ring-2 focus:outline-none dark:hover:bg-slate-700"
-				onclick={closeDialog}
-			>
-				✕
-			</button>
 		</div>
 
 		<!-- Content -->
-		<div class="max-h-[60vh] overflow-y-auto text-gray-600 dark:text-gray-300">
+		<div class="max-h-[70vh] overflow-y-auto text-gray-600 dark:text-gray-300">
 			{@render children?.()}
 		</div>
 
 		<!-- Footer -->
-		<div class="mt-6 flex justify-end">
+		<div class="mt-8 flex justify-end">
 			<button
 				type="button"
-				class="bg-primary hover:bg-primary/90 focus:ring-primary rounded-lg px-4 py-2 text-white focus:ring-2 focus:outline-none"
+				class="rounded-xl bg-ppid-primary px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-ppid-primary/20 transition-all hover:bg-ppid-primary-hover focus:ring-2 focus:ring-ppid-primary focus:outline-none"
 				onclick={closeDialog}
 			>
 				Tutup

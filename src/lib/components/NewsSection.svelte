@@ -63,7 +63,7 @@
 			<div class="hidden md:block">
 				<a
 					href="/berita"
-					class="group flex items-center gap-2 rounded-2xl bg-slate-900 px-8 py-4 text-sm font-bold text-white transition-all hover:bg-ppid-primary hover:shadow-xl hover:shadow-ppid-primary/20 dark:bg-slate-800"
+					class="group flex items-center gap-2 rounded-2xl bg-ppid-primary px-8 py-4 text-sm font-bold text-white transition-all hover:shadow-xl hover:shadow-ppid-primary/20 dark:bg-slate-800"
 				>
 					{m['news.view_all_button']()}
 					<svg
@@ -101,15 +101,12 @@
 						>
 							<div class="relative aspect-video overflow-hidden">
 								<img
-									src={item.image ? getImageUrl(`berita/${item.image}`) : '/img/placeholder-news.jpg'}
+									src={item.image
+										? getImageUrl(`berita/${item.image}`)
+										: '/img/placeholder-news.jpg'}
 									alt={item.title}
 									class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
 								/>
-								<div
-									class="absolute top-4 left-4 rounded-xl bg-white/90 px-3 py-1 text-[10px] font-black tracking-widest text-slate-900 uppercase backdrop-blur-md dark:bg-slate-900/90 dark:text-white"
-								>
-									{item.category}
-								</div>
 							</div>
 
 							<div class="flex flex-1 flex-col p-8">
@@ -117,7 +114,7 @@
 									{formatDate(item.date)}
 								</time>
 								<h3
-									class="mb-4 line-clamp-2 text-xl font-bold leading-tight text-slate-900 transition-colors group-hover:text-blue-600 dark:text-white"
+									class="mb-4 line-clamp-2 text-xl leading-tight font-bold text-slate-900 transition-colors group-hover:text-blue-600 dark:text-white"
 								>
 									{item.title}
 								</h3>

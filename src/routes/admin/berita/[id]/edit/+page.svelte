@@ -9,6 +9,7 @@
 	import { api } from '$lib/api';
 	import type { PageProps } from './$types';
 	import SearchableSelect from '$lib/components/SearchableSelect.svelte';
+	import { getImageUrl } from '$lib/get-image-url';
 
 	let { params }: PageProps = $props();
 
@@ -282,8 +283,5 @@
 	bind:show={showNotification}
 	theme={notificationType}
 	title={notificationType === 'success' ? 'BERHASIL' : 'GAGAL'}
-	description={notificationMessage}
-/>
-cess' ? 'BERHASIL' : 'GAGAL'}
 	description={notificationMessage}
 />

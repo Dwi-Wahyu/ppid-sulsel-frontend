@@ -8,6 +8,7 @@
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 	import type { PageProps } from './$types';
+	import { getImageUrl } from '$lib/get-image-url';
 
 	let { data, params }: PageProps = $props();
 
@@ -164,10 +165,6 @@
 							<span class="text-sm font-bold text-slate-700 dark:text-slate-200">
 								{user?.skpd?.nm_skpd ?? 'SKPD tidak diketahui'}
 							</span>
-							<span
-								class="ml-auto rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-black text-slate-500 uppercase dark:bg-slate-700"
-								>Otomatis</span
-							>
 						</div>
 					</div>
 
@@ -259,8 +256,5 @@
 	bind:show={showNotification}
 	theme={notificationType}
 	title={notificationType === 'success' ? 'BERHASIL!' : 'GAGAL!'}
-	description={notificationMessage}
-/>
-ss' ? 'BERHASIL!' : 'GAGAL!'}
 	description={notificationMessage}
 />

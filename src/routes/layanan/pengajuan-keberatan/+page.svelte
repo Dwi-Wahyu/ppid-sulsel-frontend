@@ -30,7 +30,7 @@
 </script>
 
 <div
-	class="border-b border-gray-200 bg-white font-['Plus_Jakarta_Sans'] dark:border-slate-700 dark:bg-slate-800"
+	class="border-b border-gray-200 bg-white font-['Plus_Jakarta_Sans'] dark:border-slate-700 text-gray-900 dark:bg-slate-800 dark:text-white"
 >
 	<div class="container mx-auto px-4 py-8">
 		<Breadcrumb
@@ -52,11 +52,9 @@
 <main class="bg-gray-50 pt-6 pb-12 font-['Plus_Jakarta_Sans'] md:py-16 dark:bg-slate-900">
 	<div class="container mx-auto px-4">
 		<div class="mx-auto max-w-5xl">
-			<div
-				class="relative rounded-2xl border border-gray-200 bg-white p-8 shadow-sm md:p-10 dark:border-slate-700 dark:bg-slate-800"
-			>
+			<div class="relative">
 				{#if $message}
-					<div class="mb-6 rounded-lg bg-red-100 p-4 text-red-700">
+					<div class="mb-6 rounded-lg bg-red-100 p-4 text-red-700 border border-red-200 shadow-sm">
 						{$message}
 					</div>
 				{/if}
@@ -65,7 +63,7 @@
 					<input type="text" name="website" class="hidden" bind:value={$form.website} />
 
 					<div
-						class="space-y-6 rounded-2xl md:border md:border-gray-100 md:p-6 md:dark:border-slate-700"
+						class="space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:p-8 dark:border-slate-700 text-gray-900 dark:bg-slate-800 dark:text-white"
 					>
 						<h3
 							class="flex items-center gap-3 border-b-2 border-ppid-primary/20 pb-4 text-xl font-bold text-ppid-primary dark:text-white"
@@ -96,7 +94,7 @@
 									name="nama_pemohon"
 									bind:value={$form.nama_pemohon}
 									placeholder={m['form.fullname_placeholder']()}
-									class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 dark:bg-slate-800 {$errors.nama_pemohon ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
+									class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 text-gray-900 dark:bg-slate-800 dark:text-white {$errors.nama_pemohon ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
 									aria-invalid={$errors.nama_pemohon ? 'true' : undefined}
 								/>
 								{#if $errors.nama_pemohon}<span class="text-xs text-red-500"
@@ -116,7 +114,7 @@
 									oninput={(e) => ($form.no_telp_pemohon = e.currentTarget.value.replace(/\D/g, ''))}
 									maxlength="15"
 									placeholder="08xxxxxxxxxx"
-									class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 dark:bg-slate-800 {$errors.no_telp_pemohon ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
+									class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 text-gray-900 dark:bg-slate-800 dark:text-white {$errors.no_telp_pemohon ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
 									aria-invalid={$errors.no_telp_pemohon ? 'true' : undefined}
 								/>
 								{#if $errors.no_telp_pemohon}<span class="text-xs text-red-500"
@@ -136,7 +134,7 @@
 									name="email_pemohon"
 									bind:value={$form.email_pemohon}
 									placeholder="contoh@email.com"
-									class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 dark:bg-slate-800 {$errors.email_pemohon ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
+									class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 text-gray-900 dark:bg-slate-800 dark:text-white {$errors.email_pemohon ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
 									aria-invalid={$errors.email_pemohon ? 'true' : undefined}
 								/>
 								{#if $errors.email_pemohon}<span class="text-xs text-red-500"
@@ -194,7 +192,7 @@
 									name="alamat_pemohon"
 									bind:value={$form.alamat_pemohon}
 									placeholder={m['form.address_placeholder']()}
-									class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 dark:bg-slate-800 {$errors.alamat_pemohon ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
+									class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 text-gray-900 dark:bg-slate-800 dark:text-white {$errors.alamat_pemohon ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
 									aria-invalid={$errors.alamat_pemohon ? 'true' : undefined}
 								/>
 								{#if $errors.alamat_pemohon}<span class="text-xs text-red-500"
@@ -235,7 +233,7 @@
 										id="nama_kuasa"
 										name="nama_kuasa"
 										bind:value={$form.nama_kuasa}
-										class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 dark:bg-slate-800 {$errors.nama_kuasa ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
+										class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 text-gray-900 dark:bg-slate-800 dark:text-white {$errors.nama_kuasa ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
 										aria-invalid={$errors.nama_kuasa ? 'true' : undefined}
 									/>
 									{#if $errors.nama_kuasa}<span class="text-xs text-red-500">{$errors.nama_kuasa}</span>{/if}
@@ -251,7 +249,7 @@
 										bind:value={$form.no_telp_kuasa}
 										oninput={(e) => ($form.no_telp_kuasa = e.currentTarget.value.replace(/\D/g, ''))}
 										maxlength="15"
-										class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 dark:bg-slate-800 {$errors.no_telp_kuasa ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
+										class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 text-gray-900 dark:bg-slate-800 dark:text-white {$errors.no_telp_kuasa ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
 										aria-invalid={$errors.no_telp_kuasa ? 'true' : undefined}
 									/>
 									{#if $errors.no_telp_kuasa}<span class="text-xs text-red-500">{$errors.no_telp_kuasa}</span>{/if}
@@ -285,7 +283,7 @@
 									id="alamat_kuasa"
 									name="alamat_kuasa"
 									bind:value={$form.alamat_kuasa}
-									class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 dark:bg-slate-800 {$errors.alamat_kuasa ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
+									class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 text-gray-900 dark:bg-slate-800 dark:text-white {$errors.alamat_kuasa ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
 									aria-invalid={$errors.alamat_kuasa ? 'true' : undefined}
 								/>
 								{#if $errors.alamat_kuasa}<span class="text-xs text-red-500">{$errors.alamat_kuasa}</span>{/if}
@@ -294,7 +292,7 @@
 					</div>
 
 					<div
-						class="space-y-6 rounded-2xl md:border md:border-gray-100 md:p-6 md:dark:border-slate-700"
+						class="space-y-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:p-8 dark:border-slate-700 text-gray-900 dark:bg-slate-800 dark:text-white"
 					>
 						<h3
 							class="flex items-center gap-3 border-b-2 border-ppid-primary/20 pb-4 text-xl font-bold text-ppid-primary dark:text-white"
@@ -324,7 +322,7 @@
 								name="no_pendaftaran"
 								bind:value={$form.no_pendaftaran}
 								placeholder={m['form.request_number_placeholder']()}
-								class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 dark:bg-slate-800 {$errors.no_pendaftaran ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
+								class="w-full rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 text-gray-900 dark:bg-slate-800 dark:text-white {$errors.no_pendaftaran ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
 								aria-invalid={$errors.no_pendaftaran ? 'true' : undefined}
 							/>
 							{#if $errors.no_pendaftaran}<span class="text-xs text-red-500"
@@ -342,7 +340,7 @@
 								bind:value={$form.tujuan}
 								rows="3"
 								placeholder={m['objection.purpose_placeholder']()}
-								class="w-full resize-none rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 dark:bg-slate-800 {$errors.tujuan ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
+								class="w-full resize-none rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 text-gray-900 dark:bg-slate-800 dark:text-white {$errors.tujuan ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
 								aria-invalid={$errors.tujuan ? 'true' : undefined}
 							></textarea>
 							{#if $errors.tujuan}<span class="text-xs text-red-500">{$errors.tujuan}</span>{/if}
@@ -385,14 +383,14 @@
 								bind:value={$form.kasus}
 								rows="5"
 								placeholder={m['form.case_position_placeholder']()}
-								class="w-full resize-none rounded-lg border bg-white px-4 py-3 outline-none focus:ring-2 dark:bg-slate-800 {$errors.kasus ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
+								class="w-full resize-none rounded-lg border bg-white px-4 py-3 text-gray-900 outline-none focus:ring-2 text-gray-900 dark:bg-slate-800 dark:text-white dark:text-white {$errors.kasus ? 'border-red-500 focus:border-red-500 focus:ring-red-500/20' : 'border-gray-300 focus:border-ppid-primary focus:ring-ppid-primary'}"
 								aria-invalid={$errors.kasus ? 'true' : undefined}
 							></textarea>
 							{#if $errors.kasus}<span class="text-xs text-red-500">{$errors.kasus}</span>{/if}
 						</div>
 					</div>
 
-					<div class="pt-6">
+					<div class="pt-4">
 						<div class="flex flex-col justify-end gap-4 sm:flex-row">
 							<button
 								type="submit"

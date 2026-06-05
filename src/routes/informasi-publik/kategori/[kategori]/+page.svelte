@@ -7,6 +7,7 @@
 	import { untrack } from 'svelte';
 	import type { KategoriResponse } from '$lib/types/informasi';
 	import Footer from '$lib/components/Footer.svelte';
+	import Breadcrumb from '$lib/components/Breadcrumb.svelte';
 
 	let { data } = $props();
 
@@ -115,47 +116,9 @@
 	class="border-b border-gray-200 bg-white font-['Plus_Jakarta_Sans'] dark:border-slate-700 dark:bg-slate-800"
 >
 	<div class="container mx-auto px-4 py-6">
-		<nav class="mb-4 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-			<a
-				title={m['breadcrumb.home']()}
-				href="/"
-				class="transition-colors hover:text-ppid-primary dark:text-white"
-			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="16"
-					height="16"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					stroke-width="2"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					class="h-4 w-4"
-				>
-					<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline
-						points="9 22 9 12 15 12 15 22"
-					/>
-				</svg>
-			</a>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="16"
-				height="16"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				class="h-4 w-4 text-gray-400"
-			>
-				<path d="m9 18 6-6-6-6" />
-			</svg>
-			<span class="font-medium text-ppid-primary dark:text-white">
-				{categoryTitle}
-			</span>
-		</nav>
+		<Breadcrumb
+			items={[{ label: 'menu.public_info_dropdown', href: '/' }, { label: categoryTitle }]}
+		/>
 
 		<div class="flex items-end justify-between">
 			<div>

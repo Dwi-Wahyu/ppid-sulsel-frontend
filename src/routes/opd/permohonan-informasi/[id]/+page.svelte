@@ -227,7 +227,7 @@
 				<!-- Admin Note for this Disposition -->
 				{#if myDisposition && myDisposition.catatan_disposisi}
 					<div class="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4">
-						<p class="mb-1 text-sm font-bold text-amber-800">📢 Catatan Admin:</p>
+						<p class="mb-1 text-sm font-bold text-amber-800">Catatan Admin:</p>
 						<p class="text-amber-800 italic">"{myDisposition.catatan_disposisi}"</p>
 					</div>
 				{/if}

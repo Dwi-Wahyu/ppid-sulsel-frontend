@@ -335,6 +335,5 @@
 <NotificationDialog
 	bind:show={notificationState.show}
 	title={notificationState.title}
-	message={notificationState.message}
 	theme={notificationState.type}
 />

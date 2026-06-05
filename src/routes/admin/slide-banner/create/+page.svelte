@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { PUBLIC_API_URL } from '$env/static/public';
+	import { api } from '$lib/api';
 	import FilePond from '$lib/components/FilePond.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
@@ -30,15 +30,9 @@
 			const formData = new FormData();
 			formData.append('nm_slide', nm_slide);
 
-			const response = await fetch(`${PUBLIC_API_URL}/admin/slide-banner`, {
-				method: 'POST',
-				credentials: 'include',
-				body: formData
-			});
+			const result = await api.post('/admin/slide-banner', formData);
 
-			const result = await response.json();
-
-			if (response.ok) {
+			if (result.success) {
 				notificationType = 'success';
 				notificationMessage = 'Banner berhasil ditambahkan';
 				showNotification = true;
@@ -46,14 +40,10 @@
 				setTimeout(() => {
 					goto('/admin/slide-banner');
 				}, 1500);
-			} else {
-				notificationType = 'error';
-				notificationMessage = result.message || 'Gagal menyimpan banner';
-				showNotification = true;
 			}
-		} catch (error) {
+		} catch (error: any) {
 			notificationType = 'error';
-			notificationMessage = 'Terjadi kesalahan saat menyimpan data';
+			notificationMessage = error.message || 'Terjadi kesalahan saat menyimpan data';
 			showNotification = true;
 		} finally {
 			isSaving = false;
@@ -141,7 +131,7 @@
 				type="submit"
 				disabled={isSaving}
 				aria-busy={isSaving}
-				class="rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+				class="rounded-xl bg-ppid-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-ppid-primary-hover focus:ring-2 focus:ring-ppid-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 			>
 				{isSaving ? 'Menyimpan...' : 'Simpan Banner'}
 			</button>

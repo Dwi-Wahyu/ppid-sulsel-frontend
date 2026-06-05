@@ -5,6 +5,7 @@
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
 	import type { PageData } from './$types';
+	import { getImageUrl } from '$lib/get-image-url';
 
 	let { data }: { data: PageData } = $props();
 
@@ -738,8 +739,5 @@
 	bind:show={showNotification}
 	title={notificationTitle}
 	description={notificationDescription}
-	theme={notificationTheme}
-/>
-cription={notificationDescription}
 	theme={notificationTheme}
 />

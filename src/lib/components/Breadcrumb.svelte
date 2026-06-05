@@ -13,14 +13,29 @@
 
 <nav
 	aria-label="Breadcrumb"
-	class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300"
+	class="mb-4 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300"
 >
 	<!-- Home Icon -->
-	<a href="/" class="transition-colors hover:text-ppid-primary dark:text-white" aria-label="Home">
-		<svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-			<path
-				d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"
-			></path>
+	<a
+		title={m['breadcrumb.home']()}
+		href="/"
+		class="transition-colors hover:text-ppid-primary dark:text-white"
+	>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="16"
+			height="16"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			class="h-4 w-4"
+		>
+			<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline
+				points="9 22 9 12 15 12 15 22"
+			/>
 		</svg>
 	</a>
 

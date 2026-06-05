@@ -120,7 +120,7 @@
 				: 'border-gray-300 focus:border-blue-500 focus:ring-blue-500/20'
 		} ${extraClass}`}
 	>
-		<span class:text-gray-400={!value}>{selectedLabel()}</span>
+		<span class="truncate" class:text-gray-400={!value} class:dark:text-gray-500={!value}>{selectedLabel()}</span>
 		<svg
 			class="h-5 w-5 transition-transform"
 			class:rotate-180={isOpen}
@@ -142,7 +142,7 @@
 					type="text"
 					bind:value={searchTerm}
 					placeholder="Cari..."
-					class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+					class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 outline-none focus:border-ppid-primary focus:ring-2 focus:ring-ppid-primary dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-gray-500"
 				/>
 			</div>
 
@@ -153,9 +153,9 @@
 						role="option"
 						aria-selected={value === option[idKey]}
 						onclick={() => selectOption(option)}
-						class="w-full px-4 py-2.5 text-left transition-colors hover:bg-ppid-primary/10 dark:hover:bg-ppid-primary/20 {index ===
+						class="w-full px-4 py-2.5 text-left text-gray-700 dark:text-gray-300 transition-colors hover:bg-ppid-primary/10 dark:hover:bg-ppid-primary/20 {index ===
 						highlightedIndex
-							? 'bg-ppid-primary/5'
+							? 'bg-ppid-primary/5 dark:bg-ppid-primary/10'
 							: ''} {value === option[idKey] ? 'font-semibold text-ppid-primary' : ''}"
 					>
 						{option[labelKey]}

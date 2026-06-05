@@ -32,10 +32,12 @@
 				search: currentSearch
 			});
 
-			if (response.success) {
+			console.log(response);
+
+			if (response) {
 				informasiData = response;
 			} else {
-				throw new Error(response.message || 'Gagal mengambil data');
+				throw new Error('Gagal mengambil data');
 			}
 		} catch (err: any) {
 			console.error('Fetch Error:', err);
@@ -208,14 +210,24 @@
 					<table class="w-full border-collapse text-left">
 						<thead class="bg-ppid-primary text-white">
 							<tr>
-								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase">{m['public_info.table.no']()}</th>
-								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase">{m['public_info.table.title']()}</th>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
+									>{m['public_info.table.no']()}</th
+								>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
+									>{m['public_info.table.title']()}</th
+								>
 								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
 									>{m['public_info.table.opd']()}</th
 								>
-								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase">{m['public_info.table.year']()}</th>
-								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase">{m['public_info.table.format']()}</th>
-								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase">{m['public_info.table.action']()}</th>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
+									>{m['public_info.table.year']()}</th
+								>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
+									>{m['public_info.table.format']()}</th
+								>
+								<th class="px-4 py-3 text-xs font-semibold tracking-wider uppercase"
+									>{m['public_info.table.action']()}</th
+								>
 							</tr>
 						</thead>
 						<tbody class="divide-y divide-gray-100 dark:divide-slate-700">
@@ -223,7 +235,9 @@
 								{#each Array(5) as _}
 									<tr>
 										<td colspan="6" class="px-4 py-4">
-											<div class="h-6 w-full animate-pulse rounded-md bg-gray-100 dark:bg-slate-700"></div>
+											<div
+												class="h-6 w-full animate-pulse rounded-md bg-gray-100 dark:bg-slate-700"
+											></div>
 										</td>
 									</tr>
 								{/each}
@@ -231,7 +245,10 @@
 								<tr>
 									<td colspan="6" class="py-20 text-center">
 										<p class="mb-4 text-red-500">{error}</p>
-										<button onclick={fetchData} class="rounded-lg bg-ppid-primary px-4 py-2 text-white">
+										<button
+											onclick={fetchData}
+											class="rounded-lg bg-ppid-primary px-4 py-2 text-white"
+										>
 											Coba Lagi
 										</button>
 									</td>
@@ -250,10 +267,14 @@
 										<td class="min-w-62 px-4 py-4 text-sm text-gray-600 dark:text-gray-300">
 											{item.skpd?.nm_skpd ?? '-'}
 										</td>
-										<td class="px-4 py-4 text-sm whitespace-nowrap text-gray-600 dark:text-gray-300">
+										<td
+											class="px-4 py-4 text-sm whitespace-nowrap text-gray-600 dark:text-gray-300"
+										>
 											{new Date(item.tgl_upload).getFullYear()}
 										</td>
-										<td class="px-4 py-4 text-sm whitespace-nowrap text-gray-600 dark:text-gray-300">
+										<td
+											class="px-4 py-4 text-sm whitespace-nowrap text-gray-600 dark:text-gray-300"
+										>
 											{getFileExt(item.file)}
 										</td>
 										<td class="px-4 py-4 text-sm">
@@ -294,8 +315,8 @@
 									disabled={!link.page || link.active}
 									class="rounded-md border px-4 py-1.5 text-sm font-medium transition-all
 								{link.active
-									? 'border-ppid-primary bg-ppid-primary text-white shadow-md'
-									: 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-200'}"
+										? 'border-ppid-primary bg-ppid-primary text-white shadow-md'
+										: 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-slate-600 dark:bg-slate-800 dark:text-gray-200'}"
 								>
 									{@html link.label}
 								</button>
@@ -307,3 +328,5 @@
 		</div>
 	</div>
 </main>
+
+<Footer />

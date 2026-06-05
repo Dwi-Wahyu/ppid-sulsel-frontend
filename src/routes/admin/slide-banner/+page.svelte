@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { PUBLIC_API_URL } from '$env/static/public';
 	import { getImageUrl } from '$lib/get-image-url';
 	import ConfirmationDialog from '$lib/components/ConfirmationDialog.svelte';
 	import NotificationDialog from '$lib/components/NotificationDialog.svelte';
+	import { api } from '$lib/api';
 
 	interface Banner {
 		id_slide: number;
@@ -14,7 +14,9 @@
 
 	interface PaginationData {
 		current_page: number;
-		data: Banner[];
+		data: {
+			data: Banner[];
+		};
 		next_page_url: string | null;
 		prev_page_url: string | null;
 		total: number;
@@ -43,18 +45,11 @@
 
 	async function fetchData(url: string | null = null) {
 		loading = true;
-		const targetUrl = url || `${PUBLIC_API_URL}/admin/slide-banner`;
 
 		try {
-			const response = await fetch(targetUrl, {
-				credentials: 'include',
-				headers: { Accept: 'application/json' }
-			});
+			const data: PaginationData = await api.get('/admin/slide-banner');
 
-			if (!response.ok) throw new Error('Failed to fetch');
-
-			const data: PaginationData = await response.json();
-			banners = data.data;
+			banners = data.data.data;
 			pagination = {
 				next_page_url: data.next_page_url,
 				prev_page_url: data.prev_page_url,
@@ -85,13 +80,9 @@
 
 		isDeleting = true;
 		try {
-			const response = await fetch(`${PUBLIC_API_URL}/admin/slide-banner/${deleteId}`, {
-				method: 'DELETE',
-				credentials: 'include',
-				headers: { Accept: 'application/json' }
-			});
+			const result = await api.delete(`/admin/slide-banner/${deleteId}`);
 
-			if (response.ok) {
+			if (result.success) {
 				notificationType = 'success';
 				notificationMessage = 'Banner berhasil dihapus';
 				showNotification = true;
@@ -101,10 +92,10 @@
 				notificationMessage = 'Gagal menghapus banner';
 				showNotification = true;
 			}
-		} catch (error) {
+		} catch (error: any) {
 			console.error('Delete error:', error);
 			notificationType = 'error';
-			notificationMessage = 'Terjadi kesalahan';
+			notificationMessage = error.message || 'Terjadi kesalahan';
 			showNotification = true;
 		} finally {
 			isDeleting = false;
